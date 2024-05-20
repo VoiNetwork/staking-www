@@ -1,0 +1,32 @@
+{
+  "name": "voix",
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "build-web": "turbo build --filter=web",
+    "dev": "turbo run dev --concurrency 15",
+    "lint": "turbo lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "clean": "rimraf node_modules packages/*/node_modules apps/*/node_modules apps/*/dist apps/*/.turbo packages/*/.turbo yarn.lock"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "*",
+    "@repo/typescript-config": "*",
+    "prettier": "^3.1.0",
+    "rimraf": "^5.0.5",
+    "turbo": "latest"
+  },
+  "resolutions": {
+    "strip-ansi": "6.0.0",
+    "wrap-ansi": "7.0.0",
+    "string-width": "4.1.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "yarn@1.22.19",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

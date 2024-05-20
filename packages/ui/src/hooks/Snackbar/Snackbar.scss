@@ -1,0 +1,15 @@
+@import "@repo/styles";
+
+.custom-snack-bar {
+  width: 400px;
+  border-radius: 10px !important;
+  .MuiAlert-message {
+    font-size: 13px;
+    font-weight: bold;
+    padding: 20px;
+    word-break: break-all;
+  }
+  .MuiIconButton-root {
+    margin: 10px;
+  }
+}

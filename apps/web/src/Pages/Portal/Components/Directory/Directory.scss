@@ -1,0 +1,52 @@
+@import "@repo/styles";
+
+.directory-wrapper {
+  .directory-container {
+    .dapps {
+      margin-top: 40px;
+      .dapp {
+        border-radius: 10px;
+        background: map-get($grey-colors, "F8F8F9");
+        padding: 20px;
+        .icon {
+          img {
+            border-radius: 10px;
+            width: 100%;
+          }
+        }
+        .meta {
+          margin-top: 20px;
+          display: flex;
+          justify-content: flex-start;
+          flex-direction: column;
+          row-gap: 5px;
+          .info {
+            font-size: 14px;
+            color: map-get($grey-colors, "A7A9AC");
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            &.name {
+              color: map-get($grey-colors, "A7A9AC");
+            }
+            &.link {
+              font-size: 12px;
+            }
+            &.flex {
+              display: flex;
+              flex-direction: column;
+              justify-content: flex-start;
+              row-gap: 5px;
+            }
+            &.small {
+              font-size: 13px;
+            }
+            &.space {
+              margin-top: 10px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

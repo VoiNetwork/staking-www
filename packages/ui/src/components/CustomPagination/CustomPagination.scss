@@ -1,0 +1,11 @@
+@import "@repo/styles";
+
+.custom-pagination {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  column-gap: 10px;
+  .loader {
+    vertical-align: middle;
+  }
+}

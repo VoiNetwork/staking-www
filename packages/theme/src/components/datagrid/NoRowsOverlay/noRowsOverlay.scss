@@ -1,0 +1,21 @@
+@import "@repo/styles";
+
+.no-rows-wrapper {
+  .no-rows-container {
+    margin: 20px auto;
+    color: map-get($grey-colors, "form-label");
+    text-align: center;
+    .bar {
+      width: 100%;
+      height: 15px;
+      background: map-get($grey-colors, "F8F8F9");
+      border-radius: 5px;
+      margin: 5px auto;
+    }
+    .text {
+      margin-top: 10px;
+      color: map-get($grey-colors, "A7A9AC");
+    }
+  }
+
+}

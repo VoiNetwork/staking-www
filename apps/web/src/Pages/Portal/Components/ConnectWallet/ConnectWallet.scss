@@ -1,0 +1,45 @@
+@import '@repo/styles';
+
+
+.connect-wallet {
+  .header {
+    display: flex;
+    justify-content: space-between;
+    .title {
+      font-size: 18px;
+    }
+  }
+  .connect-wallet-wrapper {
+    .connect-wallet-container {
+      .connect-wallet-body {
+        margin-top: 5px;
+        .provider {
+          padding: 15px;
+          border-radius: 5px;
+          &.selected {
+            background: map-get($grey-colors, "light-grey");
+          }
+          .provider-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .provider-wallets {
+            margin-top: 15px;
+            border-radius: 5px;
+            background: map-get($grey-colors, "F8F8F9");
+            color: map-get($grey-colors, "form-label");
+          }
+          .icon {
+            vertical-align: middle;
+            margin-right: 15px;
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+          }
+        }
+      }
+    }
+  }
+}
+
