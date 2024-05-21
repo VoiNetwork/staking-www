@@ -12,7 +12,7 @@ import {
 } from "@repo/algocore";
 import voiXUtils from "../../utils/voiXUtils";
 
-export interface Node {
+export interface NodeState {
   loading: boolean;
   status: A_Status;
   health: boolean;
@@ -21,7 +21,7 @@ export interface Node {
   genesis: A_Genesis;
 }
 
-const initialState: Node = {
+const initialState: NodeState = {
   loading: false,
   versionsCheck: {
     genesis_id: "",
