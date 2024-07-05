@@ -1,18 +1,14 @@
 import { AsyncThunk, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { loadNodeDetails } from "../network/nodeReducer";
+import { loadNodes } from "../network/nodesReducer";
 
-export type AppState = {
-  isDevMode: boolean;
-};
-const initialState: AppState = {
-  isDevMode: false,
-};
+export type AppState = {};
+const initialState: AppState = {};
 
 export const initApp: AsyncThunk<void, void, {}> = createAsyncThunk(
   "app/initApp",
   async (_, thunkAPI) => {
     const { dispatch } = thunkAPI;
-    dispatch(loadNodeDetails());
+    dispatch(loadNodes());
   },
 );
 

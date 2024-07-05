@@ -39,7 +39,7 @@ export function CustomPagination({
           showLastButton
           count={pageCount}
           page={page + 1}
-          onChange={(event, value) => {
+          onChange={(_, value) => {
             if (value === pageCount && onLastPage) {
               onLastPage();
             }

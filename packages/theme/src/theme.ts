@@ -64,6 +64,11 @@ export const theme = createTheme({
             background: ThemeColors.Secondary,
           },
         },
+        containedError: {
+          ":hover": {
+            background: ThemeColors.Error,
+          },
+        },
         contained: {
           "&.primary-light-button": {
             background: ThemeColors.PrimaryLight,
@@ -75,29 +80,43 @@ export const theme = createTheme({
           },
           "&.secondary-light-button": {
             background: ThemeColors.SecondaryLight,
-            color: GreyColors.A7A9AC,
+            color: GreyColors.FormLabel,
             ":hover": {
               background: ThemeColors.SecondaryLight,
-              color: GreyColors.A7A9AC,
+              color: GreyColors.FormLabel,
             },
           },
           "&.error-light-button": {
             background: ThemeColors.ErrorLight,
-            color: GreyColors.FormLabel,
+            color: GreyColors.FormValue,
+            ":hover": {
+              background: ThemeColors.ErrorLight,
+              color: GreyColors.FormValue,
+            },
           },
           "&.black-button": {
             background: BaseColors.Black,
             color: BaseColors.White,
+            ":hover": {
+              background: BaseColors.Black,
+              color: BaseColors.White,
+            },
           },
           "&.grey-button": {
             background: GreyColors.F8F8F9,
             color: GreyColors.FormLabel,
             ":hover": {
               background: GreyColors.F8F8F9,
+              color: GreyColors.FormLabel,
             },
           },
-          "&.white-background-button": {
-            background: BaseColors.White,
+          "&.dark-grey-button": {
+            background: GreyColors.ECEFF2,
+            color: GreyColors.FormValue,
+            ":hover": {
+              background: GreyColors.ECEFF2,
+              color: GreyColors.FormValue,
+            },
           },
         },
         outlined: {
@@ -122,6 +141,14 @@ export const theme = createTheme({
               color: GreyColors.A7A9AC,
             },
           },
+          "&.error-light-button": {
+            borderColor: ThemeColors.ErrorLight,
+            color: ThemeColors.Error,
+            ":hover": {
+              borderColor: ThemeColors.ErrorLight,
+              color: ThemeColors.Error,
+            },
+          },
         },
       },
     },
@@ -140,6 +167,18 @@ export const theme = createTheme({
                   fontSize: "14px",
                 },
               },
+            },
+          },
+        },
+      },
+    },
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          "&.grey-border-icon": {
+            border: `1px solid ${GreyColors.LightGrey}`,
+            svg: {
+              color: GreyColors.FormLabel,
             },
           },
         },
@@ -185,7 +224,7 @@ export const theme = createTheme({
             color: GreyColors.A7A9AC,
           },
           "&.warning-light-alert": {
-            backgroundColor: "#FAECEA",
+            backgroundColor: ThemeColors.WarningLight,
             color: GreyColors.FormValue,
             svg: {
               color: GreyColors.FormValue,
@@ -195,16 +234,58 @@ export const theme = createTheme({
             backgroundColor: ThemeColors.Error,
             color: BaseColors.White,
           },
+          "&.error-light-alert": {
+            backgroundColor: ThemeColors.ErrorLight,
+            color: GreyColors.FormValue,
+          },
           "&.success-snack-bar": {
             backgroundColor: ThemeColors.SecondaryLight,
             color: GreyColors.FormValue,
           },
           "&.error-snack-bar": {
-            backgroundColor: "#FAECEA",
+            backgroundColor: ThemeColors.WarningLight,
             color: GreyColors.FormValue,
           },
           "&.round": {
             borderRadius: "10px",
+          },
+        },
+      },
+    },
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          "&.form-value": {
+            color: GreyColors.FormValue,
+            textDecorationColor: GreyColors.FormValue,
+            "&:hover": {
+              color: GreyColors.FormValue,
+              textDecorationColor: GreyColors.FormValue,
+            },
+          },
+          "&.form-label": {
+            color: GreyColors.FormLabel,
+            textDecorationColor: GreyColors.FormLabel,
+            "&:hover": {
+              color: GreyColors.FormLabel,
+              textDecorationColor: GreyColors.FormLabel,
+            },
+          },
+          "&.A7A9AC": {
+            color: GreyColors.A7A9AC,
+            textDecorationColor: GreyColors.A7A9AC,
+            "&:hover": {
+              color: GreyColors.A7A9AC,
+              textDecorationColor: GreyColors.A7A9AC,
+            },
+          },
+          "&.black": {
+            color: BaseColors.Black,
+            textDecorationColor: BaseColors.Black,
+            "&:hover": {
+              color: BaseColors.Black,
+              textDecorationColor: BaseColors.Black,
+            },
           },
         },
       },
@@ -226,6 +307,11 @@ export const theme = createTheme({
               },
             },
           },
+          "&.round": {
+            ".MuiPaper-root": {
+              borderRadius: "10px !important",
+            },
+          },
         },
       },
     },
@@ -239,10 +325,44 @@ export const theme = createTheme({
         },
       },
     },
+    MuiTableContainer: {
+      styleOverrides: {
+        root: {
+          "&.simple-table": {
+            width: "100%",
+            borderRadius: "5px",
+            boxShadow: "none !important",
+            border: `1px solid ${GreyColors.ECEFF2}`,
+            th: {
+              fontSize: "14px",
+              background: BaseColors.White,
+              color: GreyColors.FormLabel,
+            },
+            td: {
+              color: GreyColors.A7A9AC,
+            },
+            "th, td": {
+              fontSize: "14px",
+              padding: "5px 10px",
+              borderColor: GreyColors.ECEFF2,
+            },
+            tbody: {
+              ".MuiTableRow-root": {
+                "&:last-child": {
+                  td: {
+                    border: "none !important",
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     MuiTabs: {
       styleOverrides: {
         root: {
-          "&.explorer-tabs": {
+          "&.black-small-tabs": {
             "& .MuiButtonBase-root": {
               color: GreyColors.FormLabel,
             },
@@ -271,6 +391,25 @@ export const theme = createTheme({
               backgroundColor: BaseColors.Black,
             },
           },
+          "&.vertical-pills": {
+            ".MuiButtonBase-root.Mui-selected": {
+              backgroundColor: `${BaseColors.White} !important`,
+              color: `${BaseColors.Black} !important`,
+            },
+            ".MuiButtonBase-root": {
+              minHeight: "50px",
+              marginBottom: "20px",
+              justifyContent: "flex-start",
+              fontSize: "16px",
+              color: `${BaseColors.White}`,
+            },
+            ".MuiTabs-indicator": {
+              display: "none",
+            },
+            ".MuiTab-iconWrapper": {
+              marginRight: "15px !important",
+            },
+          },
         },
       },
     },
@@ -278,7 +417,6 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           "&.classic-select": {
-            width: "100%",
             fontSize: "13px",
             marginTop: "5px",
             color: GreyColors.A7A9AC,

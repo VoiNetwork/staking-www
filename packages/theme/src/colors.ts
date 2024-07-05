@@ -13,16 +13,18 @@ export enum GreyColors {
   A7A9AC = "#A7A9AC",
   E6E7E8 = "#E6E7E8",
   D9D9D9 = "#D9D9D9",
+  F9FAFB = "#F9FAFB",
+  ECEFF2 = "#ECEFF2",
 }
 
 export enum ThemeColors {
-  Primary = "#9B95C9",
+  Primary = "#6f2ae2",
   Secondary = "#82CA9C",
   Info = "#00C0F3",
   Warning = "#FFE293",
   Error = "#F69679",
   PrimaryLight = "#E0DEF0",
   SecondaryLight = "#D8EDDD",
-  WarningLight = "#FBBEA7",
+  WarningLight = "#FAECEA",
   ErrorLight = "#FABEA7",
 }

@@ -1,0 +1,15 @@
+@import '@repo/styles';
+
+.wallet-widget-wrapper {
+  .wallet-widget-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    column-gap: 10px;
+    img.provider-logo {
+      width: 20px;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+  }
+}

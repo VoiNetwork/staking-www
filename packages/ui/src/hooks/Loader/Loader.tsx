@@ -1,5 +1,4 @@
 import { createContext, useContext, useState } from "react";
-// @ts-ignore
 import loaderImg from "./loader.gif";
 import "./Loader.scss";
 

@@ -2,8 +2,9 @@ import {
   AlgodTokenHeader,
   CustomTokenHeader,
   IndexerTokenHeader,
-  KMDTokenHeader,
+  TransactionType,
 } from "algosdk";
+import { TransactionResult } from "@algorandfoundation/algokit-utils/types/indexer";
 
 export type AlgodConnectionParams = {
   url: string;
@@ -11,16 +12,18 @@ export type AlgodConnectionParams = {
   token: string | AlgodTokenHeader | CustomTokenHeader;
 };
 
-export type KmdConnectionParams = {
-  url: string;
-  port: string;
-  token: string | KMDTokenHeader | CustomTokenHeader;
-};
-
 export type IndexerConnectionParams = {
   url: string;
   port: string;
   token: string | IndexerTokenHeader | CustomTokenHeader;
+};
+
+export type NodeConnectionParams = {
+  id: string;
+  label: string;
+  name: string;
+  algod: AlgodConnectionParams;
+  indexer: IndexerConnectionParams;
 };
 
 export type A_VersionsCheck = {
@@ -64,14 +67,14 @@ export interface A_Health {
   version: string;
 }
 
-export type NodeConnectionParams = {
-  id: string;
-  label: string;
-  name: string;
-  algod: AlgodConnectionParams;
-  indexer: IndexerConnectionParams;
+export type GenesisAccountAlloc = {
+  addr: string;
+  comment: string;
+  state: {
+    algo: number;
+    onl: number;
+  };
 };
-
 export type A_Genesis = {
   fees: string;
   proto: string;
@@ -79,4 +82,22 @@ export type A_Genesis = {
   timestamp: number;
   devmode: boolean;
   network: string;
+  alloc: GenesisAccountAlloc[];
+};
+
+export type A_Block = {
+  round: number;
+  timestamp: number;
+  "txn-counter": number;
+  transactions: TransactionResult[];
+};
+
+export type A_BlockTxnTypesStats = {
+  [TransactionType.pay]: number;
+  [TransactionType.appl]: number;
+  [TransactionType.afrz]: number;
+  [TransactionType.acfg]: number;
+  [TransactionType.axfer]: number;
+  [TransactionType.stpf]: number;
+  [TransactionType.keyreg]: number;
 };

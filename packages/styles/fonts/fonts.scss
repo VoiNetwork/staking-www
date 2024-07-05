@@ -1,0 +1,27 @@
+@mixin font-face(
+  $font-name,
+  $font-weight
+) {
+  @font-face {
+    font-family: $font-name;
+    font-weight: $font-weight;
+    src:
+        url("./Rubik/Rubik-VariableFont_wght.ttf")
+        format("ttf"),
+        url("./Rubik/Rubik-VariableFont_wght.ttf")
+        format("truetype")
+  }
+}
+
+@include font-face("Rubik", 400);
+@include font-face("RubikLight", 300);
+@include font-face("RubikThin", 100);
+@include font-face("RubikBold", 600);
+
+body {
+  font-family: "Rubik", "Rubik", sans-serif;
+}
+
+* {
+  font-family: "Rubik", sans-serif !important;
+}

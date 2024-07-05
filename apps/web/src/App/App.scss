@@ -2,5 +2,31 @@
 
 .app-root {
   .app-container {
+    .app-container-body {
+      display: flex;
+      justify-content: start;
+      .app-left {
+        width: 250px;
+      }
+      .app-right {
+        width: calc(100% - 250px);
+        .content-wrapper {
+          height: calc(100vh);
+          overflow: auto;
+          .content-container {
+            .content-header {
+              border-bottom: 1px solid map-get($grey-colors, "F8F8F9");
+              padding: 15px 20px;
+              display: flex;
+              justify-content: flex-end;
+              align-items: center;
+            }
+            .content-body {
+              margin: 20px 60px;
+            }
+          }
+        }
+      }
+    }
   }
 }

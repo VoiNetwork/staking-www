@@ -12,7 +12,7 @@ export function LoadingTile({ count = 5 }: LoadingTileProps): ReactElement {
         <div className="wrapper">
           <div className="wrapper-cell">
             <div className="text">
-              {[...Array(count)].map((value, index) => {
+              {[...Array(count)].map((_, index) => {
                 return <div className="text-line" key={index}></div>;
               })}
             </div>

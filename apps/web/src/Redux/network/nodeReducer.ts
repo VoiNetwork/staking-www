@@ -8,9 +8,11 @@ import {
   A_Genesis,
   A_Status,
   A_VersionsCheck,
+  IdxClient,
+  Indexer_Health,
   NodeClient,
 } from "@repo/algocore";
-import voiXUtils from "../../utils/voiXUtils";
+import voiStaking from "../../utils/voiStakingUtils";
 
 export interface NodeState {
   loading: boolean;
@@ -19,6 +21,9 @@ export interface NodeState {
   ready: boolean;
   versionsCheck: A_VersionsCheck;
   genesis: A_Genesis;
+  indexer: {
+    health: Indexer_Health;
+  };
 }
 
 const initialState: NodeState = {
@@ -61,6 +66,17 @@ const initialState: NodeState = {
     rwd: "",
     timestamp: 0,
     devmode: false,
+    alloc: [],
+  },
+  indexer: {
+    health: {
+      "db-available": false,
+      errors: [],
+      "is-migrating": false,
+      message: "",
+      round: 0,
+      version: "",
+    },
   },
 };
 
@@ -70,25 +86,32 @@ export const loadNodeDetails: AsyncThunk<void, void, {}> = createAsyncThunk(
     const { dispatch } = thunkAPI;
     try {
       dispatch(setLoading(true));
-      const network = voiXUtils.network;
+      const network = voiStaking.network;
       const nodeClient = new NodeClient(network);
+
+      const idxClient = new IdxClient(network);
 
       const statusAwait = nodeClient.status();
       const versionsCheckAwait = nodeClient.versionsCheck();
       const genesisAwait = nodeClient.genesis();
       const healthAwait = nodeClient.health();
 
-      const [status, versionsCheck, genesis, health] = await Promise.all([
-        statusAwait,
-        versionsCheckAwait,
-        genesisAwait,
-        healthAwait,
-      ]);
+      const idxHealthAwait = idxClient.health();
+
+      const [status, versionsCheck, genesis, health, idxHealth] =
+        await Promise.all([
+          statusAwait,
+          versionsCheckAwait,
+          genesisAwait,
+          healthAwait,
+          idxHealthAwait,
+        ]);
 
       dispatch(setStatus(status));
       dispatch(setVersions(versionsCheck));
       dispatch(setGenesis(genesis));
       dispatch(setHealth(health));
+      dispatch(setIndexerHealth(idxHealth));
       dispatch(setLoading(false));
     } catch (e: any) {
       dispatch(setLoading(false));
@@ -109,15 +132,28 @@ export const nodeSlice = createSlice({
     setHealth: (state, action: PayloadAction<boolean>) => {
       state.health = action.payload;
     },
+    setReady: (state, action: PayloadAction<boolean>) => {
+      state.ready = action.payload;
+    },
     setVersions: (state, action: PayloadAction<A_VersionsCheck>) => {
       state.versionsCheck = action.payload;
     },
     setGenesis: (state, action: PayloadAction<A_Genesis>) => {
       state.genesis = action.payload;
     },
+    setIndexerHealth: (state, action: PayloadAction<Indexer_Health>) => {
+      state.indexer.health = action.payload;
+    },
   },
 });
 
-export const { setLoading, setVersions, setStatus, setGenesis, setHealth } =
-  nodeSlice.actions;
+export const {
+  setLoading,
+  setVersions,
+  setStatus,
+  setGenesis,
+  setHealth,
+  setReady,
+  setIndexerHealth,
+} = nodeSlice.actions;
 export default nodeSlice.reducer;

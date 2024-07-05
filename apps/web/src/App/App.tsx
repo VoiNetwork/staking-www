@@ -4,11 +4,12 @@ import AppRouter from "./Router/AppRouter";
 import { useAppDispatch } from "../Redux/store";
 import { initApp } from "../Redux/app/appReducer";
 import {
-  PROVIDER_ID,
-  useInitializeProviders,
+  NetworkId,
+  WalletId,
+  WalletManager,
   WalletProvider,
-} from "@txnlab/use-wallet";
-import { nodeParams } from "../utils/voiXUtils";
+} from "@txnlab/use-wallet-react";
+import { getPreConfiguredNodes } from "../Redux/network/nodesReducer";
 
 function App(): ReactElement {
   const dispatch = useAppDispatch();
@@ -16,22 +17,30 @@ function App(): ReactElement {
     dispatch(initApp());
   }, []);
 
-  const useWalletConfig = useInitializeProviders({
-    providers: [{ id: PROVIDER_ID.KIBISIS }],
-    nodeConfig: {
-      network: nodeParams.name,
-      nodeServer: nodeParams.algod.url,
+  const node = getPreConfiguredNodes()[0];
+  const walletManager = new WalletManager({
+    wallets: [
+      WalletId.DEFLY,
+      WalletId.KIBISIS,
+      {
+        id: WalletId.LUTE,
+        options: { siteName: "VoiX" },
+      },
+    ],
+    algod: {
+      baseServer: node.algod.url,
+      port: node.algod.port,
+      token: node.algod.token,
     },
+    network: NetworkId.TESTNET,
   });
 
   return (
     <div className="app-root">
       <div className="app-wrapper">
-        <div className="app-container">
-          <WalletProvider value={useWalletConfig}>
-            <AppRouter></AppRouter>
-          </WalletProvider>
-        </div>
+        <WalletProvider manager={walletManager}>
+          <AppRouter></AppRouter>
+        </WalletProvider>
       </div>
     </div>
   );

@@ -1,0 +1,27 @@
+@import '@repo/styles';
+
+.left-panel-wrapper {
+  .left-panel-container {
+    height: calc(100vh);
+    background: map-get($theme-colors, "primary");
+    .logo {
+      color: map-get($base-colors, "white");
+      font-size: 24px;
+      text-align: center;
+      padding: 20px 0;
+      border-bottom: 1px solid map-get($base-colors, "white");
+    }
+    .nav-tabs {
+      margin: 50px auto 0;
+      .MuiButtonBase-root {
+        &:hover {
+          cursor: pointer;
+          svg {
+            transform: rotate(360deg);
+            transition: all 0.3s ease-in-out 0s;
+          }
+        }
+      }
+    }
+  }
+}

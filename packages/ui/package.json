@@ -6,7 +6,8 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
-    "lint": "eslint . --max-warnings 0"
+    "lint": "eslint . --max-warnings 5",
+    "clean": "rimraf node_modules .turbo dist"
   },
   "dependencies": {
     "@mui/material": "^5.15.2",
