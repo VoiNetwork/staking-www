@@ -19,6 +19,7 @@
     "@repo/theme": "*",
     "@repo/ui": "*",
     "@repo/utils": "*",
+    "@repo/voix": "*",
     "@rollup/plugin-inject": "^5.0.5",
     "@txnlab/use-wallet-react": "^3.0.0-rc.3",
     "@types/humanize-duration": "^3.27.4",

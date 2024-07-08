@@ -15,7 +15,7 @@
           overflow: auto;
           .content-container {
             .content-header {
-              border-bottom: 1px solid map-get($grey-colors, "F8F8F9");
+              border-bottom: 1px solid map-get($grey-colors, "light-grey");
               padding: 15px 20px;
               display: flex;
               justify-content: flex-end;
@@ -23,6 +23,9 @@
             }
             .content-body {
               margin: 20px 60px;
+              .info-msg {
+                color: map-get($grey-colors, "A7A9AC");
+              }
             }
           }
         }

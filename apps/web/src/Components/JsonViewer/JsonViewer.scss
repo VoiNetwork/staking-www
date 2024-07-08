@@ -1,0 +1,17 @@
+@import "@repo/styles";
+
+.json-viewer-wrapper {
+  .json-viewer-container {
+    .json-actions {
+      display: flex;
+      justify-content: flex-start;
+      column-gap: 10px;
+      align-items: center;
+    }
+    .json-content {
+      font-size: 13px;
+      word-break: break-all;
+      margin-top: 25px;
+    }
+  }
+}

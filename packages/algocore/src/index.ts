@@ -10,3 +10,4 @@ export * from "./utils/utils";
 export * from "./clients/idxClient";
 export * from "./CoreClasses/CoreIndexer";
 export * from "./explorer/blockPackExplorer";
+export * from "./clients/blockClient";

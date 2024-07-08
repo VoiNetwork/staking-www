@@ -4,9 +4,12 @@ import LeftPanel from "../../Components/LeftPanel/LeftPanel";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import WalletWidget from "../../Components/WalletWidget/WalletWidget";
+import Overview from "../../Pages/Overview/Overview";
+import { useWallet } from "@txnlab/use-wallet-react";
 
 function AppRouter(): ReactElement {
   const { selectedNode } = useSelector((state: RootState) => state.nodes);
+  const { activeAccount } = useWallet();
 
   return (
     <HashRouter>
@@ -23,26 +26,34 @@ function AppRouter(): ReactElement {
                 </div>
                 {selectedNode && (
                   <div className="content-body">
-                    <Routes>
-                      <Route
-                        path="/overview"
-                        element={<div>Overview</div>}
-                      ></Route>
-                      <Route path="/stake" element={<div>Stake</div>}></Route>
-                      <Route
-                        path="/deposit"
-                        element={<div>Deposit</div>}
-                      ></Route>
-                      <Route
-                        path="/withdraw"
-                        element={<div>Withdraw</div>}
-                      ></Route>
-                      <Route path="/config" element={<div>Config</div>}></Route>
-                      <Route
-                        path="*"
-                        element={<Navigate to="/overview" replace />}
-                      />
-                    </Routes>
+                    {activeAccount && (
+                      <Routes>
+                        <Route
+                          path="/overview"
+                          element={<Overview></Overview>}
+                        ></Route>
+                        <Route path="/stake" element={<div>Stake</div>}></Route>
+                        <Route
+                          path="/deposit"
+                          element={<div>Deposit</div>}
+                        ></Route>
+                        <Route
+                          path="/withdraw"
+                          element={<div>Withdraw</div>}
+                        ></Route>
+                        <Route
+                          path="/config"
+                          element={<div>Config</div>}
+                        ></Route>
+                        <Route
+                          path="*"
+                          element={<Navigate to="/overview" replace />}
+                        />
+                      </Routes>
+                    )}
+                    {!activeAccount && (
+                      <div className="info-msg">Please connect your wallet</div>
+                    )}
                   </div>
                 )}
               </div>

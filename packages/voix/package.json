@@ -1,0 +1,32 @@
+{
+  "name": "@repo/voix",
+  "version": "1.0.0",
+  "license": "ISC",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "lint": "eslint . --max-warnings 5",
+    "clean": "rimraf node_modules .turbo dist"
+  },
+  "dependencies": {
+    "@algorandfoundation/algokit-utils": "^6.0.5",
+    "@types/axios": "^0.14.0",
+    "@types/dateformat": "^5.0.2",
+    "@types/humanize-duration": "^3.27.4",
+    "@types/is-utf8": "^0.2.3",
+    "algosdk": "^2.7.0",
+    "axios": "^1.6.7",
+    "dateformat": "^5.0.3",
+    "humanize-duration": "^3.31.0",
+    "is-utf8": "^0.2.1",
+    "multiformats": "^13.1.0"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "*",
+    "@repo/typescript-config": "*",
+    "@types/eslint": "^8.44.7",
+    "eslint": "^8.53.0",
+    "typescript": "^5.2.2"
+  }
+}
