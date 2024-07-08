@@ -9,6 +9,7 @@ import {
   Payments,
   SettingsOutlined,
 } from "@mui/icons-material";
+import logo from "../../assets/images/full-logo.png";
 
 function LeftPanel(): ReactElement {
   const location = useLocation();
@@ -26,7 +27,9 @@ function LeftPanel(): ReactElement {
   return (
     <div className="left-panel-wrapper">
       <div className="left-panel-container">
-        <div className="logo">VoiX</div>
+        <div className="logo">
+          <img src={logo} alt={"logo"} />
+        </div>
         <div className="nav-tabs">
           <Tabs
             value={route}
