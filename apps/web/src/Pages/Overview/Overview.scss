@@ -46,6 +46,17 @@
           font-size: 24px;
         }
       }
+
+      .lockup-details {
+        margin-top: 50px;
+        .lockup-details-header {
+          font-size: 20px;
+          margin-bottom: 20px;
+        }
+        .lockup-actions {
+          margin-top: 20px;
+        }
+      }
     }
   }
 }

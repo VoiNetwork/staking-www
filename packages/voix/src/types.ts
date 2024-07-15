@@ -1,4 +1,9 @@
-export interface ContractDetails {
+import {
+  BinaryState,
+  IntegerState,
+} from "./clients/SmartContractStakingClient";
+
+export type ContractDetails = {
   contractId: number;
   contractAddress: string;
   creator: string;
@@ -16,4 +21,12 @@ export interface ContractDetails {
   part_vote_kd: string | null;
   part_sp_key: string | null;
   deleted: number;
-}
+};
+
+export type StakingContractState = {
+  funder?: BinaryState;
+  funding?: IntegerState;
+  owner?: BinaryState;
+  period?: IntegerState;
+  total?: IntegerState;
+};
