@@ -14,6 +14,25 @@
     }
     .overview-body {
       margin-top: 20px;
+      .props {
+        margin: 40px 0;
+        .prop {
+          margin: 20px 0;
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+          column-gap: 20px;
+          .key {
+            font-size: 14px;
+            width: 150px;
+          }
+          .val {
+            font-size: 14px;
+            color: map-get($grey-colors, "form-value");
+          }
+        }
+      }
+
       .tile {
         border-radius: 10px;
         background: map-get($grey-colors, "F8F8F9");

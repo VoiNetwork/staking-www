@@ -32,4 +32,8 @@ export class BlockPackExplorer {
   openAddress(address: string): void {
     window.open(`${this.getBaseUrl()}/account/${address}`, "_blank");
   }
+
+  openApplication(appId: number): void {
+    window.open(`${this.getBaseUrl()}/application/${appId}`, "_blank");
+  }
 }

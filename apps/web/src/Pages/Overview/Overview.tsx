@@ -8,7 +8,9 @@ import { RootState } from "../../Redux/store";
 import {
   AccountClient,
   BlockClient,
+  BlockPackExplorer,
   CoreAccount,
+  CoreNode,
   NodeClient,
 } from "@repo/algocore";
 import voiStakingUtils from "../../utils/voiStakingUtils";
@@ -37,6 +39,17 @@ function Overview(): ReactElement {
   const [isMetadataVisible, setMetadataVisibility] = useState<boolean>(false);
 
   const isDataLoading = loading || loadingContract || loadingStakingAccount;
+
+  const { genesis, health, versionsCheck, status, ready } = useSelector(
+    (state: RootState) => state.node,
+  );
+  const coreNodeInstance = new CoreNode(
+    status,
+    versionsCheck,
+    genesis,
+    health,
+    ready,
+  );
 
   async function loadStakingAccount(address: string): Promise<void> {
     try {
@@ -109,7 +122,7 @@ function Overview(): ReactElement {
     <div className="overview-wrapper">
       <div className="overview-container">
         <div className="overview-header">
-          <div>Overview</div>
+          <div>Staking Overview</div>
           <div>
             <Button
               variant={"contained"}
@@ -136,6 +149,50 @@ function Overview(): ReactElement {
           {isDataLoading && <LoadingTile></LoadingTile>}
           {!isDataLoading && stakingAccount && (
             <div>
+              <div className="props">
+                <div className="prop">
+                  <div className="key">Your Account</div>
+                  <div
+                    className="val hover hover-underline underline"
+                    onClick={() => {
+                      new BlockPackExplorer(coreNodeInstance).openAddress(
+                        activeAccount?.address || "",
+                      );
+                    }}
+                  >
+                    {activeAccount?.address}
+                  </div>
+                </div>
+                <div className="prop">
+                  <div className="key">Staking Account</div>
+                  <div
+                    className="val hover hover-underline underline"
+                    onClick={() => {
+                      new BlockPackExplorer(coreNodeInstance).openAddress(
+                        stakingAccount?.address,
+                      );
+                    }}
+                  >
+                    {stakingAccount.address}
+                  </div>
+                </div>
+                <div className="prop">
+                  <div className="key">Staking Contract</div>
+                  {contractDetails?.contractId && (
+                    <div
+                      className="val hover hover-underline underline"
+                      onClick={() => {
+                        new BlockPackExplorer(coreNodeInstance).openApplication(
+                          contractDetails?.contractId,
+                        );
+                      }}
+                    >
+                      {contractDetails?.contractId}
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
                   <div className="tile">
