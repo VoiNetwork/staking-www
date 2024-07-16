@@ -1,7 +1,7 @@
 import "./Overview.scss";
 import { ReactElement, useEffect, useState } from "react";
 import { useWallet } from "@txnlab/use-wallet-react";
-import { LoadingTile, useLoader, useSnackbar } from "@repo/ui";
+import { LoadingTile, useSnackbar } from "@repo/ui";
 import {
   ContractDetails,
   CoreStaker,
@@ -24,15 +24,14 @@ import { Button, Grid } from "@mui/material";
 import { microalgosToAlgos } from "algosdk";
 import { NumericFormat } from "react-number-format";
 import JsonViewer from "../../Components/JsonViewer/JsonViewer";
-import { waitForConfirmation } from "@algorandfoundation/algokit-utils";
+import Lockup from "./Lockup/Lockup";
 
 function Overview(): ReactElement {
   const { loading } = useSelector((state: RootState) => state.node);
 
-  const { activeAccount, transactionSigner } = useWallet();
+  const { activeAccount } = useWallet();
 
-  const { showException, showSnack } = useSnackbar();
-  const { showLoader, hideLoader } = useLoader();
+  const { showException } = useSnackbar();
 
   const [loadingContract, setLoadingContract] = useState<boolean>(false);
   const [contractDetails, setContractDetails] =
@@ -64,6 +63,9 @@ function Overview(): ReactElement {
     health,
     ready,
   );
+
+  const [isLockupModalVisible, setLockupModalVisibility] =
+    useState<boolean>(false);
 
   async function loadStakingAccount(address: string): Promise<void> {
     try {
@@ -146,34 +148,6 @@ function Overview(): ReactElement {
       }
     }
   }, [stakingAccount]);
-
-  async function lockup(contractDetails: ContractDetails) {
-    try {
-      showLoader("Opting for lockup");
-      const txn = await new CoreStaker(contractDetails).lock(
-        voiStakingUtils.network.getAlgodClient(),
-        2,
-        {
-          addr: activeAccount?.address || "",
-          signer: transactionSigner,
-        },
-      );
-      await waitForConfirmation(
-        txn.txID(),
-        20,
-        voiStakingUtils.network.getAlgodClient(),
-      );
-      showSnack("Transaction successful", "success");
-
-      if (activeAccount?.address) {
-        loadContractDetails(activeAccount?.address);
-      }
-    } catch (e) {
-      showException(e);
-    } finally {
-      hideLoader();
-    }
-  }
 
   return (
     <div className="overview-wrapper">
@@ -333,15 +307,26 @@ function Overview(): ReactElement {
                             </div>
                             <div className="lockup-actions">
                               <Button
-                                variant={"contained"}
+                                variant={"outlined"}
                                 color={"primary"}
-                                size={"small"}
                                 onClick={() => {
-                                  lockup(contractDetails);
+                                  setLockupModalVisibility(true);
                                 }}
                               >
                                 Lock
                               </Button>
+                              <Lockup
+                                show={isLockupModalVisible}
+                                contractDetails={contractDetails}
+                                address={activeAccount.address}
+                                onClose={() => {
+                                  setLockupModalVisibility(false);
+                                }}
+                                onSuccess={() => {
+                                  loadContractDetails(activeAccount.address);
+                                  setLockupModalVisibility(false);
+                                }}
+                              ></Lockup>
                             </div>
                           </div>
                         )}
