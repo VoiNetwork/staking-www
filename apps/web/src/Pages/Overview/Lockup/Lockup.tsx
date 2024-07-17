@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { ModalGrowTransition } from "@repo/theme";
-import { ContractDetails, CoreStaker } from "@repo/voix";
+import { AccountData, CoreStaker } from "@repo/voix";
 import voiStakingUtils from "../../../utils/voiStakingUtils";
 import { waitForConfirmation } from "@algorandfoundation/algokit-utils";
 import { useWallet } from "@txnlab/use-wallet-react";
@@ -22,7 +22,7 @@ import { useLoader, useSnackbar } from "@repo/ui";
 interface LockupProps {
   show: boolean;
   onClose: () => void;
-  contractDetails: ContractDetails;
+  accountData: AccountData;
   address: string;
   onSuccess: () => void;
 }
@@ -30,7 +30,7 @@ interface LockupProps {
 function Lockup({
   show,
   onClose,
-  contractDetails,
+  accountData,
   address,
   onSuccess,
 }: LockupProps): ReactElement {
@@ -48,7 +48,7 @@ function Lockup({
   async function lockup() {
     try {
       showLoader("Opting for lockup");
-      const txn = await new CoreStaker(contractDetails).lock(
+      const txn = await new CoreStaker(accountData).lock(
         voiStakingUtils.network.getAlgodClient(),
         Number(decimals),
         {

@@ -1,9 +1,9 @@
-import { ContractDetails } from "../types";
+import { AccountData } from "../types";
 import axios from "axios";
 import { API_URL } from "../constants";
 
 export class StakingClient {
-  async getContractDetails(address: string): Promise<ContractDetails> {
+  async getAccountData(address: string): Promise<AccountData> {
     const response = await axios.get(
       `${API_URL}/v1/scs/accounts?owner=${address}`,
     );

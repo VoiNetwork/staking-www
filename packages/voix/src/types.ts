@@ -3,7 +3,7 @@ import {
   IntegerState,
 } from "./clients/SmartContractStakingClient";
 
-export type ContractDetails = {
+export type AccountData = {
   contractId: number;
   contractAddress: string;
   creator: string;
@@ -29,4 +29,13 @@ export type StakingContractState = {
   owner?: BinaryState;
   period?: IntegerState;
   total?: IntegerState;
+};
+
+export type ParticipateParams = {
+  selK: Uint8Array;
+  spKey: Uint8Array;
+  voteFst: number | bigint;
+  voteK: Uint8Array;
+  voteKd: number | bigint;
+  voteLst: number | bigint;
 };

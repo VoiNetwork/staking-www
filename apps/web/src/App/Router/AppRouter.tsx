@@ -1,15 +1,25 @@
 import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
-import { ReactElement } from "react";
+import { ReactElement, useEffect } from "react";
 import LeftPanel from "../../Components/LeftPanel/LeftPanel";
 import { useSelector } from "react-redux";
-import { RootState } from "../../Redux/store";
+import { RootState, useAppDispatch } from "../../Redux/store";
 import WalletWidget from "../../Components/WalletWidget/WalletWidget";
 import Overview from "../../Pages/Overview/Overview";
 import { useWallet } from "@txnlab/use-wallet-react";
+import Stake from "../../Pages/Stake/Stake";
+import { loadAccountData } from "../../Redux/staking/userReducer";
 
 function AppRouter(): ReactElement {
   const { selectedNode } = useSelector((state: RootState) => state.nodes);
   const { activeAccount } = useWallet();
+
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (activeAccount?.address) {
+      dispatch(loadAccountData(activeAccount.address));
+    }
+  }, [activeAccount]);
 
   return (
     <HashRouter>
@@ -32,7 +42,7 @@ function AppRouter(): ReactElement {
                           path="/overview"
                           element={<Overview></Overview>}
                         ></Route>
-                        <Route path="/stake" element={<div>Stake</div>}></Route>
+                        <Route path="/stake" element={<Stake></Stake>}></Route>
                         <Route
                           path="/deposit"
                           element={<div>Deposit</div>}

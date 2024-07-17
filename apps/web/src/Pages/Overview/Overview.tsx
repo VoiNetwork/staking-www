@@ -1,17 +1,11 @@
 import "./Overview.scss";
 import { ReactElement, useEffect, useState } from "react";
 import { useWallet } from "@txnlab/use-wallet-react";
-import { LoadingTile, useSnackbar } from "@repo/ui";
-import {
-  ContractDetails,
-  CoreStaker,
-  StakingClient,
-  StakingContractState,
-} from "@repo/voix";
+import { LoadingTile } from "@repo/ui";
+import { CoreStaker } from "@repo/voix";
 import { useSelector } from "react-redux";
-import { RootState } from "../../Redux/store";
+import { RootState, useAppDispatch } from "../../Redux/store";
 import {
-  AccountClient,
   BlockClient,
   BlockPackExplorer,
   CoreAccount,
@@ -25,33 +19,24 @@ import { microalgosToAlgos } from "algosdk";
 import { NumericFormat } from "react-number-format";
 import JsonViewer from "../../Components/JsonViewer/JsonViewer";
 import Lockup from "./Lockup/Lockup";
+import { loadAccountData } from "../../Redux/staking/userReducer";
 
 function Overview(): ReactElement {
   const { loading } = useSelector((state: RootState) => state.node);
-
   const { activeAccount } = useWallet();
 
-  const { showException } = useSnackbar();
-
-  const [loadingContract, setLoadingContract] = useState<boolean>(false);
-  const [contractDetails, setContractDetails] =
-    useState<ContractDetails | null>(null);
-
-  const [loadingStakingAccount, setLoadingStakingAccount] =
-    useState<boolean>(false);
-  const [stakingAccount, setStakingAccount] = useState<AccountResult | null>(
-    null,
+  const { account, staking, contract } = useSelector(
+    (state: RootState) => state.user,
   );
 
-  const [loadingStakingState, setLoadingStakingState] =
-    useState<boolean>(false);
-  const [stakingState, setStakingState] = useState<StakingContractState | null>(
-    null,
-  );
+  const dispatch = useAppDispatch();
+
+  const accountData = account.data;
+  const stakingAccount = staking.account;
 
   const [isMetadataVisible, setMetadataVisibility] = useState<boolean>(false);
 
-  const isDataLoading = loading || loadingContract || loadingStakingAccount;
+  const isDataLoading = loading || account.loading || staking.loading;
 
   const { genesis, health, versionsCheck, status, ready } = useSelector(
     (state: RootState) => state.node,
@@ -66,34 +51,6 @@ function Overview(): ReactElement {
 
   const [isLockupModalVisible, setLockupModalVisibility] =
     useState<boolean>(false);
-
-  async function loadStakingAccount(address: string): Promise<void> {
-    try {
-      setLoadingStakingAccount(true);
-      const account = await new AccountClient(voiStakingUtils.network).get(
-        address,
-      );
-      setStakingAccount(account);
-    } catch (e) {
-      showException(e);
-    } finally {
-      setLoadingStakingAccount(false);
-    }
-  }
-
-  async function loadContractDetails(address: string): Promise<void> {
-    try {
-      setLoadingContract(true);
-      const contractDetails = await new StakingClient().getContractDetails(
-        address,
-      );
-      setContractDetails(contractDetails);
-    } catch (e) {
-      showException(e);
-    } finally {
-      setLoadingContract(false);
-    }
-  }
 
   const [expiresIn, setExpiresIn] = useState<string>("--");
 
@@ -114,48 +71,21 @@ function Overview(): ReactElement {
     }
   }
 
-  async function loadLockupDetails(contractDetails: ContractDetails) {
-    try {
-      setLoadingStakingState(true);
-      const state = await new CoreStaker(contractDetails).getStakingState(
-        voiStakingUtils.network.getAlgodClient(),
-      );
-      setStakingState(state);
-    } catch (e) {
-      /* empty */
-    } finally {
-      setLoadingStakingState(false);
-    }
-  }
-
   useEffect(() => {
-    if (activeAccount?.address) {
-      loadContractDetails(activeAccount.address);
-    }
-  }, [activeAccount]);
-
-  useEffect(() => {
-    if (contractDetails) {
-      loadStakingAccount(contractDetails.contractAddress);
-      loadLockupDetails(contractDetails);
-    }
-  }, [contractDetails]);
-
-  useEffect(() => {
-    if (stakingAccount) {
-      if (new CoreAccount(stakingAccount).isOnline()) {
-        loadExpiresIn(stakingAccount);
+    if (staking.account) {
+      if (new CoreAccount(staking.account).isOnline()) {
+        loadExpiresIn(staking.account);
       }
     }
-  }, [stakingAccount]);
+  }, [staking]);
 
   return (
     <div className="overview-wrapper">
       <div className="overview-container">
         <div className="overview-header">
-          <div>Staking Overview</div>
+          <div>Overview</div>
           <div>
-            {contractDetails && (
+            {accountData && (
               <div>
                 <Button
                   variant={"contained"}
@@ -172,9 +102,8 @@ function Overview(): ReactElement {
                   onClose={() => {
                     setMetadataVisibility(false);
                   }}
-                  json={contractDetails}
+                  json={accountData}
                   title="Metadata"
-                  fileName={"metadata"}
                 ></JsonViewer>
               </div>
             )}
@@ -182,160 +111,158 @@ function Overview(): ReactElement {
         </div>
         <div className="overview-body">
           {isDataLoading && <LoadingTile></LoadingTile>}
-          {!isDataLoading && !contractDetails && (
+          {!isDataLoading && !accountData && (
             <div>No contract details found for your account.</div>
           )}
-          {!isDataLoading &&
-            activeAccount &&
-            contractDetails &&
-            stakingAccount && (
-              <div>
-                <div className="props">
-                  <div className="prop">
-                    <div className="key">Your Account</div>
-                    <div
-                      className="val hover hover-underline underline"
-                      onClick={() => {
-                        new BlockPackExplorer(coreNodeInstance).openAddress(
-                          activeAccount.address,
-                        );
-                      }}
-                    >
-                      {activeAccount.address}
-                    </div>
-                  </div>
-                  <div className="prop">
-                    <div className="key">Staking Account</div>
-                    <div
-                      className="val hover hover-underline underline"
-                      onClick={() => {
-                        new BlockPackExplorer(coreNodeInstance).openAddress(
-                          new CoreStaker(contractDetails).stakingAddress(),
-                        );
-                      }}
-                    >
-                      {new CoreStaker(contractDetails).stakingAddress()}
-                    </div>
-                  </div>
-                  <div className="prop">
-                    <div className="key">Staking Contract</div>
-                    <div
-                      className="val hover hover-underline underline"
-                      onClick={() => {
-                        new BlockPackExplorer(coreNodeInstance).openApplication(
-                          new CoreStaker(contractDetails).contractId(),
-                        );
-                      }}
-                    >
-                      {new CoreStaker(contractDetails).contractId()}
-                    </div>
+          {!isDataLoading && activeAccount && accountData && stakingAccount && (
+            <div>
+              <div className="props">
+                <div className="prop">
+                  <div className="key">Your Account</div>
+                  <div
+                    className="val hover hover-underline underline"
+                    onClick={() => {
+                      new BlockPackExplorer(coreNodeInstance).openAddress(
+                        activeAccount.address,
+                      );
+                    }}
+                  >
+                    {activeAccount.address}
                   </div>
                 </div>
-
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
-                    <div className="tile">
-                      <div className="title">Balance</div>
-                      <div className="content">
-                        <NumericFormat
-                          value={microalgosToAlgos(
-                            new CoreAccount(stakingAccount).balance(),
-                          )}
-                          suffix=" Voi"
-                          displayType={"text"}
-                          thousandSeparator={true}
-                        ></NumericFormat>
-                      </div>
-                    </div>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
-                    <div className="tile">
-                      <div className="title">Available balance</div>
-                      <div className="content">
-                        <NumericFormat
-                          value={microalgosToAlgos(
-                            new CoreAccount(stakingAccount).availableBalance(),
-                          )}
-                          suffix=" Voi"
-                          displayType={"text"}
-                          thousandSeparator={true}
-                        ></NumericFormat>
-                      </div>
-                    </div>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
-                    <div className="tile">
-                      <div className="title">Status</div>
-                      <div className="content">
-                        {new CoreAccount(stakingAccount).isOnline()
-                          ? "Online"
-                          : "Offline"}
-                      </div>
-                    </div>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
-                    <div className="tile">
-                      <div className="title">Key expires</div>
-                      <div className="content">{expiresIn}</div>
-                    </div>
-                  </Grid>
-                </Grid>
-
-                <div className="lockup-details">
-                  <div className="lockup-details-header">Lockup details</div>
-                  <div className="lockup-details-body">
-                    {loadingStakingState && <LoadingTile></LoadingTile>}
-                    {!loadingStakingState && stakingState && (
-                      <div>
-                        {new CoreStaker(contractDetails).hasLocked(
-                          stakingState,
-                        ) ? (
-                          <div>
-                            <div className="info-msg">
-                              You have locked your coins for{" "}
-                              {new CoreStaker(contractDetails).getLockingPeriod(
-                                stakingState,
-                              )}{" "}
-                              months
-                            </div>
-                          </div>
-                        ) : (
-                          <div>
-                            <div className="info-msg">
-                              You have not locked your coins yet. You can opt-in
-                              for locking using below button.
-                            </div>
-                            <div className="lockup-actions">
-                              <Button
-                                variant={"outlined"}
-                                color={"primary"}
-                                onClick={() => {
-                                  setLockupModalVisibility(true);
-                                }}
-                              >
-                                Lock
-                              </Button>
-                              <Lockup
-                                show={isLockupModalVisible}
-                                contractDetails={contractDetails}
-                                address={activeAccount.address}
-                                onClose={() => {
-                                  setLockupModalVisibility(false);
-                                }}
-                                onSuccess={() => {
-                                  loadContractDetails(activeAccount.address);
-                                  setLockupModalVisibility(false);
-                                }}
-                              ></Lockup>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                <div className="prop">
+                  <div className="key">Staking Account</div>
+                  <div
+                    className="val hover hover-underline underline"
+                    onClick={() => {
+                      new BlockPackExplorer(coreNodeInstance).openAddress(
+                        new CoreStaker(accountData).stakingAddress(),
+                      );
+                    }}
+                  >
+                    {new CoreStaker(accountData).stakingAddress()}
+                  </div>
+                </div>
+                <div className="prop">
+                  <div className="key">Staking Contract</div>
+                  <div
+                    className="val hover hover-underline underline"
+                    onClick={() => {
+                      new BlockPackExplorer(coreNodeInstance).openApplication(
+                        new CoreStaker(accountData).contractId(),
+                      );
+                    }}
+                  >
+                    {new CoreStaker(accountData).contractId()}
                   </div>
                 </div>
               </div>
-            )}
+
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
+                  <div className="tile">
+                    <div className="title">Balance</div>
+                    <div className="content">
+                      <NumericFormat
+                        value={microalgosToAlgos(
+                          new CoreAccount(stakingAccount).balance(),
+                        )}
+                        suffix=" Voi"
+                        displayType={"text"}
+                        thousandSeparator={true}
+                      ></NumericFormat>
+                    </div>
+                  </div>
+                </Grid>
+                <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
+                  <div className="tile">
+                    <div className="title">Available balance</div>
+                    <div className="content">
+                      <NumericFormat
+                        value={microalgosToAlgos(
+                          new CoreAccount(stakingAccount).availableBalance(),
+                        )}
+                        suffix=" Voi"
+                        displayType={"text"}
+                        thousandSeparator={true}
+                      ></NumericFormat>
+                    </div>
+                  </div>
+                </Grid>
+                <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
+                  <div className="tile">
+                    <div className="title">Status</div>
+                    <div className="content">
+                      {new CoreAccount(stakingAccount).isOnline()
+                        ? "Online"
+                        : "Offline"}
+                    </div>
+                  </div>
+                </Grid>
+                <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
+                  <div className="tile">
+                    <div className="title">Key expires</div>
+                    <div className="content">{expiresIn}</div>
+                  </div>
+                </Grid>
+              </Grid>
+
+              <div className="lockup-details">
+                <div className="lockup-details-header">Lockup details</div>
+                <div className="lockup-details-body">
+                  {contract.loading && <LoadingTile></LoadingTile>}
+
+                  {!contract.loading && contract.state && (
+                    <div>
+                      {new CoreStaker(accountData).hasLocked(contract.state) ? (
+                        <div>
+                          <div className="info-msg">
+                            You have locked your coins for{" "}
+                            {new CoreStaker(accountData).getLockingPeriod(
+                              contract.state,
+                            )}{" "}
+                            months
+                          </div>
+                        </div>
+                      ) : (
+                        <div>
+                          <div className="info-msg">
+                            You have not locked your coins yet. You can opt-in
+                            for locking using below button.
+                          </div>
+                          <div className="lockup-actions">
+                            <Button
+                              variant={"outlined"}
+                              color={"primary"}
+                              onClick={() => {
+                                setLockupModalVisibility(true);
+                              }}
+                            >
+                              Lock
+                            </Button>
+                            <Lockup
+                              show={isLockupModalVisible}
+                              accountData={accountData}
+                              address={activeAccount.address}
+                              onClose={() => {
+                                setLockupModalVisibility(false);
+                              }}
+                              onSuccess={() => {
+                                dispatch(
+                                  loadAccountData(activeAccount.address),
+                                );
+                                setLockupModalVisibility(false);
+                              }}
+                            ></Lockup>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
