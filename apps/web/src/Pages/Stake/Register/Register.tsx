@@ -83,7 +83,7 @@ function Register({
 
     try {
       showLoader("Registering your participation key");
-      const txn = await new CoreStaker(accountData).stake(
+      const txnId = await new CoreStaker(accountData).stake(
         voiStakingUtils.network.getAlgodClient(),
         {
           selK: new Uint8Array(Buffer.from(selectionKey, "base64")),
@@ -99,7 +99,7 @@ function Register({
         },
       );
       await waitForConfirmation(
-        txn.txID(),
+        txnId,
         20,
         voiStakingUtils.network.getAlgodClient(),
       );

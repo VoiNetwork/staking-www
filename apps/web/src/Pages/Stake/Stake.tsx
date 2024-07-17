@@ -45,12 +45,12 @@ function Stake(): ReactElement {
 
     try {
       showLoader("DeRegistering your participation key");
-      const txn = await new CoreStaker(data).stake(
+      const txnId = await new CoreStaker(data).stake(
         voiStakingUtils.network.getAlgodClient(),
         {
           selK: new Uint8Array(32),
-          spKey: new Uint8Array(32),
-          voteK: new Uint8Array(64),
+          spKey: new Uint8Array(64),
+          voteK: new Uint8Array(32),
           voteKd: 0,
           voteFst: 0,
           voteLst: 0,
@@ -61,7 +61,7 @@ function Stake(): ReactElement {
         },
       );
       await waitForConfirmation(
-        txn.txID(),
+        txnId,
         20,
         voiStakingUtils.network.getAlgodClient(),
       );

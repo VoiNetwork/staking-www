@@ -1,7 +1,15 @@
 import { AccountData, ParticipateParams, StakingContractState } from "../types";
 import { SmartContractStakingClient } from "../clients/SmartContractStakingClient";
-import { Algodv2, Transaction } from "algosdk";
+import {
+  ABIContract,
+  Algodv2,
+  AtomicTransactionComposer,
+  makePaymentTxnWithSuggestedParamsFromObject,
+  Transaction,
+} from "algosdk";
 import { TransactionSignerAccount } from "@algorandfoundation/algokit-utils/types/account";
+import abi from "../clients/contract.json";
+import { getTransactionParams } from "@algorandfoundation/algokit-utils";
 
 export class CoreStaker {
   accountData: AccountData;
@@ -35,7 +43,7 @@ export class CoreStaker {
   }
 
   hasStaked(): boolean {
-    return this.accountData.part_vote_k != null;
+    return !!this.accountData.part_vote_fst;
   }
 
   async lock(
@@ -63,15 +71,39 @@ export class CoreStaker {
     algod: Algodv2,
     params: ParticipateParams,
     sender: TransactionSignerAccount,
-  ): Promise<Transaction> {
+  ): Promise<string> {
     const contractId = this.contractId();
-    const result = await new SmartContractStakingClient(
-      { resolveBy: "id", id: contractId },
-      algod,
-    ).participate(params, {
-      sender,
+
+    const txnParams = await getTransactionParams(undefined, algod);
+    const atc = new AtomicTransactionComposer();
+
+    const paymentTxn = makePaymentTxnWithSuggestedParamsFromObject({
+      from: sender.addr,
+      to: this.stakingAddress(),
+      suggestedParams: txnParams,
+      amount: 1000,
     });
 
-    return result.transaction;
+    atc.addTransaction({ txn: paymentTxn, signer: sender.signer });
+
+    atc.addMethodCall({
+      appID: contractId,
+      method: new ABIContract(abi).getMethodByName("participate"),
+      methodArgs: [
+        params.voteK,
+        params.selK,
+        params.voteFst,
+        params.voteLst,
+        params.voteKd,
+        params.spKey,
+      ],
+      sender: sender.addr,
+      signer: sender.signer,
+      suggestedParams: txnParams,
+    });
+
+    const result = await atc.execute(algod, 4);
+
+    return result.txIDs[0];
   }
 }
