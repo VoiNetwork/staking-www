@@ -1,0 +1,46 @@
+@import '@repo/styles';
+
+.withdraw-wrapper {
+  .withdraw-container {
+    .withdraw-header {
+      padding: 10px 0 20px;
+      border-bottom: 1px solid map-get($grey-colors, "light-grey");
+      font-size: 20px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      column-gap: 20px;
+    }
+    .withdraw-body {
+      margin-top: 20px;
+      .props {
+        margin: 40px 0;
+        .prop {
+          margin: 20px 0;
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+          column-gap: 20px;
+          .key {
+            font-size: 14px;
+            width: 150px;
+          }
+          .val {
+            font-size: 14px;
+            color: map-get($grey-colors, "form-value");
+          }
+        }
+      }
+
+      .withdraw-widget {
+        .flex {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          column-gap: 20px;
+        }
+      }
+    }
+  }
+}

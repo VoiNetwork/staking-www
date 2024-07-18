@@ -12,6 +12,7 @@ import abi from "../clients/contract.json";
 import { getTransactionParams } from "@algorandfoundation/algokit-utils";
 import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
 import { CoreAccount } from "@repo/algocore";
+import { AlgoAmount } from "@algorandfoundation/algokit-utils/types/amount";
 
 export class CoreStaker {
   accountData: AccountData;
@@ -107,5 +108,29 @@ export class CoreStaker {
     const result = await atc.execute(algod, 4);
 
     return result.txIDs[1];
+  }
+
+  async withdraw(
+    algod: Algodv2,
+    amount: number,
+    sender: TransactionSignerAccount,
+  ): Promise<Transaction> {
+    const contractId = this.contractId();
+    const result = await new SmartContractStakingClient(
+      { resolveBy: "id", id: contractId },
+      algod,
+    ).withdraw(
+      {
+        amount: amount,
+      },
+      {
+        sender,
+        sendParams: {
+          fee: AlgoAmount.MicroAlgos(2000),
+        },
+      },
+    );
+
+    return result.transaction;
   }
 }

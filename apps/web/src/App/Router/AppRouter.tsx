@@ -8,6 +8,7 @@ import Overview from "../../Pages/Overview/Overview";
 import { useWallet } from "@txnlab/use-wallet-react";
 import Stake from "../../Pages/Stake/Stake";
 import { loadAccountData } from "../../Redux/staking/userReducer";
+import Withdraw from "../../Pages/Withdraw/Withdraw";
 
 function AppRouter(): ReactElement {
   const { selectedNode } = useSelector((state: RootState) => state.nodes);
@@ -49,7 +50,7 @@ function AppRouter(): ReactElement {
                         ></Route>
                         <Route
                           path="/withdraw"
-                          element={<div>Withdraw</div>}
+                          element={<Withdraw></Withdraw>}
                         ></Route>
                         <Route
                           path="/config"
