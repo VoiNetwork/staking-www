@@ -133,4 +133,26 @@ export class CoreStaker {
 
     return result.transaction;
   }
+
+  async deposit(
+    algod: Algodv2,
+    amount: number,
+    sender: TransactionSignerAccount,
+  ): Promise<string> {
+    const txnParams = await getTransactionParams(undefined, algod);
+    const atc = new AtomicTransactionComposer();
+
+    const paymentTxn = makePaymentTxnWithSuggestedParamsFromObject({
+      from: sender.addr,
+      to: this.stakingAddress(),
+      suggestedParams: txnParams,
+      amount: amount,
+    });
+
+    atc.addTransaction({ txn: paymentTxn, signer: sender.signer });
+
+    const result = await atc.execute(algod, 4);
+
+    return result.txIDs[0];
+  }
 }
