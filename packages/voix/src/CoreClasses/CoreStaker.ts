@@ -10,6 +10,8 @@ import {
 import { TransactionSignerAccount } from "@algorandfoundation/algokit-utils/types/account";
 import abi from "../clients/contract.json";
 import { getTransactionParams } from "@algorandfoundation/algokit-utils";
+import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
+import { CoreAccount } from "@repo/algocore";
 
 export class CoreStaker {
   accountData: AccountData;
@@ -42,8 +44,8 @@ export class CoreStaker {
     return this.getLockingPeriod(state) != 0;
   }
 
-  hasStaked(): boolean {
-    return !!this.accountData.part_vote_fst;
+  hasStaked(contractAccount: AccountResult): boolean {
+    return new CoreAccount(contractAccount).isOnline();
   }
 
   async lock(
@@ -104,6 +106,6 @@ export class CoreStaker {
 
     const result = await atc.execute(algod, 4);
 
-    return result.txIDs[0];
+    return result.txIDs[1];
   }
 }

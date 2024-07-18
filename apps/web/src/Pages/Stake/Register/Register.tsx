@@ -17,13 +17,14 @@ import { waitForConfirmation } from "@algorandfoundation/algokit-utils";
 import { useWallet } from "@txnlab/use-wallet-react";
 import { useLoader, useSnackbar } from "@repo/ui";
 import { isNumber } from "@repo/utils";
+import party from "party-js";
 
 interface RegisterProps {
   show: boolean;
   onClose: () => void;
   accountData: AccountData;
   address: string;
-  onSuccess: () => void;
+  onSuccess: (id: string) => void;
 }
 
 function Register({
@@ -103,9 +104,12 @@ function Register({
         20,
         voiStakingUtils.network.getAlgodClient(),
       );
-      showSnack("Transaction successful", "success");
 
-      onSuccess();
+      party.confetti(document.body, {
+        count: party.variation.range(200, 300),
+        size: party.variation.range(1, 1.4),
+      });
+      onSuccess(txnId);
     } catch (e) {
       showException(e);
     } finally {
@@ -167,7 +171,7 @@ function Register({
                           setStateProofKey(ev.target.value);
                         }}
                         multiline
-                        rows={2}
+                        rows={3}
                         fullWidth
                       />
                     </FormControl>

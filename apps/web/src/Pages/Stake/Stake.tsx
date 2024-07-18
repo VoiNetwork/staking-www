@@ -12,6 +12,7 @@ import voiStakingUtils from "../../utils/voiStakingUtils";
 import { waitForConfirmation } from "@algorandfoundation/algokit-utils";
 import { useConfirm } from "material-ui-confirm";
 import { confirmationProps } from "@repo/theme";
+import TransactionDetails from "../../Components/TransactionDetails/TransactionDetails";
 
 function Stake(): ReactElement {
   const { transactionSigner, activeAccount } = useWallet();
@@ -29,6 +30,9 @@ function Stake(): ReactElement {
 
   const dispatch = useAppDispatch();
   const [isRegisterVisible, setRegisterVisibility] = useState<boolean>(false);
+
+  const [txnId, setTxnId] = useState<string>("");
+  const [txnMsg, setTxnMsg] = useState<string>("");
 
   const accountData = account.data;
   const stakingAccount = staking.account;
@@ -65,7 +69,9 @@ function Stake(): ReactElement {
         20,
         voiStakingUtils.network.getAlgodClient(),
       );
-      showSnack("Transaction successful", "success");
+
+      setTxnId(txnId);
+      setTxnMsg("You have deregistered successfully.");
       dispatch(loadAccountData(activeAccount.address));
     } catch (e) {
       showException(e);
@@ -92,7 +98,7 @@ function Stake(): ReactElement {
             stakingAccount &&
             contractState && (
               <div>
-                {new CoreStaker(accountData).hasStaked() && (
+                {new CoreStaker(accountData).hasStaked(stakingAccount) && (
                   <div>
                     <div className="props">
                       <div className="prop">
@@ -141,7 +147,7 @@ function Stake(): ReactElement {
                     </div>
                   </div>
                 )}
-                {!new CoreStaker(accountData).hasStaked() && (
+                {!new CoreStaker(accountData).hasStaked(stakingAccount) && (
                   <div>
                     <div className="info-msg">
                       You need to register your participation key.
@@ -164,7 +170,9 @@ function Stake(): ReactElement {
                         }}
                         accountData={accountData}
                         address={activeAccount.address}
-                        onSuccess={() => {
+                        onSuccess={(txnId: string) => {
+                          setTxnId(txnId);
+                          setTxnMsg("You have registered successfully.");
                           setRegisterVisibility(false);
                           dispatch(loadAccountData(activeAccount.address));
                         }}
@@ -174,6 +182,15 @@ function Stake(): ReactElement {
                 )}
               </div>
             )}
+
+          <TransactionDetails
+            id={txnId}
+            show={Boolean(txnId)}
+            onClose={() => {
+              setTxnId("");
+            }}
+            msg={txnMsg}
+          ></TransactionDetails>
         </div>
       </div>
     </div>
