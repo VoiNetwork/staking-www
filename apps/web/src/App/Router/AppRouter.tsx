@@ -1,4 +1,4 @@
-import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { ReactElement, useEffect } from "react";
 import LeftPanel from "../../Components/LeftPanel/LeftPanel";
 import { useSelector } from "react-redux";
@@ -25,12 +25,13 @@ function AppRouter(): ReactElement {
   }, [activeAccount]);
 
   return (
-    <HashRouter>
+    <BrowserRouter>
       <div className="app-container">
         <div className="app-container-body">
           <div className="app-left">
             <LeftPanel></LeftPanel>
           </div>
+
           <div className="app-right">
             <div className="content-wrapper">
               <div className="content-container">
@@ -74,7 +75,7 @@ function AppRouter(): ReactElement {
           </div>
         </div>
       </div>
-    </HashRouter>
+    </BrowserRouter>
   );
 }
 

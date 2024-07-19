@@ -1,6 +1,6 @@
 import "./LeftPanel.scss";
 import { Tab, Tabs } from "@mui/material";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ReactElement } from "react";
 import {
   AdfScannerOutlined,
@@ -42,40 +42,40 @@ function LeftPanel(): ReactElement {
               label="Overview"
               value="overview"
               iconPosition="start"
-              component="a"
-              href={`#/overview`}
+              component={Link}
+              to={`/overview`}
               icon={<HomeOutlined></HomeOutlined>}
             />
             <Tab
               label="Stake"
               value="stake"
               iconPosition="start"
-              component="a"
-              href={`#/stake`}
+              component={Link}
+              to={`/stake`}
               icon={<AdjustOutlined></AdjustOutlined>}
             />
             <Tab
               label="Deposit"
               value="deposit"
               iconPosition="start"
-              component="a"
-              href={`#/deposit`}
+              component={Link}
+              to={`/deposit`}
               icon={<AdfScannerOutlined></AdfScannerOutlined>}
             />
             <Tab
               label="Withdraw"
               value="withdraw"
               iconPosition="start"
-              component="a"
-              href={`#/withdraw`}
+              component={Link}
+              to={`/withdraw`}
               icon={<Payments></Payments>}
             />
             <Tab
               label="Transfer"
               value="transfer"
               iconPosition="start"
-              component="a"
-              href={`#/transfer`}
+              component={Link}
+              to={`/transfer`}
               icon={<MoveDown></MoveDown>}
             />
           </Tabs>
