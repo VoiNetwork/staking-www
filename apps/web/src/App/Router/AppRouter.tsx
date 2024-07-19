@@ -10,6 +10,7 @@ import Stake from "../../Pages/Stake/Stake";
 import { loadAccountData } from "../../Redux/staking/userReducer";
 import Withdraw from "../../Pages/Withdraw/Withdraw";
 import Deposit from "../../Pages/Deposit/Deposit";
+import Transfer from "../../Pages/Transfer/Transfer";
 
 function AppRouter(): ReactElement {
   const { selectedNode } = useSelector((state: RootState) => state.nodes);
@@ -54,8 +55,8 @@ function AppRouter(): ReactElement {
                           element={<Withdraw></Withdraw>}
                         ></Route>
                         <Route
-                          path="/config"
-                          element={<div>Config</div>}
+                          path="/transfer"
+                          element={<Transfer></Transfer>}
                         ></Route>
                         <Route
                           path="*"

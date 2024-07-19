@@ -155,4 +155,25 @@ export class CoreStaker {
 
     return result.txIDs[0];
   }
+
+  async transfer(
+    algod: Algodv2,
+    address: string,
+    sender: TransactionSignerAccount,
+  ): Promise<Transaction> {
+    const contractId = this.contractId();
+    const result = await new SmartContractStakingClient(
+      { resolveBy: "id", id: contractId },
+      algod,
+    ).transfer(
+      {
+        newOwner: address,
+      },
+      {
+        sender,
+      },
+    );
+
+    return result.transaction;
+  }
 }

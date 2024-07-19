@@ -112,7 +112,9 @@ function Overview(): ReactElement {
         <div className="overview-body">
           {isDataLoading && <LoadingTile></LoadingTile>}
           {!isDataLoading && !accountData && (
-            <div>No contract details found for your account.</div>
+            <div className="info-msg">
+              No contract details found for your account.
+            </div>
           )}
           {!isDataLoading && activeAccount && accountData && stakingAccount && (
             <div>

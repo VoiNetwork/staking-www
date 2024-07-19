@@ -24,7 +24,7 @@
       }
       .msg {
         color: map-get($grey-colors, "dark-grey");
-        word-break: break-all;
+        word-break: break-word;
         font-size: 13px;
         width: 60%;
         margin: 0 auto;

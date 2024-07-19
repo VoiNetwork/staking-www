@@ -90,7 +90,9 @@ function Deposit(): ReactElement {
         <div className="deposit-body">
           {isDataLoading && <LoadingTile></LoadingTile>}
           {!isDataLoading && !accountData && (
-            <div>No contract details found for your account.</div>
+            <div className="info-msg">
+              No contract details found for your account.
+            </div>
           )}
 
           {!isDataLoading &&

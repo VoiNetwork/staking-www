@@ -6,8 +6,8 @@ import {
   AdfScannerOutlined,
   AdjustOutlined,
   HomeOutlined,
+  MoveDown,
   Payments,
-  SettingsOutlined,
 } from "@mui/icons-material";
 import logo from "../../assets/images/full-logo.png";
 
@@ -19,7 +19,7 @@ function LeftPanel(): ReactElement {
   route = route.split("/");
   route = route[0];
 
-  const routes = ["overview", "stake", "deposit", "withdraw", "config"];
+  const routes = ["overview", "stake", "deposit", "withdraw", "transfer"];
   if (routes.indexOf(route) === -1) {
     route = false;
   }
@@ -71,12 +71,12 @@ function LeftPanel(): ReactElement {
               icon={<Payments></Payments>}
             />
             <Tab
-              label="Config"
-              value="config"
+              label="Transfer"
+              value="transfer"
               iconPosition="start"
               component="a"
-              href={`#/config`}
-              icon={<SettingsOutlined></SettingsOutlined>}
+              href={`#/transfer`}
+              icon={<MoveDown></MoveDown>}
             />
           </Tabs>
         </div>

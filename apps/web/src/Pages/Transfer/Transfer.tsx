@@ -1,4 +1,4 @@
-import "./Withdraw.scss";
+import "./Transfer.scss";
 import { ReactElement, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../Redux/store";
@@ -9,15 +9,15 @@ import { Button, FormControl, FormLabel, Grid } from "@mui/material";
 import { loadAccountData } from "../../Redux/staking/userReducer";
 import voiStakingUtils from "../../utils/voiStakingUtils";
 import { waitForConfirmation } from "@algorandfoundation/algokit-utils";
-import { ShadedInput } from "@repo/theme";
+import { confirmationProps, ShadedInput } from "@repo/theme";
 import TransactionDetails from "../../Components/TransactionDetails/TransactionDetails";
-import { microalgosToAlgos } from "algosdk";
+import { isValidAddress, microalgosToAlgos } from "algosdk";
 import { CoreAccount } from "@repo/algocore";
 import { NumericFormat } from "react-number-format";
-import { AlgoAmount } from "@algorandfoundation/algokit-utils/types/amount";
-import { isNumber } from "@repo/utils";
+import { useConfirm } from "material-ui-confirm";
 
-function Withdraw(): ReactElement {
+function Transfer(): ReactElement {
+  const confirmation = useConfirm();
   const { transactionSigner, activeAccount } = useWallet();
 
   const { showException, showSnack } = useSnackbar();
@@ -34,7 +34,7 @@ function Withdraw(): ReactElement {
   const [txnId, setTxnId] = useState<string>("");
   const [txnMsg, setTxnMsg] = useState<string>("");
 
-  const [amount, setAmount] = useState<string>("");
+  const [transferTo, setTransferTo] = useState<string>("");
 
   const accountData = account.data;
   const stakingAccount = staking.account;
@@ -43,22 +43,22 @@ function Withdraw(): ReactElement {
   const isDataLoading =
     loading || account.loading || staking.loading || contract.loading;
 
-  async function withdraw(data: AccountData) {
+  async function transfer(data: AccountData) {
     if (!activeAccount) {
       showSnack("Please connect your wallet", "error");
       return;
     }
 
-    if (!amount || !isNumber(amount)) {
-      showSnack("Invalid amount", "error");
+    if (!transferTo || !isValidAddress(transferTo)) {
+      showSnack("Invalid address", "error");
       return;
     }
 
     try {
-      showLoader("Withdrawal in progress");
-      const transaction = await new CoreStaker(data).withdraw(
+      showLoader("Transferring your staking contract");
+      const transaction = await new CoreStaker(data).transfer(
         voiStakingUtils.network.getAlgodClient(),
-        AlgoAmount.Algos(Number(amount)).microAlgos,
+        transferTo,
         {
           addr: activeAccount.address,
           signer: transactionSigner,
@@ -72,7 +72,7 @@ function Withdraw(): ReactElement {
       );
 
       setTxnId(transaction.txID());
-      setTxnMsg("You have withdrawn successfully.");
+      setTxnMsg("You have transferred your staking contract successfully.");
       dispatch(loadAccountData(activeAccount.address));
     } catch (e) {
       showException(e);
@@ -82,12 +82,12 @@ function Withdraw(): ReactElement {
   }
 
   return (
-    <div className="withdraw-wrapper">
-      <div className="withdraw-container">
-        <div className="withdraw-header">
-          <div>Withdraw</div>
+    <div className="transfer-wrapper">
+      <div className="transfer-container">
+        <div className="transfer-header">
+          <div>Transfer</div>
         </div>
-        <div className="withdraw-body">
+        <div className="transfer-body">
           {isDataLoading && <LoadingTile></LoadingTile>}
           {!isDataLoading && !accountData && (
             <div className="info-msg">
@@ -109,6 +109,12 @@ function Withdraw(): ReactElement {
                     </div>
                   </div>
                   <div className="prop">
+                    <div className="key">Staking contract</div>
+                    <div className="value">
+                      {new CoreStaker(accountData).contractId()}
+                    </div>
+                  </div>
+                  <div className="prop">
                     <div className="key">Available balance</div>
                     <div className="value">
                       <NumericFormat
@@ -122,37 +128,21 @@ function Withdraw(): ReactElement {
                     </div>
                   </div>
                 </div>
-                <div className="withdraw-widget">
+                <div className="transfer-widget">
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={12} md={4} lg={3} xl={3}>
                       <FormControl fullWidth variant="outlined">
                         <FormLabel className="classic-label flex">
-                          <div>Amount</div>
-                          <div>
-                            <Button
-                              size={"small"}
-                              variant={"outlined"}
-                              onClick={() => {
-                                setAmount(
-                                  AlgoAmount.MicroAlgos(
-                                    new CoreAccount(
-                                      stakingAccount,
-                                    ).availableBalance(),
-                                  ).algos.toString(),
-                                );
-                              }}
-                            >
-                              MAX
-                            </Button>
-                          </div>
+                          <div>Transfer to</div>
                         </FormLabel>
                         <ShadedInput
-                          value={amount}
+                          value={transferTo}
                           onChange={(ev) => {
-                            setAmount(ev.target.value);
+                            setTransferTo(ev.target.value);
                           }}
+                          multiline={true}
+                          rows={4}
                           fullWidth
-                          endAdornment={<div>VOI</div>}
                         />
                       </FormControl>
                     </Grid>
@@ -164,10 +154,27 @@ function Withdraw(): ReactElement {
                         fullWidth
                         size={"large"}
                         onClick={() => {
-                          withdraw(accountData);
+                          if (!activeAccount) {
+                            showSnack("Please connect your wallet", "error");
+                            return;
+                          }
+
+                          if (!transferTo || !isValidAddress(transferTo)) {
+                            showSnack("Invalid address", "error");
+                            return;
+                          }
+
+                          confirmation({
+                            ...confirmationProps,
+                            description: `You are trying to transfer your staking contract ownership to the address ${transferTo}.`,
+                          })
+                            .then(async () => {
+                              transfer(accountData);
+                            })
+                            .catch(() => {});
                         }}
                       >
-                        Withdraw
+                        Transfer
                       </Button>
                     </Grid>
                   </Grid>
@@ -189,4 +196,4 @@ function Withdraw(): ReactElement {
   );
 }
 
-export default Withdraw;
+export default Transfer;
