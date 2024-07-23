@@ -18,6 +18,7 @@ export type UserState = {
   account: {
     loading: boolean;
     data: AccountData | undefined;
+    availableContracts: AccountData[];
   };
   staking: {
     loading: boolean;
@@ -33,6 +34,7 @@ const initialState: UserState = {
   account: {
     loading: false,
     data: undefined,
+    availableContracts: [],
   },
   staking: {
     loading: false,
@@ -49,11 +51,28 @@ export const loadAccountData: AsyncThunk<void, string, any> = createAsyncThunk(
   async (address: string, thunkAPI) => {
     const { dispatch } = thunkAPI;
     try {
+      dispatch(resetUserState());
       dispatch(setAccountDataLoading(true));
-      const accountData = await new StakingClient().getAccountData(address);
-      dispatch(setAccountData(accountData));
-      dispatch(loadStakingAccount(accountData.contractAddress));
-      dispatch(loadContractState(accountData));
+      const availableContracts = await new StakingClient().getAccountData(
+        address,
+      );
+      dispatch(setAvailableContracts(availableContracts));
+
+      if (availableContracts.length > 0) {
+        let accountData: AccountData | undefined = availableContracts[0];
+
+        const currentContractId = localStorage.getItem("currentContractId");
+        if (currentContractId) {
+          accountData =
+            availableContracts.find((accountData) => {
+              return accountData.contractId.toString() === currentContractId;
+            }) || availableContracts[0];
+        }
+
+        if (accountData) {
+          dispatch(initAccountData(accountData));
+        }
+      }
     } catch (e) {
       /* empty */
     } finally {
@@ -61,6 +80,21 @@ export const loadAccountData: AsyncThunk<void, string, any> = createAsyncThunk(
     }
   },
 );
+
+export const initAccountData: AsyncThunk<void, AccountData, any> =
+  createAsyncThunk(
+    "user/initAccountData",
+    async (accountData: AccountData, thunkAPI) => {
+      const { dispatch } = thunkAPI;
+      dispatch(setAccountData(accountData));
+      dispatch(loadStakingAccount(accountData.contractAddress));
+      dispatch(loadContractState(accountData));
+      localStorage.setItem(
+        "currentContractId",
+        accountData.contractId.toString(),
+      );
+    },
+  );
 
 export const loadStakingAccount: AsyncThunk<void, string, any> =
   createAsyncThunk(
@@ -104,11 +138,15 @@ export const nodeSlice = createSlice({
   name: "node",
   initialState,
   reducers: {
+    resetUserState: () => initialState,
     setAccountDataLoading: (state, action: PayloadAction<boolean>) => {
       state.account.loading = action.payload;
     },
     setAccountData: (state, action: PayloadAction<AccountData>) => {
       state.account.data = action.payload;
+    },
+    setAvailableContracts: (state, action: PayloadAction<AccountData[]>) => {
+      state.account.availableContracts = action.payload;
     },
     setStakingAccountLoading: (state, action: PayloadAction<boolean>) => {
       state.staking.loading = action.payload;
@@ -132,6 +170,8 @@ export const {
   setStakingAccount,
   setContractStateLoading,
   setContractState,
+  setAvailableContracts,
+  resetUserState,
 } = nodeSlice.actions;
 
 export default nodeSlice.reducer;

@@ -11,6 +11,7 @@ import { loadAccountData } from "../../Redux/staking/userReducer";
 import Withdraw from "../../Pages/Withdraw/Withdraw";
 import Deposit from "../../Pages/Deposit/Deposit";
 import Transfer from "../../Pages/Transfer/Transfer";
+import ContractPicker from "../../Components/ContractPicker/ContractPicker";
 
 function AppRouter(): ReactElement {
   const { selectedNode } = useSelector((state: RootState) => state.nodes);
@@ -36,7 +37,12 @@ function AppRouter(): ReactElement {
             <div className="content-wrapper">
               <div className="content-container">
                 <div className="content-header">
-                  <WalletWidget></WalletWidget>
+                  <div>
+                    <WalletWidget></WalletWidget>
+                  </div>
+                  <div>
+                    <ContractPicker></ContractPicker>
+                  </div>
                 </div>
                 {selectedNode && (
                   <div className="content-body">
