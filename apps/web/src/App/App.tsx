@@ -20,7 +20,6 @@ function App(): ReactElement {
   const node = getPreConfiguredNodes()[0];
   const walletManager = new WalletManager({
     wallets: [
-      WalletId.DEFLY,
       WalletId.KIBISIS,
       {
         id: WalletId.LUTE,
