@@ -1,5 +1,5 @@
 {
-  "name": "SmartContractStaking",
+  "name": "Airdrop",
   "methods": [
     {
       "name": "setup",
@@ -11,8 +11,17 @@
         {
           "type": "address",
           "name": "funder"
+        },
+        {
+          "type": "uint64",
+          "name": "deadline"
+        },
+        {
+          "type": "uint64",
+          "name": "initial"
         }
       ],
+      "readonly": false,
       "returns": {
         "type": "void"
       }
@@ -25,6 +34,7 @@
           "name": "period"
         }
       ],
+      "readonly": false,
       "returns": {
         "type": "void"
       }
@@ -37,6 +47,54 @@
           "name": "funding"
         }
       ],
+      "readonly": false,
+      "returns": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "withdraw",
+      "args": [
+        {
+          "type": "uint64",
+          "name": "amount"
+        }
+      ],
+      "readonly": false,
+      "returns": {
+        "type": "uint64"
+      }
+    },
+    {
+      "name": "close",
+      "args": [],
+      "readonly": false,
+      "returns": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "approve_update",
+      "args": [
+        {
+          "type": "bool",
+          "name": "approval"
+        }
+      ],
+      "readonly": false,
+      "returns": {
+        "type": "void"
+      }
+    },
+    {
+      "name": "set_delegate",
+      "args": [
+        {
+          "type": "address",
+          "name": "delegate"
+        }
+      ],
+      "readonly": false,
       "returns": {
         "type": "void"
       }
@@ -45,11 +103,11 @@
       "name": "participate",
       "args": [
         {
-          "type": "byte[]",
+          "type": "byte[32]",
           "name": "vote_k"
         },
         {
-          "type": "byte[]",
+          "type": "byte[32]",
           "name": "sel_k"
         },
         {
@@ -65,24 +123,30 @@
           "name": "vote_kd"
         },
         {
-          "type": "byte[]",
+          "type": "byte[64]",
           "name": "sp_key"
         }
       ],
+      "readonly": false,
       "returns": {
         "type": "void"
       }
     },
     {
-      "name": "withdraw",
+      "name": "set_version",
       "args": [
         {
           "type": "uint64",
-          "name": "amount"
+          "name": "contract_version"
+        },
+        {
+          "type": "uint64",
+          "name": "deployment_version"
         }
       ],
+      "readonly": false,
       "returns": {
-        "type": "uint64"
+        "type": "void"
       }
     },
     {
@@ -93,13 +157,7 @@
           "name": "new_owner"
         }
       ],
-      "returns": {
-        "type": "void"
-      }
-    },
-    {
-      "name": "close",
-      "args": [],
+      "readonly": false,
       "returns": {
         "type": "void"
       }

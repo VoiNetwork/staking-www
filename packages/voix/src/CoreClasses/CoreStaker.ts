@@ -1,5 +1,5 @@
 import { AccountData, ParticipateParams, StakingContractState } from "../types";
-import { SmartContractStakingClient } from "../clients/SmartContractStakingClient";
+import { AirdropClient } from "../clients/AirdropClient";
 import {
   ABIContract,
   Algodv2,
@@ -8,11 +8,12 @@ import {
   Transaction,
 } from "algosdk";
 import { TransactionSignerAccount } from "@algorandfoundation/algokit-utils/types/account";
-import abi from "../clients/contract.json";
+import abi from "../clients/airdrop.contract.json";
 import { getTransactionParams } from "@algorandfoundation/algokit-utils";
 import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
 import { CoreAccount } from "@repo/algocore";
 import { AlgoAmount } from "@algorandfoundation/algokit-utils/types/amount";
+import humanizeDuration from "humanize-duration";
 
 export class CoreStaker {
   accountData: AccountData;
@@ -29,9 +30,21 @@ export class CoreStaker {
     return this.accountData.contractAddress;
   }
 
+  deployer(): number {
+    return this.accountData.global_parent_id;
+  }
+
+  messenger(): number {
+    return this.accountData.global_messenger_id;
+  }
+
+  lockupPeriodLimit(): number {
+    return this.accountData.global_period_limit;
+  }
+
   async getStakingState(algod: Algodv2): Promise<StakingContractState> {
     const contractId = this.contractId();
-    return await new SmartContractStakingClient(
+    return await new AirdropClient(
       { resolveBy: "id", id: contractId },
       algod,
     ).getGlobalState();
@@ -49,13 +62,72 @@ export class CoreStaker {
     return new CoreAccount(contractAccount).isOnline();
   }
 
+  deadline(): number {
+    return this.accountData.global_deadline;
+  }
+
+  currentTimestamp(): number {
+    return Math.floor(Date.now() / 1000);
+  }
+
+  lockupDeadlineDate(): string {
+    const timestamp = this.deadline();
+    const date = new Date(timestamp * 1000);
+
+    return date.toString();
+  }
+
+  getLockupDeadlineRemainingSeconds(): number {
+    const deadline = this.deadline();
+    const currentTime = this.currentTimestamp();
+
+    const remainingTime = deadline - currentTime;
+    return remainingTime >= 0 ? remainingTime : 0;
+  }
+
+  hasLockupDeadlineCompleted(): boolean {
+    return this.getLockupDeadlineRemainingSeconds() <= 0;
+  }
+
+  getLockupDeadlineDuration(): string {
+    if (this.hasLockupDeadlineCompleted()) {
+      return "";
+    }
+
+    const seconds = this.getLockupDeadlineRemainingSeconds();
+    return humanizeDuration(seconds * 1000, { largest: 3, round: false });
+  }
+
+  periodSeconds(): number {
+    return this.accountData.global_period_seconds;
+  }
+
+  getPeriodInSeconds(period: number) {
+    const periodSeconds = this.periodSeconds();
+    return period * periodSeconds;
+  }
+
+  getPeriodInDuration(period: number) {
+    const seconds = this.getPeriodInSeconds(period);
+    return humanizeDuration(seconds * 1000, { largest: 2, round: false });
+  }
+
+  lockupPeriod() {
+    return this.accountData.global_period;
+  }
+
+  getLockupDuration() {
+    const period = this.lockupPeriod();
+    return this.getPeriodInDuration(period);
+  }
+
   async lock(
     algod: Algodv2,
     months: number,
     sender: TransactionSignerAccount,
   ): Promise<Transaction> {
     const contractId = this.contractId();
-    const result = await new SmartContractStakingClient(
+    const result = await new AirdropClient(
       { resolveBy: "id", id: contractId },
       algod,
     ).configure(
@@ -116,7 +188,7 @@ export class CoreStaker {
     sender: TransactionSignerAccount,
   ): Promise<Transaction> {
     const contractId = this.contractId();
-    const result = await new SmartContractStakingClient(
+    const result = await new AirdropClient(
       { resolveBy: "id", id: contractId },
       algod,
     ).withdraw(
@@ -162,7 +234,7 @@ export class CoreStaker {
     sender: TransactionSignerAccount,
   ): Promise<Transaction> {
     const contractId = this.contractId();
-    const result = await new SmartContractStakingClient(
+    const result = await new AirdropClient(
       { resolveBy: "id", id: contractId },
       algod,
     ).transfer(

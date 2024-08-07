@@ -39,10 +39,17 @@ function Lockup({
   const { showException, showSnack } = useSnackbar();
   const { showLoader, hideLoader } = useLoader();
 
-  const [decimals, setDecimals] = useState<string>("1");
+  const periodLimit = new CoreStaker(accountData).lockupPeriodLimit();
+
+  const [period, setPeriod] = useState<string>("0");
 
   function handleClose() {
     onClose();
+    resetState();
+  }
+
+  function resetState() {
+    setPeriod("0");
   }
 
   async function lockup() {
@@ -50,7 +57,7 @@ function Lockup({
       showLoader("Opting for lockup");
       const txn = await new CoreStaker(accountData).lock(
         voiStakingUtils.network.getAlgodClient(),
-        Number(decimals),
+        Number(period),
         {
           addr: address,
           signer: transactionSigner,
@@ -100,27 +107,39 @@ function Lockup({
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                     <FormControl fullWidth variant="outlined">
-                      <FormLabel className="classic-label">Months</FormLabel>
+                      <FormLabel className="classic-label">Period</FormLabel>
                       <Select
                         className="classic-select"
-                        value={decimals}
+                        value={period}
                         onChange={(ev) => {
-                          setDecimals(ev.target.value);
+                          setPeriod(ev.target.value);
                         }}
                         fullWidth
                         color={"primary"}
                       >
-                        {Array.from({ length: 5 }, (_, i) => i + 1).map(
-                          (dec) => {
-                            return (
-                              <MenuItem value={dec} key={dec}>
-                                {dec}
-                              </MenuItem>
-                            );
-                          },
-                        )}
+                        {Array.from(
+                          { length: periodLimit + 1 },
+                          (_, i) => i,
+                        ).map((dec) => {
+                          return (
+                            <MenuItem value={dec} key={dec}>
+                              {dec}
+                            </MenuItem>
+                          );
+                        })}
                       </Select>
                     </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                    {Number(period) === 0 ? (
+                      <div>--None--</div>
+                    ) : (
+                      <div>
+                        {new CoreStaker(accountData).getPeriodInDuration(
+                          Number(period),
+                        )}
+                      </div>
+                    )}
                   </Grid>
                   <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                     <Button

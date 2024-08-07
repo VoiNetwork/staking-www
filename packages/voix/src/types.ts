@@ -1,7 +1,4 @@
-import {
-  BinaryState,
-  IntegerState,
-} from "./clients/SmartContractStakingClient";
+import { BinaryState, IntegerState } from "./clients/AirdropClient";
 
 export type AccountData = {
   contractId: number;

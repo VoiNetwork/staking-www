@@ -54,6 +54,18 @@
           font-size: 20px;
           margin-bottom: 20px;
         }
+        .lockup-deadline {
+          margin-top: 20px;
+          display: flex;
+          flex-direction: column;
+          row-gap: 10px;
+          .key {
+            color: map-get($grey-colors, "form-label");
+          }
+          .value {
+            color: map-get($grey-colors, "A7A9AC");
+          }
+        }
         .lockup-actions {
           margin-top: 20px;
         }

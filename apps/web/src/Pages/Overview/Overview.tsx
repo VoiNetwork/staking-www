@@ -158,6 +158,34 @@ function Overview(): ReactElement {
                     {new CoreStaker(accountData).contractId()}
                   </div>
                 </div>
+
+                <div className="prop">
+                  <div className="key">Deployer</div>
+                  <div
+                    className="val hover hover-underline underline"
+                    onClick={() => {
+                      new BlockPackExplorer(coreNodeInstance).openApplication(
+                        new CoreStaker(accountData).deployer(),
+                      );
+                    }}
+                  >
+                    {new CoreStaker(accountData).deployer()}
+                  </div>
+                </div>
+
+                <div className="prop">
+                  <div className="key">Messenger</div>
+                  <div
+                    className="val hover hover-underline underline"
+                    onClick={() => {
+                      new BlockPackExplorer(coreNodeInstance).openApplication(
+                        new CoreStaker(accountData).messenger(),
+                      );
+                    }}
+                  >
+                    {new CoreStaker(accountData).messenger()}
+                  </div>
+                </div>
               </div>
 
               <Grid container spacing={2}>
@@ -219,44 +247,87 @@ function Overview(): ReactElement {
                       {new CoreStaker(accountData).hasLocked(contract.state) ? (
                         <div>
                           <div className="info-msg">
-                            You have locked your coins for{" "}
-                            {new CoreStaker(accountData).getLockingPeriod(
-                              contract.state,
-                            )}{" "}
-                            months
+                            You have opted for lockup.
+                          </div>
+                          <div className="lockup-deadline">
+                            <div>
+                              <span className="key">
+                                Your lockup duration : &nbsp;
+                              </span>
+                              <span className="value">
+                                {new CoreStaker(
+                                  accountData,
+                                ).getLockupDuration()}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       ) : (
                         <div>
-                          <div className="info-msg">
-                            You have not locked your coins yet. You can opt-in
-                            for locking using below button.
-                          </div>
-                          <div className="lockup-actions">
-                            <Button
-                              variant={"outlined"}
-                              color={"primary"}
-                              onClick={() => {
-                                setLockupModalVisibility(true);
-                              }}
-                            >
-                              Lock
-                            </Button>
-                            <Lockup
-                              show={isLockupModalVisible}
-                              accountData={accountData}
-                              address={activeAccount.address}
-                              onClose={() => {
-                                setLockupModalVisibility(false);
-                              }}
-                              onSuccess={() => {
-                                dispatch(
-                                  loadAccountData(activeAccount.address),
-                                );
-                                setLockupModalVisibility(false);
-                              }}
-                            ></Lockup>
-                          </div>
+                          {new CoreStaker(
+                            accountData,
+                          ).hasLockupDeadlineCompleted() ? (
+                            <div>
+                              <div className="info-msg">
+                                Lockup deadline is completed. you will not be
+                                able to lockup anymore.
+                              </div>
+                            </div>
+                          ) : (
+                            <div>
+                              <div className="info-msg">
+                                You have not locked your coins yet. You can
+                                opt-in for locking using below button.
+                              </div>
+                              <div className="lockup-deadline">
+                                <div>
+                                  <span className="key">
+                                    Deadline duration : &nbsp;
+                                  </span>
+                                  <span className="value">
+                                    {new CoreStaker(
+                                      accountData,
+                                    ).getLockupDeadlineDuration()}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="key">
+                                    Deadline date : &nbsp;
+                                  </span>
+                                  <span className="value">
+                                    {new CoreStaker(
+                                      accountData,
+                                    ).lockupDeadlineDate()}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="lockup-actions">
+                                <Button
+                                  variant={"outlined"}
+                                  color={"primary"}
+                                  onClick={() => {
+                                    setLockupModalVisibility(true);
+                                  }}
+                                >
+                                  Lock
+                                </Button>
+                                <Lockup
+                                  show={isLockupModalVisible}
+                                  accountData={accountData}
+                                  address={activeAccount.address}
+                                  onClose={() => {
+                                    setLockupModalVisibility(false);
+                                  }}
+                                  onSuccess={() => {
+                                    dispatch(
+                                      loadAccountData(activeAccount.address),
+                                    );
+                                    setLockupModalVisibility(false);
+                                  }}
+                                ></Lockup>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
