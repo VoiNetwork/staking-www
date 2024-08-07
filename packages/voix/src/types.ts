@@ -14,6 +14,15 @@ export type AccountData = {
   global_owner: string;
   global_period: number;
   global_total: string | null;
+  global_period_seconds: number;
+  global_lockup_delay: number;
+  global_vesting_delay: number;
+  global_period_limit: number;
+  global_delegate: string | null;
+  global_parent_id: number;
+  global_messenger_id: number;
+  global_initial: string;
+  global_deadline: number;
   part_vote_k: string | null;
   part_sel_k: string | null;
   part_vote_fst: string | null;

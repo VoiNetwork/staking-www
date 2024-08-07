@@ -36,7 +36,8 @@ export class CoreAccount {
   }
 
   availableBalance(): number {
-    return this.balance() - this.minBalance();
+    const availableBalance = this.balance() - this.minBalance();
+    return availableBalance > 0 ? availableBalance : 0;
   }
 
   getParticipation(): AccountParticipation | undefined {
