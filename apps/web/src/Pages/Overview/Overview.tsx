@@ -33,6 +33,7 @@ function Overview(): ReactElement {
 
   const accountData = account.data;
   const stakingAccount = staking.account;
+  const contractState = contract.state;
 
   const [isMetadataVisible, setMetadataVisibility] = useState<boolean>(false);
 
@@ -116,226 +117,254 @@ function Overview(): ReactElement {
               No contract details found for your account.
             </div>
           )}
-          {!isDataLoading && activeAccount && accountData && stakingAccount && (
-            <div>
-              <div className="props">
-                <div className="prop">
-                  <div className="key">Your Account</div>
-                  <div
-                    className="val hover hover-underline underline"
-                    onClick={() => {
-                      new BlockPackExplorer(coreNodeInstance).openAddress(
-                        activeAccount.address,
-                      );
-                    }}
-                  >
-                    {activeAccount.address}
-                  </div>
-                </div>
-                <div className="prop">
-                  <div className="key">Staking Account</div>
-                  <div
-                    className="val hover hover-underline underline"
-                    onClick={() => {
-                      new BlockPackExplorer(coreNodeInstance).openAddress(
-                        new CoreStaker(accountData).stakingAddress(),
-                      );
-                    }}
-                  >
-                    {new CoreStaker(accountData).stakingAddress()}
-                  </div>
-                </div>
-                <div className="prop">
-                  <div className="key">Staking Contract</div>
-                  <div
-                    className="val hover hover-underline underline"
-                    onClick={() => {
-                      new BlockPackExplorer(coreNodeInstance).openApplication(
-                        new CoreStaker(accountData).contractId(),
-                      );
-                    }}
-                  >
-                    {new CoreStaker(accountData).contractId()}
-                  </div>
-                </div>
-
-                <div className="prop">
-                  <div className="key">Deployer</div>
-                  <div
-                    className="val hover hover-underline underline"
-                    onClick={() => {
-                      new BlockPackExplorer(coreNodeInstance).openApplication(
-                        new CoreStaker(accountData).deployer(),
-                      );
-                    }}
-                  >
-                    {new CoreStaker(accountData).deployer()}
-                  </div>
-                </div>
-
-                <div className="prop">
-                  <div className="key">Messenger</div>
-                  <div
-                    className="val hover hover-underline underline"
-                    onClick={() => {
-                      new BlockPackExplorer(coreNodeInstance).openApplication(
-                        new CoreStaker(accountData).messenger(),
-                      );
-                    }}
-                  >
-                    {new CoreStaker(accountData).messenger()}
-                  </div>
-                </div>
-              </div>
-
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
-                  <div className="tile">
-                    <div className="title">Balance</div>
-                    <div className="content">
-                      <NumericFormat
-                        value={microalgosToAlgos(
-                          new CoreAccount(stakingAccount).balance(),
-                        )}
-                        suffix=" Voi"
-                        displayType={"text"}
-                        thousandSeparator={true}
-                      ></NumericFormat>
+          {!isDataLoading &&
+            activeAccount &&
+            accountData &&
+            stakingAccount &&
+            contractState && (
+              <div>
+                <div className="props">
+                  <div className="prop">
+                    <div className="key">Your Account</div>
+                    <div
+                      className="val hover hover-underline underline"
+                      onClick={() => {
+                        new BlockPackExplorer(coreNodeInstance).openAddress(
+                          activeAccount.address,
+                        );
+                      }}
+                    >
+                      {activeAccount.address}
                     </div>
                   </div>
-                </Grid>
-                <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
-                  <div className="tile">
-                    <div className="title">Available balance</div>
-                    <div className="content">
-                      <NumericFormat
-                        value={microalgosToAlgos(
-                          new CoreAccount(stakingAccount).availableBalance(),
-                        )}
-                        suffix=" Voi"
-                        displayType={"text"}
-                        thousandSeparator={true}
-                      ></NumericFormat>
+                  <div className="prop">
+                    <div className="key">Staking Account</div>
+                    <div
+                      className="val hover hover-underline underline"
+                      onClick={() => {
+                        new BlockPackExplorer(coreNodeInstance).openAddress(
+                          new CoreStaker(accountData).stakingAddress(),
+                        );
+                      }}
+                    >
+                      {new CoreStaker(accountData).stakingAddress()}
                     </div>
                   </div>
-                </Grid>
-                <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
-                  <div className="tile">
-                    <div className="title">Status</div>
-                    <div className="content">
-                      {new CoreAccount(stakingAccount).isOnline()
-                        ? "Online"
-                        : "Offline"}
+                  <div className="prop">
+                    <div className="key">Delegated to</div>
+                    <div
+                      className="val hover hover-underline underline"
+                      onClick={() => {
+                        const addr = new CoreStaker(
+                          accountData,
+                        ).delegateAddress(contractState);
+                        if (addr) {
+                          new BlockPackExplorer(coreNodeInstance).openAddress(
+                            addr,
+                          );
+                        }
+                      }}
+                    >
+                      {new CoreStaker(accountData).isDelegated(contractState)
+                        ? new CoreStaker(accountData).delegateAddress(
+                            contractState,
+                          )
+                        : "--None--"}
                     </div>
                   </div>
-                </Grid>
-                <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
-                  <div className="tile">
-                    <div className="title">Key expires</div>
-                    <div className="content">{expiresIn}</div>
+                  <div className="prop">
+                    <div className="key">Staking Contract</div>
+                    <div
+                      className="val hover hover-underline underline"
+                      onClick={() => {
+                        new BlockPackExplorer(coreNodeInstance).openApplication(
+                          new CoreStaker(accountData).contractId(),
+                        );
+                      }}
+                    >
+                      {new CoreStaker(accountData).contractId()}
+                    </div>
                   </div>
-                </Grid>
-              </Grid>
 
-              <div className="lockup-details">
-                <div className="lockup-details-header">Lockup details</div>
-                <div className="lockup-details-body">
-                  {contract.loading && <LoadingTile></LoadingTile>}
+                  <div className="prop">
+                    <div className="key">Deployer</div>
+                    <div
+                      className="val hover hover-underline underline"
+                      onClick={() => {
+                        new BlockPackExplorer(coreNodeInstance).openApplication(
+                          new CoreStaker(accountData).deployer(),
+                        );
+                      }}
+                    >
+                      {new CoreStaker(accountData).deployer()}
+                    </div>
+                  </div>
 
-                  {!contract.loading && contract.state && (
-                    <div>
-                      {new CoreStaker(accountData).hasLocked(contract.state) ? (
-                        <div>
-                          <div className="info-msg">
-                            You have opted for lockup.
-                          </div>
-                          <div className="lockup-deadline">
-                            <div>
-                              <span className="key">
-                                Your lockup duration : &nbsp;
-                              </span>
-                              <span className="value">
-                                {new CoreStaker(
-                                  accountData,
-                                ).getLockupDuration()}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div>
-                          {new CoreStaker(
-                            accountData,
-                          ).hasLockupDeadlineCompleted() ? (
-                            <div>
-                              <div className="info-msg">
-                                Lockup deadline is completed. you will not be
-                                able to lockup anymore.
-                              </div>
-                            </div>
-                          ) : (
-                            <div>
-                              <div className="info-msg">
-                                You have not locked your coins yet. You can
-                                opt-in for locking using below button.
-                              </div>
-                              <div className="lockup-deadline">
-                                <div>
-                                  <span className="key">
-                                    Deadline duration : &nbsp;
-                                  </span>
-                                  <span className="value">
-                                    {new CoreStaker(
-                                      accountData,
-                                    ).getLockupDeadlineDuration()}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span className="key">
-                                    Deadline date : &nbsp;
-                                  </span>
-                                  <span className="value">
-                                    {new CoreStaker(
-                                      accountData,
-                                    ).lockupDeadlineDate()}
-                                  </span>
-                                </div>
-                              </div>
-                              <div className="lockup-actions">
-                                <Button
-                                  variant={"outlined"}
-                                  color={"primary"}
-                                  onClick={() => {
-                                    setLockupModalVisibility(true);
-                                  }}
-                                >
-                                  Lock
-                                </Button>
-                                <Lockup
-                                  show={isLockupModalVisible}
-                                  accountData={accountData}
-                                  address={activeAccount.address}
-                                  onClose={() => {
-                                    setLockupModalVisibility(false);
-                                  }}
-                                  onSuccess={() => {
-                                    dispatch(
-                                      loadAccountData(activeAccount.address),
-                                    );
-                                    setLockupModalVisibility(false);
-                                  }}
-                                ></Lockup>
-                              </div>
-                            </div>
+                  <div className="prop">
+                    <div className="key">Messenger</div>
+                    <div
+                      className="val hover hover-underline underline"
+                      onClick={() => {
+                        new BlockPackExplorer(coreNodeInstance).openApplication(
+                          new CoreStaker(accountData).messenger(),
+                        );
+                      }}
+                    >
+                      {new CoreStaker(accountData).messenger()}
+                    </div>
+                  </div>
+                </div>
+
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
+                    <div className="tile">
+                      <div className="title">Balance</div>
+                      <div className="content">
+                        <NumericFormat
+                          value={microalgosToAlgos(
+                            new CoreAccount(stakingAccount).balance(),
                           )}
-                        </div>
-                      )}
+                          suffix=" Voi"
+                          displayType={"text"}
+                          thousandSeparator={true}
+                        ></NumericFormat>
+                      </div>
                     </div>
-                  )}
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
+                    <div className="tile">
+                      <div className="title">Available balance</div>
+                      <div className="content">
+                        <NumericFormat
+                          value={microalgosToAlgos(
+                            new CoreAccount(stakingAccount).availableBalance(),
+                          )}
+                          suffix=" Voi"
+                          displayType={"text"}
+                          thousandSeparator={true}
+                        ></NumericFormat>
+                      </div>
+                    </div>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
+                    <div className="tile">
+                      <div className="title">Status</div>
+                      <div className="content">
+                        {new CoreAccount(stakingAccount).isOnline()
+                          ? "Online"
+                          : "Offline"}
+                      </div>
+                    </div>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
+                    <div className="tile">
+                      <div className="title">Key expires</div>
+                      <div className="content">{expiresIn}</div>
+                    </div>
+                  </Grid>
+                </Grid>
+
+                <div className="lockup-details">
+                  <div className="lockup-details-header">Lockup details</div>
+                  <div className="lockup-details-body">
+                    {contract.loading && <LoadingTile></LoadingTile>}
+
+                    {!contract.loading && contract.state && (
+                      <div>
+                        {new CoreStaker(accountData).hasLocked(
+                          contract.state,
+                        ) ? (
+                          <div>
+                            <div className="info-msg">
+                              You have opted for lockup.
+                            </div>
+                            <div className="lockup-deadline">
+                              <div>
+                                <span className="key">
+                                  Your lockup duration : &nbsp;
+                                </span>
+                                <span className="value">
+                                  {new CoreStaker(
+                                    accountData,
+                                  ).getLockupDuration()}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            {new CoreStaker(
+                              accountData,
+                            ).hasLockupDeadlineCompleted() ? (
+                              <div>
+                                <div className="info-msg">
+                                  Lockup deadline is completed. you will not be
+                                  able to lockup anymore.
+                                </div>
+                              </div>
+                            ) : (
+                              <div>
+                                <div className="info-msg">
+                                  You have not locked your coins yet. You can
+                                  opt-in for locking using below button.
+                                </div>
+                                <div className="lockup-deadline">
+                                  <div>
+                                    <span className="key">
+                                      Deadline duration : &nbsp;
+                                    </span>
+                                    <span className="value">
+                                      {new CoreStaker(
+                                        accountData,
+                                      ).getLockupDeadlineDuration()}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <span className="key">
+                                      Deadline date : &nbsp;
+                                    </span>
+                                    <span className="value">
+                                      {new CoreStaker(
+                                        accountData,
+                                      ).lockupDeadlineDate()}
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="lockup-actions">
+                                  <Button
+                                    variant={"outlined"}
+                                    color={"primary"}
+                                    onClick={() => {
+                                      setLockupModalVisibility(true);
+                                    }}
+                                  >
+                                    Lock
+                                  </Button>
+                                  <Lockup
+                                    show={isLockupModalVisible}
+                                    accountData={accountData}
+                                    address={activeAccount.address}
+                                    onClose={() => {
+                                      setLockupModalVisibility(false);
+                                    }}
+                                    onSuccess={() => {
+                                      dispatch(
+                                        loadAccountData(activeAccount.address),
+                                      );
+                                      setLockupModalVisibility(false);
+                                    }}
+                                  ></Lockup>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
         </div>
       </div>
     </div>

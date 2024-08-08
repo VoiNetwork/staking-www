@@ -8,6 +8,7 @@ import {
   HomeOutlined,
   MoveDown,
   Payments,
+  SupervisorAccount,
 } from "@mui/icons-material";
 import logo from "../../assets/images/full-logo.png";
 
@@ -19,7 +20,14 @@ function LeftPanel(): ReactElement {
   route = route.split("/");
   route = route[0];
 
-  const routes = ["overview", "stake", "deposit", "withdraw", "transfer"];
+  const routes = [
+    "overview",
+    "stake",
+    "deposit",
+    "withdraw",
+    "transfer",
+    "delegate",
+  ];
   if (routes.indexOf(route) === -1) {
     route = false;
   }
@@ -77,6 +85,14 @@ function LeftPanel(): ReactElement {
               component={Link}
               to={`/transfer`}
               icon={<MoveDown></MoveDown>}
+            />
+            <Tab
+              label="Delegate"
+              value="delegate"
+              iconPosition="start"
+              component={Link}
+              to={`/delegate`}
+              icon={<SupervisorAccount></SupervisorAccount>}
             />
           </Tabs>
         </div>

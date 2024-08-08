@@ -12,6 +12,7 @@ import Withdraw from "../../Pages/Withdraw/Withdraw";
 import Deposit from "../../Pages/Deposit/Deposit";
 import Transfer from "../../Pages/Transfer/Transfer";
 import ContractPicker from "../../Components/ContractPicker/ContractPicker";
+import Delegate from "../../Pages/Delegate/Delegate";
 
 function AppRouter(): ReactElement {
   const { selectedNode } = useSelector((state: RootState) => state.nodes);
@@ -64,6 +65,10 @@ function AppRouter(): ReactElement {
                         <Route
                           path="/transfer"
                           element={<Transfer></Transfer>}
+                        ></Route>
+                        <Route
+                          path="/delegate"
+                          element={<Delegate></Delegate>}
                         ></Route>
                         <Route
                           path="*"

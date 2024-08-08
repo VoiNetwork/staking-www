@@ -35,6 +35,7 @@ export type StakingContractState = {
   owner?: BinaryState;
   period?: IntegerState;
   total?: IntegerState;
+  delegate?: BinaryState;
 };
 
 export type ParticipateParams = {

@@ -4,6 +4,7 @@ import {
   ABIContract,
   Algodv2,
   AtomicTransactionComposer,
+  encodeAddress,
   makePaymentTxnWithSuggestedParamsFromObject,
   Transaction,
 } from "algosdk";
@@ -11,7 +12,7 @@ import { TransactionSignerAccount } from "@algorandfoundation/algokit-utils/type
 import abi from "../clients/airdrop.contract.json";
 import { getTransactionParams } from "@algorandfoundation/algokit-utils";
 import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
-import { CoreAccount } from "@repo/algocore";
+import { CoreAccount, isZeroAddress } from "@repo/algocore";
 import { AlgoAmount } from "@algorandfoundation/algokit-utils/types/amount";
 import humanizeDuration from "humanize-duration";
 
@@ -28,6 +29,20 @@ export class CoreStaker {
 
   stakingAddress(): string {
     return this.accountData.contractAddress;
+  }
+
+  delegateAddress(state: StakingContractState): string | undefined {
+    const delegate = state.delegate?.asByteArray() || "";
+    if (delegate) {
+      const address = encodeAddress(delegate).toString();
+      if (!isZeroAddress(address)) {
+        return address;
+      }
+    }
+  }
+
+  isDelegated(state: StakingContractState): boolean {
+    return Boolean(this.delegateAddress(state));
   }
 
   deployer(): number {
@@ -240,6 +255,27 @@ export class CoreStaker {
     ).transfer(
       {
         newOwner: address,
+      },
+      {
+        sender,
+      },
+    );
+
+    return result.transaction;
+  }
+
+  async delegate(
+    algod: Algodv2,
+    address: string,
+    sender: TransactionSignerAccount,
+  ): Promise<Transaction> {
+    const contractId = this.contractId();
+    const result = await new AirdropClient(
+      { resolveBy: "id", id: contractId },
+      algod,
+    ).setDelegate(
+      {
+        delegate: address,
       },
       {
         sender,
