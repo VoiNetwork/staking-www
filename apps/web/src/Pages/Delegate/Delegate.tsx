@@ -12,7 +12,7 @@ import { waitForConfirmation } from "@algorandfoundation/algokit-utils";
 import { confirmationProps, ShadedInput } from "@repo/theme";
 import TransactionDetails from "../../Components/TransactionDetails/TransactionDetails";
 import { isValidAddress, microalgosToAlgos } from "algosdk";
-import { CoreAccount } from "@repo/algocore";
+import { CoreAccount, ZERO_ADDRESS_STRING } from "@repo/algocore";
 import { NumericFormat } from "react-number-format";
 import { useConfirm } from "material-ui-confirm";
 
@@ -43,22 +43,23 @@ function Delegate(): ReactElement {
   const isDataLoading =
     loading || account.loading || staking.loading || contract.loading;
 
-  async function delegate(data: AccountData) {
+  async function delegate(data: AccountData, address: string) {
     if (!activeAccount) {
       showSnack("Please connect your wallet", "error");
       return;
     }
 
-    if (!delegateTo || !isValidAddress(delegateTo)) {
+    if (!address || !isValidAddress(address)) {
       showSnack("Invalid address", "error");
       return;
     }
 
+    const isRevoke = address === ZERO_ADDRESS_STRING;
     try {
-      showLoader("Delegating...");
+      showLoader(isRevoke ? "Revoking..." : "Delegating...");
       const transaction = await new CoreStaker(data).delegate(
         voiStakingUtils.network.getAlgodClient(),
-        delegateTo,
+        address,
         {
           addr: activeAccount.address,
           signer: transactionSigner,
@@ -72,8 +73,9 @@ function Delegate(): ReactElement {
       );
 
       setTxnId(transaction.txID());
-      setTxnMsg("You have delegated successfully.");
+      setTxnMsg(`You have ${isRevoke ? "revoked" : "delegated"} successfully.`);
       dispatch(loadAccountData(activeAccount.address));
+      setDelegateTo("");
     } catch (e) {
       showException(e);
     } finally {
@@ -111,11 +113,32 @@ function Delegate(): ReactElement {
                   <div className="prop">
                     <div className="key">Delegated to</div>
                     <div className="value">
-                      {new CoreStaker(accountData).isDelegated(contractState)
-                        ? new CoreStaker(accountData).delegateAddress(
-                            contractState,
-                          )
-                        : "--None--"}
+                      {new CoreStaker(accountData).isDelegated(
+                        contractState,
+                      ) ? (
+                        <div className="flex">
+                          <div>
+                            {new CoreStaker(accountData).delegateAddress(
+                              contractState,
+                            )}
+                          </div>
+                          <div>
+                            <Button
+                              color={"error"}
+                              variant={"contained"}
+                              size={"small"}
+                              onClick={() => {
+                                delegate(accountData, ZERO_ADDRESS_STRING);
+                              }}
+                              sx={{ marginLeft: "10px" }}
+                            >
+                              Revoke
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        "--None--"
+                      )}
                     </div>
                   </div>
                   <div className="prop">
@@ -179,7 +202,7 @@ function Delegate(): ReactElement {
                             description: `You are trying to delegate to the address ${delegateTo}.`,
                           })
                             .then(async () => {
-                              delegate(accountData);
+                              delegate(accountData, delegateTo);
                             })
                             .catch(() => {});
                         }}
