@@ -1,5 +1,6 @@
 {
   "name": "Airdrop",
+  "events": [],
   "methods": [
     {
       "name": "setup",
