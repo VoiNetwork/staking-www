@@ -1,5 +1,5 @@
 import "./Transfer.scss";
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../Redux/store";
 import { useWallet } from "@txnlab/use-wallet-react";
@@ -12,7 +12,7 @@ import { waitForConfirmation } from "@algorandfoundation/algokit-utils";
 import { confirmationProps, ShadedInput } from "@repo/theme";
 import TransactionDetails from "../../Components/TransactionDetails/TransactionDetails";
 import { isValidAddress, microalgosToAlgos } from "algosdk";
-import { CoreAccount } from "@repo/algocore";
+import { CoreAccount, NodeClient } from "@repo/algocore";
 import { NumericFormat } from "react-number-format";
 import { useConfirm } from "material-ui-confirm";
 
@@ -26,7 +26,7 @@ function Transfer(): ReactElement {
   const { loading } = useSelector((state: RootState) => state.node);
 
   const { account, staking, contract } = useSelector(
-    (state: RootState) => state.user,
+    (state: RootState) => state.user
   );
 
   const dispatch = useAppDispatch();
@@ -62,13 +62,13 @@ function Transfer(): ReactElement {
         {
           addr: activeAccount.address,
           signer: transactionSigner,
-        },
+        }
       );
 
       await waitForConfirmation(
         transaction.txID(),
         20,
-        voiStakingUtils.network.getAlgodClient(),
+        voiStakingUtils.network.getAlgodClient()
       );
 
       setTxnId(transaction.txID());
@@ -80,6 +80,15 @@ function Transfer(): ReactElement {
       hideLoader();
     }
   }
+
+  const [minBalance, setMinBalance] = useState<number>(-1);
+  useEffect(() => {
+    if (!activeAccount || !contractState || !accountData) return;
+    const algod = new NodeClient(voiStakingUtils.network);
+    new CoreStaker(accountData)
+      .getMinBalance(algod.algod, contractState)
+      .then(setMinBalance);
+  }, [activeAccount, accountData, contractState]);
 
   return (
     <div className="transfer-wrapper">
@@ -118,9 +127,15 @@ function Transfer(): ReactElement {
                     <div className="key">Available balance</div>
                     <div className="value">
                       <NumericFormat
-                        value={microalgosToAlgos(
-                          new CoreAccount(stakingAccount).availableBalance(),
-                        )}
+                        value={
+                          minBalance < 0
+                            ? "-"
+                            : microalgosToAlgos(
+                                new CoreAccount(
+                                  stakingAccount
+                                ).availableBalance() - minBalance
+                              )
+                        }
                         suffix=" VOI"
                         displayType={"text"}
                         thousandSeparator={true}

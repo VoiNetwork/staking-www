@@ -54,7 +54,7 @@ export const loadAccountData: AsyncThunk<void, string, any> = createAsyncThunk(
       dispatch(resetUserState());
       dispatch(setAccountDataLoading(true));
       const availableContracts = await new StakingClient().getAccountData(
-        address,
+        address
       );
       dispatch(setAvailableContracts(availableContracts));
 
@@ -78,7 +78,7 @@ export const loadAccountData: AsyncThunk<void, string, any> = createAsyncThunk(
     } finally {
       dispatch(setAccountDataLoading(false));
     }
-  },
+  }
 );
 
 export const initAccountData: AsyncThunk<void, AccountData, any> =
@@ -91,9 +91,9 @@ export const initAccountData: AsyncThunk<void, AccountData, any> =
       dispatch(loadContractState(accountData));
       localStorage.setItem(
         "currentContractId",
-        accountData.contractId.toString(),
+        accountData.contractId.toString()
       );
-    },
+    }
   );
 
 export const loadStakingAccount: AsyncThunk<void, string, any> =
@@ -104,7 +104,7 @@ export const loadStakingAccount: AsyncThunk<void, string, any> =
       try {
         dispatch(setStakingAccountLoading(true));
         const account = await new AccountClient(voiStakingUtils.network).get(
-          address,
+          address
         );
         dispatch(setStakingAccount(account));
       } catch (e) {
@@ -112,7 +112,7 @@ export const loadStakingAccount: AsyncThunk<void, string, any> =
       } finally {
         dispatch(setStakingAccountLoading(false));
       }
-    },
+    }
   );
 
 export const loadContractState: AsyncThunk<void, AccountData, any> =
@@ -122,16 +122,16 @@ export const loadContractState: AsyncThunk<void, AccountData, any> =
       const { dispatch } = thunkAPI;
       try {
         dispatch(setContractStateLoading(true));
-        const state = await new CoreStaker(data).getStakingState(
-          voiStakingUtils.network.getAlgodClient(),
-        );
+        const algod = voiStakingUtils.network.getAlgodClient();
+        const staker = new CoreStaker(data);
+        const state = await staker.getStakingState(algod);
         dispatch(setContractState(state));
       } catch (e) {
         /* empty */
       } finally {
         dispatch(setContractStateLoading(false));
       }
-    },
+    }
   );
 
 export const nodeSlice = createSlice({

@@ -33,7 +33,6 @@ function AppRouter(): ReactElement {
           <div className="app-left">
             <LeftPanel></LeftPanel>
           </div>
-
           <div className="app-right">
             <div className="content-wrapper">
               <div className="content-container">
@@ -69,6 +68,10 @@ function AppRouter(): ReactElement {
                         <Route
                           path="/delegate"
                           element={<Delegate></Delegate>}
+                        ></Route>
+                        <Route
+                          path="/airdrop"
+                          element={<Navigate to="/airdrop" replace />}
                         ></Route>
                         <Route
                           path="*"

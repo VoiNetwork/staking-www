@@ -61,12 +61,12 @@ function Lockup({
         {
           addr: address,
           signer: transactionSigner,
-        }
+        },
       );
       await waitForConfirmation(
         txn.txID(),
         20,
-        voiStakingUtils.network.getAlgodClient()
+        voiStakingUtils.network.getAlgodClient(),
       );
       showSnack("Transaction successful", "success");
 
@@ -119,7 +119,7 @@ function Lockup({
                       >
                         {Array.from(
                           { length: periodLimit + 1 },
-                          (_, i) => i
+                          (_, i) => i,
                         ).map((dec) => {
                           return (
                             <MenuItem value={dec} key={dec}>
@@ -136,7 +136,7 @@ function Lockup({
                     ) : (
                       <div>
                         {new CoreStaker(accountData).getPeriodInDuration(
-                          Number(period)
+                          Number(period),
                         )}
                       </div>
                     )}

@@ -15,6 +15,7 @@ import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
 import { CoreAccount, isZeroAddress } from "@repo/algocore";
 import { AlgoAmount } from "@algorandfoundation/algokit-utils/types/amount";
 import humanizeDuration from "humanize-duration";
+import { CONTRACT } from "ulujs";
 
 export class CoreStaker {
   accountData: AccountData;
@@ -45,6 +46,10 @@ export class CoreStaker {
     return Boolean(this.delegateAddress(state));
   }
 
+  owner(): string {
+    return this.accountData.global_owner;
+  }
+
   deployer(): number {
     return this.accountData.global_parent_id;
   }
@@ -61,8 +66,12 @@ export class CoreStaker {
     const contractId = this.contractId();
     return await new AirdropClient(
       { resolveBy: "id", id: contractId },
-      algod,
+      algod
     ).getGlobalState();
+  }
+
+  getOwner(state: StakingContractState): string {
+    return encodeAddress(state.owner.asByteArray()).toString();
   }
 
   getLockingPeriod(state: StakingContractState): number {
@@ -117,9 +126,14 @@ export class CoreStaker {
     return this.accountData.global_period_seconds;
   }
 
+  lockupDelay(): number {
+    return this.accountData.global_lockup_delay;
+  }
+
   getPeriodInSeconds(period: number) {
     const periodSeconds = this.periodSeconds();
-    return period * periodSeconds;
+    const lockupDelay = this.lockupDelay();
+    return period * periodSeconds * lockupDelay;
   }
 
   getPeriodInDuration(period: number) {
@@ -139,19 +153,19 @@ export class CoreStaker {
   async lock(
     algod: Algodv2,
     months: number,
-    sender: TransactionSignerAccount,
+    sender: TransactionSignerAccount
   ): Promise<Transaction> {
     const contractId = this.contractId();
     const result = await new AirdropClient(
       { resolveBy: "id", id: contractId },
-      algod,
+      algod
     ).configure(
       {
         period: months,
       },
       {
         sender,
-      },
+      }
     );
 
     return result.transaction;
@@ -160,7 +174,7 @@ export class CoreStaker {
   async stake(
     algod: Algodv2,
     params: ParticipateParams,
-    sender: TransactionSignerAccount,
+    sender: TransactionSignerAccount
   ): Promise<string> {
     const contractId = this.contractId();
 
@@ -200,12 +214,12 @@ export class CoreStaker {
   async withdraw(
     algod: Algodv2,
     amount: number,
-    sender: TransactionSignerAccount,
+    sender: TransactionSignerAccount
   ): Promise<Transaction> {
     const contractId = this.contractId();
     const result = await new AirdropClient(
       { resolveBy: "id", id: contractId },
-      algod,
+      algod
     ).withdraw(
       {
         amount: amount,
@@ -215,16 +229,33 @@ export class CoreStaker {
         sendParams: {
           fee: AlgoAmount.MicroAlgos(2000),
         },
-      },
+      }
     );
 
     return result.transaction;
   }
 
+  async getMinBalance(
+    algod: Algodv2,
+    state: StakingContractState
+  ): Promise<number> {
+    const contractId = this.contractId();
+    const ci = new CONTRACT(contractId, algod, undefined, abi, {
+      addr: this.getOwner(state),
+      sk: new Uint8Array(0),
+    });
+    const withdrawR = await ci.withdraw(0);
+    if (withdrawR.success) {
+      return Number(withdrawR.returnValue);
+    } else {
+      return 0;
+    }
+  }
+
   async deposit(
     algod: Algodv2,
     amount: number,
-    sender: TransactionSignerAccount,
+    sender: TransactionSignerAccount
   ): Promise<string> {
     const txnParams = await getTransactionParams(undefined, algod);
     const atc = new AtomicTransactionComposer();
@@ -246,19 +277,19 @@ export class CoreStaker {
   async transfer(
     algod: Algodv2,
     address: string,
-    sender: TransactionSignerAccount,
+    sender: TransactionSignerAccount
   ): Promise<Transaction> {
     const contractId = this.contractId();
     const result = await new AirdropClient(
       { resolveBy: "id", id: contractId },
-      algod,
+      algod
     ).transfer(
       {
         newOwner: address,
       },
       {
         sender,
-      },
+      }
     );
 
     return result.transaction;
@@ -267,19 +298,19 @@ export class CoreStaker {
   async delegate(
     algod: Algodv2,
     address: string,
-    sender: TransactionSignerAccount,
+    sender: TransactionSignerAccount
   ): Promise<Transaction> {
     const contractId = this.contractId();
     const result = await new AirdropClient(
       { resolveBy: "id", id: contractId },
-      algod,
+      algod
     ).setDelegate(
       {
         delegate: address,
       },
       {
         sender,
-      },
+      }
     );
 
     return result.transaction;

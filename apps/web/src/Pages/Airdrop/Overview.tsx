@@ -80,15 +80,6 @@ function Overview(): ReactElement {
     }
   }, [staking]);
 
-  const [minBalance, setMinBalance] = useState<number>(-1);
-  useEffect(() => {
-    if (!activeAccount || !contractState || !accountData) return;
-    const algod = new NodeClient(voiStakingUtils.network);
-    new CoreStaker(accountData)
-      .getMinBalance(algod.algod, contractState)
-      .then(setMinBalance);
-  }, [activeAccount, accountData, contractState]);
-
   return (
     <div className="overview-wrapper">
       <div className="overview-container">
@@ -245,15 +236,9 @@ function Overview(): ReactElement {
                       <div className="title">Available balance</div>
                       <div className="content">
                         <NumericFormat
-                          value={
-                            minBalance < 0
-                              ? "-"
-                              : microalgosToAlgos(
-                                  new CoreAccount(
-                                    stakingAccount
-                                  ).availableBalance() - minBalance
-                                )
-                          }
+                          value={microalgosToAlgos(
+                            new CoreAccount(stakingAccount).availableBalance()
+                          )}
                           suffix=" Voi"
                           displayType={"text"}
                           thousandSeparator={true}
