@@ -126,65 +126,6 @@ function LeftPanel(): ReactElement {
                   />
                 ))
               : null}
-
-            {/*
-            <Tab
-              label="Airdrop"
-              value="airdrop"
-              iconPosition="start"
-              component={Link}
-              to={`/airdrop`}
-              icon={<Redeem></Redeem>}
-            />
-            <Tab
-              label="Overview"
-              value="overview"
-              iconPosition="start"
-              component={Link}
-              to={`/overview`}
-              icon={<HomeOutlined></HomeOutlined>}
-            />
-            <Tab
-              label="Stake"
-              value="stake"
-              iconPosition="start"
-              component={Link}
-              to={`/stake`}
-              icon={<AdjustOutlined></AdjustOutlined>}
-            />
-            <Tab
-              label="Deposit"
-              value="deposit"
-              iconPosition="start"
-              component={Link}
-              to={`/deposit`}
-              icon={<AdfScannerOutlined></AdfScannerOutlined>}
-            />
-            <Tab
-              label="Withdraw"
-              value="withdraw"
-              iconPosition="start"
-              component={Link}
-              to={`/withdraw`}
-              icon={<Payments></Payments>}
-            />
-            <Tab
-              label="Transfer"
-              value="transfer"
-              iconPosition="start"
-              component={Link}
-              to={`/transfer`}
-              icon={<MoveDown></MoveDown>}
-            />
-            <Tab
-              label="Delegate"
-              value="delegate"
-              iconPosition="start"
-              component={Link}
-              to={`/delegate`}
-              icon={<SupervisorAccount></SupervisorAccount>}
-            />
-              */}
           </Tabs>
         </div>
       </div>
