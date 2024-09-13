@@ -20,6 +20,8 @@ export type AccountData = {
   global_messenger_id: number;
   global_initial: string;
   global_deadline: number;
+  global_distribution_count: number;
+  global_distribution_seconds: number;
   part_vote_k: string | null;
   part_sel_k: string | null;
   part_vote_fst: string | null;

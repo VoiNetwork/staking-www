@@ -69,7 +69,7 @@ function Lockup({
         voiStakingUtils.network.getAlgodClient()
       );
       showSnack("Transaction successful", "success");
-
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // TODO replace with indexer confirmation
       onSuccess();
     } catch (e) {
       showException(e);

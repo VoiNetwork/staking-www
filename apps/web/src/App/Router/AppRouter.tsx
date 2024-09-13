@@ -13,12 +13,15 @@ import Deposit from "../../Pages/Deposit/Deposit";
 import Transfer from "../../Pages/Transfer/Transfer";
 import ContractPicker from "../../Components/ContractPicker/ContractPicker";
 import Delegate from "../../Pages/Delegate/Delegate";
+import Airdrop from "../../Pages/Airdrop/Airdrop";
 
 function AppRouter(): ReactElement {
   const { selectedNode } = useSelector((state: RootState) => state.nodes);
   const { activeAccount } = useWallet();
 
   const dispatch = useAppDispatch();
+
+  const isAirdrop = document.location?.pathname?.includes("airdrop");
 
   useEffect(() => {
     if (activeAccount?.address) {
@@ -40,9 +43,11 @@ function AppRouter(): ReactElement {
                   <div>
                     <WalletWidget></WalletWidget>
                   </div>
-                  <div>
-                    <ContractPicker></ContractPicker>
-                  </div>
+                  {!isAirdrop ? (
+                    <div>
+                      <ContractPicker></ContractPicker>
+                    </div>
+                  ) : null}
                 </div>
                 {selectedNode && (
                   <div className="content-body">
@@ -71,7 +76,7 @@ function AppRouter(): ReactElement {
                         ></Route>
                         <Route
                           path="/airdrop"
-                          element={<Navigate to="/airdrop" replace />}
+                          element={<Airdrop></Airdrop>}
                         ></Route>
                         <Route
                           path="*"

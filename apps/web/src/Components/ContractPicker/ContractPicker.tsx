@@ -10,17 +10,24 @@ import {
 import { ArrowDropDown, Done } from "@mui/icons-material";
 import { RootState, useAppDispatch } from "../../Redux/store";
 import { useSelector } from "react-redux";
-import { CoreStaker } from "@repo/voix";
+import { AccountData, CoreStaker } from "@repo/voix";
 import { initAccountData } from "../../Redux/staking/userReducer";
 import { theme } from "@repo/theme";
 
-function ContractPicker(): ReactElement {
+interface ContractPickerProps {
+  funder?: string;
+}
+function ContractPicker(props: ContractPickerProps): ReactElement {
   const [menuAnchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const { account } = useSelector((state: RootState) => state.user);
 
   const dispatch = useAppDispatch();
 
   const { availableContracts, data } = account;
+
+  const filteredContracts = availableContracts.filter(
+    (contract) => !props.funder || contract.global_funder === props.funder
+  );
 
   function closeMenu() {
     setAnchorEl(null);
@@ -30,7 +37,7 @@ function ContractPicker(): ReactElement {
     <div className="contract-picker-wrapper">
       <div className="contract-picker-container">
         <div>
-          {data && availableContracts.length > 0 && (
+          {data && filteredContracts.length > 0 && (
             <div>
               <Button
                 variant="outlined"
@@ -63,7 +70,7 @@ function ContractPicker(): ReactElement {
                 }}
                 onClose={closeMenu}
               >
-                {availableContracts.map((accountData) => {
+                {filteredContracts.map((accountData: AccountData) => {
                   const staker = new CoreStaker(accountData);
                   return (
                     <MenuItem

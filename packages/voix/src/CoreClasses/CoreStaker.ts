@@ -28,6 +28,10 @@ export class CoreStaker {
     return this.accountData.contractId;
   }
 
+  initial(): number {
+    return Number(this.accountData.global_initial) / 1e6;
+  }
+
   stakingAddress(): string {
     return this.accountData.contractAddress;
   }
@@ -136,9 +140,12 @@ export class CoreStaker {
     return period * periodSeconds * lockupDelay;
   }
 
-  getPeriodInDuration(period: number) {
+  getPeriodInDuration(period: number, options?: any) {
     const seconds = this.getPeriodInSeconds(period);
-    return humanizeDuration(seconds * 1000, { largest: 2, round: false });
+    return humanizeDuration(
+      seconds * 1000,
+      options || { largest: 2, round: false }
+    );
   }
 
   lockupPeriod() {
