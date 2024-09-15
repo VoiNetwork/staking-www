@@ -11,18 +11,20 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Tab,
 } from "@mui/material";
-import ContractPicker from "../ContractPicker/ContractPicker";
+import ContractPicker from "../../../Components/ContractPicker/ContractPicker";
 import { useSelector } from "react-redux";
-import { RootState, useAppDispatch } from "../../Redux/store";
+import { RootState, useAppDispatch } from "../../../Redux/store";
 import moment from "moment";
 import humanizeDuration from "humanize-duration";
-import Lockup from "../../Pages/Airdrop/Lockup/Lockup";
+import Lockup from "../Lockup/Lockup";
 import { useWallet } from "@txnlab/use-wallet-react";
 import {
   initAccountData,
   loadAccountData,
-} from "../../Redux/staking/userReducer";
+} from "../../../Redux/staking/userReducer";
+import { NavLink } from "react-router-dom";
 
 const formatNumber = (number: number): string => {
   return new Intl.NumberFormat("en-US", {
@@ -72,11 +74,7 @@ interface LockupProps {
   parent_id: number;
   rate: (period: number) => number;
 }
-const HorizontalStepper: React.FC<LockupProps> = ({
-  funder,
-  parent_id,
-  rate,
-}) => {
+const StakingTable: React.FC<LockupProps> = ({ funder, parent_id, rate }) => {
   const { account, staking, contract } = useSelector(
     (state: RootState) => state.user
   );
@@ -102,11 +100,10 @@ const HorizontalStepper: React.FC<LockupProps> = ({
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Deadline</TableCell>
               <TableCell>Amount</TableCell>
               <TableCell>Lockup</TableCell>
               <TableCell>Vesting</TableCell>
-              <TableCell>Stakeable Balance</TableCell>
+              <TableCell>Total</TableCell>
               <TableCell>Action</TableCell>
             </TableRow>
           </TableHead>
@@ -114,40 +111,35 @@ const HorizontalStepper: React.FC<LockupProps> = ({
             {filteredContracts.map((contract) => (
               <TableRow key={contract.contractId}>
                 <TableCell>
-                  <UnixToDateTime
-                    timestamp={Number(contract.global_deadline)}
-                  />
-                </TableCell>
-                <TableCell>
                   {formatNumber(Number(contract.global_initial) / 1e6)} VOI
                 </TableCell>
                 <TableCell>
-                  {contract.global_period === 0
-                    ? "-"
-                    : humanizeDuration(
-                        Number(contract.global_period) *
-                          Number(contract.global_lockup_delay) *
-                          Number(contract.global_period_seconds) *
-                          1000,
-                        { units: ["y"], round: true }
-                      )}
+                  {humanizeDuration(
+                    (Number(contract.global_period) *
+                      Number(contract.global_lockup_delay) +
+                      Number(contract.global_vesting_delay)) *
+                      Number(contract.global_period_seconds) *
+                      1000,
+                    { units: ["mo"], round: true }
+                  )}
                 </TableCell>
                 <TableCell>
                   {humanizeDuration(
                     Number(contract.global_distribution_count) *
                       Number(contract.global_distribution_seconds) *
                       1000,
-                    { units: ["y"], round: true }
+                    { units: ["mo"], round: true }
                   )}
                 </TableCell>
-
                 <TableCell>
-                  <CompoundInterest
-                    principal={Number(contract.global_initial) / 1e6}
-                    time={contract.global_period}
-                    rate={rate(contract.global_period)}
-                    compoundingsPerYear={1}
-                  />
+                  {Number(contract.global_initial) > 0
+                    ? formatNumber(
+                        ((amt, r) => amt + r * amt)(
+                          Number(contract.global_initial) / 1e6,
+                          rate(contract.global_period + 1)
+                        )
+                      )
+                    : "-"}
                 </TableCell>
                 <TableCell>
                   <div className="lockup-actions">
@@ -162,30 +154,10 @@ const HorizontalStepper: React.FC<LockupProps> = ({
                         Select
                       </Button>
                     ) : (
-                      <Button
-                        variant={"outlined"}
-                        color={"primary"}
-                        onClick={() => {
-                          setLockupModalVisibility(true);
-                        }}
-                      >
-                        Update Lockup
-                      </Button>
+                      <NavLink to="/overview">
+                        <Button variant="outlined">Go to dashbaord</Button>
+                      </NavLink>
                     )}
-                    {accountData && activeAccount ? (
-                      <Lockup
-                        show={isLockupModalVisible}
-                        accountData={accountData}
-                        address={activeAccount.address}
-                        onClose={() => {
-                          setLockupModalVisibility(false);
-                        }}
-                        onSuccess={() => {
-                          dispatch(loadAccountData(activeAccount.address));
-                          setLockupModalVisibility(false);
-                        }}
-                      ></Lockup>
-                    ) : null}
                   </div>
                 </TableCell>
               </TableRow>
@@ -206,4 +178,4 @@ const HorizontalStepper: React.FC<LockupProps> = ({
   );
 };
 
-export default HorizontalStepper;
+export default StakingTable;

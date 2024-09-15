@@ -93,6 +93,26 @@ function Airdrop(): ReactElement {
     }
   }, [staking]);
 
+  const step_funder =
+    "BNERIHFXRPMF5RI4UQHMB6CFZ4RVXIBOJUNYEUXKDUSETECXDNGWLW5EOY";
+  const step_parent_id = 87585701;
+  const step_rate = (period: number) => {
+    switch (period) {
+      case 1:
+        return 10;
+      case 2:
+        return 12;
+      case 3:
+        return 15;
+      case 4:
+        return 18;
+      case 5:
+        return 20;
+      default:
+        return 0;
+    }
+  };
+
   return (
     <div className="overview-wrapper">
       <div className="overview-container">
@@ -103,7 +123,11 @@ function Airdrop(): ReactElement {
         <div className="overview-body">
           {isDataLoading && <LoadingTile></LoadingTile>}
           {!isDataLoading && accountData && filteredContracts.length > 0 ? (
-            <Stepper></Stepper>
+            <Stepper
+              funder={step_funder}
+              parent_id={step_parent_id}
+              rate={step_rate}
+            ></Stepper>
           ) : null}
           {!isDataLoading && !accountData && filteredContracts.length === 0 ? (
             <div className="info-msg">
