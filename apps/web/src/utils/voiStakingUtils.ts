@@ -1,12 +1,17 @@
 import { Network, NodeConnectionParams } from "@repo/algocore";
-import { getPreConfiguredNodes } from "../Redux/network/nodesReducer";
+import {
+  getPreConfiguredNodes,
+  getSelectedNode,
+} from "../Redux/network/nodesReducer";
 
 class VoiStakingUtils {
+  params: NodeConnectionParams;
   network: Network;
-
   constructor() {
-    const mainnet = getPreConfiguredNodes()[0];
-    this.network = new Network(mainnet);
+    const nodeConnectionParams =
+      getSelectedNode() || getPreConfiguredNodes()[0];
+    this.network = new Network(nodeConnectionParams);
+    this.params = nodeConnectionParams;
   }
 
   setNetwork(network: NodeConnectionParams): void {

@@ -39,10 +39,13 @@ function LeftPanel(): ReactElement {
 
   const stakingRoutes: string[] = ["staking"];
 
+  const settingRoutes: string[] = ["setting"];
+
   const routes: string[] = [
     ...dashboardRoutes,
     ...airdropRoutes,
     ...stakingRoutes,
+    ...settingRoutes,
   ];
 
   if (routes.indexOf(route) === -1) {
@@ -57,6 +60,11 @@ function LeftPanel(): ReactElement {
 
   const airdropTabs = [
     {
+      label: "Overview",
+      value: "overview",
+      icon: <HomeOutlined></HomeOutlined>,
+    },
+    {
       label: "Airdrop",
       value: "airdrop",
       icon: <Redeem></Redeem>,
@@ -65,8 +73,26 @@ function LeftPanel(): ReactElement {
 
   const stakingTabs = [
     {
+      label: "Overview",
+      value: "overview",
+      icon: <HomeOutlined></HomeOutlined>,
+    },
+    {
       label: "Staking",
       value: "staking",
+      icon: <AdjustOutlined></AdjustOutlined>,
+    },
+  ];
+
+  const settingTabls = [
+    {
+      label: "Overview",
+      value: "overview",
+      icon: <HomeOutlined></HomeOutlined>,
+    },
+    {
+      label: "Setting",
+      value: "setting",
       icon: <AdjustOutlined></AdjustOutlined>,
     },
   ];
@@ -143,7 +169,20 @@ function LeftPanel(): ReactElement {
                   />
                 ))
               : null}
-            {["airdrop", "staking"].indexOf(route) === -1
+            {route === "setting"
+              ? settingTabls.map((tab) => (
+                  <Tab
+                    key={tab.value}
+                    label={tab.label}
+                    value={tab.value}
+                    iconPosition="start"
+                    component={Link}
+                    to={`/${tab.value}`}
+                    icon={tab.icon}
+                  />
+                ))
+              : null}
+            {["airdrop", "staking", "setting"].indexOf(route) === -1
               ? dashboardTabs.map((tab) => (
                   <Tab
                     key={tab.value}

@@ -25,7 +25,7 @@ import axios from "axios";
 import Lockup from "./Lockup/Lockup";
 import { loadAccountData } from "../../Redux/staking/userReducer";
 import { Contract } from "ulujs/types/arc200";
-import ContractPicker from "../../Components/ContractPicker/ContractPicker";
+import ContractPicker from "../../Components/pickers/ContractPicker/ContractPicker";
 
 function Airdrop(): ReactElement {
   const { loading } = useSelector((state: RootState) => state.node);

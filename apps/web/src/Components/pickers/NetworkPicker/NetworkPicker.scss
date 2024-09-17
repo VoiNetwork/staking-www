@@ -1,0 +1,10 @@
+@import '@repo/styles';
+
+.contract-picker-wrapper {
+  .contract-picker-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    column-gap: 10px;
+  }
+}

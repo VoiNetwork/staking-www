@@ -12,7 +12,7 @@ import {
   TableRow,
   TableCell,
 } from "@mui/material";
-import ContractPicker from "../../../Components/ContractPicker/ContractPicker";
+import ContractPicker from "../../../Components/pickers/ContractPicker/ContractPicker";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../../Redux/store";
 import moment from "moment";
