@@ -191,7 +191,9 @@ function Lockup({
                           <th>Selection</th>
                           <th>Duraction</th>
                           <th>Rate</th>
-                          <th>VOI</th>
+                          {accountData?.global_initial !== "0" ? (
+                            <th>VOI</th>
+                          ) : null}
                         </tr>
                       </TableHead>
                       <TableBody>
@@ -213,16 +215,18 @@ function Lockup({
                                 )}
                               </TableCell>
                               <TableCell>{rate(i)}%</TableCell>
-                              <TableCell>
-                                <CompoundInterest
-                                  principal={
-                                    Number(accountData?.global_initial) / 1e6
-                                  }
-                                  time={i}
-                                  rate={rate(i)}
-                                  compoundingsPerYear={1}
-                                />
-                              </TableCell>
+                              {accountData?.global_initial !== "0" ? (
+                                <TableCell>
+                                  <CompoundInterest
+                                    principal={
+                                      Number(accountData?.global_initial) / 1e6
+                                    }
+                                    time={i}
+                                    rate={rate(i)}
+                                    compoundingsPerYear={1}
+                                  />
+                                </TableCell>
+                              ) : null}
                             </TableRow>
                           );
                         })}

@@ -26,14 +26,23 @@ function LeftPanel(): ReactElement {
   route = route.split("/");
   route = route[0];
 
-  const routes: string[] = [
+  const dashboardRoutes: string[] = [
     "overview",
     "stake",
     "deposit",
     "withdraw",
     "transfer",
     "delegate",
-    "airdrop",
+  ];
+
+  const airdropRoutes: string[] = ["airdrop"];
+
+  const stakingRoutes: string[] = ["staking"];
+
+  const routes: string[] = [
+    ...dashboardRoutes,
+    ...airdropRoutes,
+    ...stakingRoutes,
   ];
 
   if (routes.indexOf(route) === -1) {
@@ -51,6 +60,14 @@ function LeftPanel(): ReactElement {
       label: "Airdrop",
       value: "airdrop",
       icon: <Redeem></Redeem>,
+    },
+  ];
+
+  const stakingTabs = [
+    {
+      label: "Staking",
+      value: "staking",
+      icon: <AdjustOutlined></AdjustOutlined>,
     },
   ];
 
@@ -113,7 +130,20 @@ function LeftPanel(): ReactElement {
                   />
                 ))
               : null}
-            {route !== "airdrop"
+            {route === "staking"
+              ? stakingTabs.map((tab) => (
+                  <Tab
+                    key={tab.value}
+                    label={tab.label}
+                    value={tab.value}
+                    iconPosition="start"
+                    component={Link}
+                    to={`/${tab.value}`}
+                    icon={tab.icon}
+                  />
+                ))
+              : null}
+            {["airdrop", "staking"].indexOf(route) === -1
               ? dashboardTabs.map((tab) => (
                   <Tab
                     key={tab.value}

@@ -17,7 +17,8 @@ import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
 import { Button, Grid } from "@mui/material";
 import { microalgosToAlgos } from "algosdk";
 import { NumericFormat } from "react-number-format";
-import Stepper from "../../Components/Stepper/Stepper";
+import Table from "./Table/Table";
+import axios from "axios";
 
 //import JsonViewer from "../../Components/JsonViewer/JsonViewer";
 
@@ -30,9 +31,7 @@ function Airdrop(): ReactElement {
   const { loading } = useSelector((state: RootState) => state.node);
   const { activeAccount } = useWallet();
 
-  const { account, staking, contract } = useSelector(
-    (state: RootState) => state.user
-  );
+  const { account, staking } = useSelector((state: RootState) => state.user);
 
   const { availableContracts } = account;
 
@@ -42,13 +41,7 @@ function Airdrop(): ReactElement {
     (contract) => contract.global_funder === funder
   );
 
-  const dispatch = useAppDispatch();
-
   const accountData = account.data;
-  const stakingAccount = staking.account;
-  const contractState = contract.state;
-
-  //const [isMetadataVisible, setMetadataVisibility] = useState<boolean>(false);
 
   const isDataLoading = loading || account.loading || staking.loading;
 
@@ -86,12 +79,44 @@ function Airdrop(): ReactElement {
   }
 
   useEffect(() => {
+    if (!activeAccount) return;
+    axios
+      .get(`https://voirewards.com/api/phase2?wallet=${activeAccount.address}`)
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [activeAccount]);
+
+  useEffect(() => {
     if (staking.account) {
       if (new CoreAccount(staking.account).isOnline()) {
         loadExpiresIn(staking.account);
       }
     }
   }, [staking]);
+
+  const step_funder =
+    "BNERIHFXRPMF5RI4UQHMB6CFZ4RVXIBOJUNYEUXKDUSETECXDNGWLW5EOY";
+  const step_parent_id = 87585701;
+  const step_rate = (period: number) => {
+    switch (period) {
+      case 1:
+        return 10;
+      case 2:
+        return 12;
+      case 3:
+        return 15;
+      case 4:
+        return 18;
+      case 5:
+        return 20;
+      default:
+        return 0;
+    }
+  };
 
   return (
     <div className="overview-wrapper">
@@ -103,7 +128,11 @@ function Airdrop(): ReactElement {
         <div className="overview-body">
           {isDataLoading && <LoadingTile></LoadingTile>}
           {!isDataLoading && accountData && filteredContracts.length > 0 ? (
-            <Stepper></Stepper>
+            <Table
+              funder={step_funder}
+              parent_id={step_parent_id}
+              rate={step_rate}
+            ></Table>
           ) : null}
           {!isDataLoading && !accountData && filteredContracts.length === 0 ? (
             <div className="info-msg">

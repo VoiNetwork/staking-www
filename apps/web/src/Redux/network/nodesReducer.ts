@@ -14,6 +14,7 @@ async function getNodes(): Promise<NodeConnectionParams[]> {
 
 export function getPreConfiguredNodes(): [NodeConnectionParams] {
   return [
+    /*
     {
       id: "nodly_voinet",
       label: "Voinet",
@@ -25,6 +26,22 @@ export function getPreConfiguredNodes(): [NodeConnectionParams] {
       },
       indexer: {
         url: "https://testnet-idx.voi.nodly.io",
+        port: "",
+        token: "",
+      },
+    },
+    */
+    {
+      id: "nodly_voinet",
+      label: "Voinet",
+      name: "voimain",
+      algod: {
+        url: "https://mainnet-api.voi.nodely.dev",
+        port: "",
+        token: "",
+      },
+      indexer: {
+        url: "https://mainnet-idx.voi.nodely.dev",
         port: "",
         token: "",
       },
@@ -78,7 +95,7 @@ export const nodesSlice = createSlice({
         if (action.payload) {
           state.nodes = action.payload;
         }
-      },
+      }
     );
     builder.addCase(
       loadSelectedNode.fulfilled,
@@ -86,7 +103,7 @@ export const nodesSlice = createSlice({
         if (action.payload) {
           state.selectedNode = action.payload;
         }
-      },
+      }
     );
   },
 });

@@ -5,6 +5,7 @@ import {
   NODE_SANDNET_GENESIS_ID,
   NODE_TESTNET_HASH,
   NODE_VOI_TESTNET_HASH,
+  NODE_VOI_MAINNET_HASH,
 } from "../constants";
 import { A_Genesis, A_Status, A_VersionsCheck } from "../types";
 
@@ -20,7 +21,7 @@ export class CoreNode {
     versions: A_VersionsCheck,
     genesis: A_Genesis,
     health: boolean,
-    ready: boolean,
+    ready: boolean
   ) {
     this.status = status;
     this.versions = versions;
@@ -98,6 +99,10 @@ export class CoreNode {
 
   isVoiTestnet(): boolean {
     return this.getGenesisHash() === NODE_VOI_TESTNET_HASH;
+  }
+
+  isVoiMainnet(): boolean {
+    return this.getGenesisHash() === NODE_VOI_MAINNET_HASH;
   }
 
   getDispenserLinks(): string[] {

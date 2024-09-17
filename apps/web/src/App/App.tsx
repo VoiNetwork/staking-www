@@ -31,7 +31,7 @@ function App(): ReactElement {
       port: node.algod.port,
       token: node.algod.token,
     },
-    network: NetworkId.TESTNET,
+    network: NetworkId.MAINNET,
   });
 
   return (
