@@ -34,8 +34,12 @@ import humanizeDuration from "humanize-duration";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../Redux/store";
 import { NumericFormat } from "react-number-format";
-import { microalgosToAlgos } from "algosdk";
-import { CoreAccount, NodeClient } from "@repo/algocore";
+import algosdk, { algosToMicroalgos, microalgosToAlgos } from "algosdk";
+import { CoreAccount, NodeClient, ZERO_ADDRESS_STRING } from "@repo/algocore";
+
+const CTC_INFO_STAKING_FACTORY = 87502365; // staking factory apid
+const ADDR_STAKING_FUNDER =
+  "BNERIHFXRPMF5RI4UQHMB6CFZ4RVXIBOJUNYEUXKDUSETECXDNGWLW5EOY";
 
 const formatNumber = (number: number): string => {
   return new Intl.NumberFormat("en-US", {
@@ -62,7 +66,7 @@ function Lockup({
   onSuccess,
   rate,
 }: LockupProps): ReactElement {
-  const { transactionSigner, activeAccount } = useWallet();
+  const { transactionSigner, activeAccount, signTransactions } = useWallet();
 
   const [amount, setAmount] = useState<string>("");
 
@@ -78,7 +82,6 @@ function Lockup({
         });
     }
   }, [activeAccount]);
-  console.log(accountInfo);
 
   const { showException, showSnack } = useSnackbar();
   const { showLoader, hideLoader } = useLoader();
@@ -99,21 +102,32 @@ function Lockup({
   }
 
   async function lockup() {
+    if (!activeAccount) {
+      return;
+    }
     try {
       showLoader("Opting for lockup");
-      const txn = await new CoreStaker(accountData).lock(
-        voiStakingUtils.network.getAlgodClient(),
-        Number(period),
+      const algod = voiStakingUtils.network.getAlgodClient();
+      const txns = await CoreStaker.create(
+        algod,
+        CTC_INFO_STAKING_FACTORY,
+        {
+          amount: algosToMicroalgos(Number(amount)),
+          funder: ADDR_STAKING_FUNDER,
+          owner: activeAccount.address,
+          delegate: ZERO_ADDRESS_STRING,
+          period: Number(period),
+        },
         {
           addr: address,
           signer: transactionSigner,
         }
       );
-      await waitForConfirmation(
-        txn.txID(),
-        20,
-        voiStakingUtils.network.getAlgodClient()
+      const stxns: any = await signTransactions(
+        txns.map((t) => new Uint8Array(Buffer.from(t, "base64")))
       );
+      const { txId } = await algod.sendRawTransaction(stxns).do();
+      const { confirmedRound } = await waitForConfirmation(txId, 20, algod);
       await new Promise((resolve) => setTimeout(resolve, 8000)); // TODO replace with indexer confirmation
       showSnack("Transaction successful", "success");
       onSuccess();

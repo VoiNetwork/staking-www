@@ -14,7 +14,7 @@ import Transfer from "../../Pages/Transfer/Transfer";
 import ContractPicker from "../../Components/ContractPicker/ContractPicker";
 import Delegate from "../../Pages/Delegate/Delegate";
 import Airdrop from "../../Pages/Airdrop/Airdrop";
-import Staking from "../../Pages/Staking/Staking";
+//import Staking from "../../Pages/Staking/Staking";
 
 function AppRouter(): ReactElement {
   const { selectedNode } = useSelector((state: RootState) => state.nodes);
@@ -23,7 +23,7 @@ function AppRouter(): ReactElement {
   const dispatch = useAppDispatch();
 
   const isAirdrop = document.location?.pathname?.includes("airdrop");
-  const isStaking = document.location?.pathname?.includes("staking");
+  //const isStaking = document.location?.pathname?.includes("staking");
 
   useEffect(() => {
     if (activeAccount?.address) {
@@ -80,10 +80,10 @@ function AppRouter(): ReactElement {
                           path="/airdrop"
                           element={<Airdrop></Airdrop>}
                         ></Route>
-                        <Route
+                        {/*<Route
                           path="/staking"
                           element={<Staking></Staking>}
-                        ></Route>
+                    ></Route>*/}
                         <Route
                           path="*"
                           element={<Navigate to="/overview" replace />}

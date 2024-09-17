@@ -44,7 +44,6 @@ function Staking(): ReactElement {
     startTime: Date,
     currentUnixTime = moment().unix()
   ): number {
-    //const currentUnixTime = moment().unix(); // Current time in Unix timestamp (seconds since epoch)
     const startUnixTime = moment(startTime).unix(); // Start time in Unix timestamp
 
     const secondsPerWeek = 60 * 60 * 24 * 7;
@@ -55,7 +54,11 @@ function Staking(): ReactElement {
     return weeksPassed;
   }
 
-  const startTime = new Date("2024-09-14T00:00:00Z"); // UTC+0 start time
+  //const startTime = new Date("2024-08-17T00:00:00Z"); // UTC+0 start time 
+  //const startTime = new Date("2024-08-24T00:00:00Z"); // UTC+0 start time (week 4)
+  //const startTime = new Date("2024-09-01T00:00:00Z"); // UTC+0 start time (week 3)
+  //const startTime = new Date("2024-09-07T00:00:00Z"); // UTC+0 start time (week 2)
+  const startTime = new Date("2024-09-14T00:00:00Z"); // UTC+0 start time (week 1)
   const weeksPassed = getWeeksFromTime(startTime);
 
   console.log({ weeksPassed });

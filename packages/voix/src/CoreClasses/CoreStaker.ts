@@ -1,5 +1,11 @@
-import { AccountData, ParticipateParams, StakingContractState } from "../types";
+import {
+  CreateParams,
+  AccountData,
+  ParticipateParams,
+  StakingContractState,
+} from "../types";
 import { AirdropClient } from "../clients/AirdropClient";
+import { APP_SPEC as StakingFactorySpec } from "../clients/StakingFactoryClient";
 import {
   ABIContract,
   Algodv2,
@@ -155,6 +161,46 @@ export class CoreStaker {
   getLockupDuration() {
     const period = this.lockupPeriod();
     return this.getPeriodInDuration(period);
+  }
+
+  // create staking contract
+
+  static async create(
+    algod: Algodv2,
+    apid: number,
+    params: CreateParams,
+    sender: TransactionSignerAccount
+  ): Promise<string[]> {
+    const ci = new CONTRACT(
+      apid,
+      algod,
+      undefined,
+      {
+        name: "",
+        desc: "",
+        methods: StakingFactorySpec.contract.methods,
+        events: [],
+      },
+      {
+        addr: sender.addr,
+        sk: new Uint8Array(0),
+      }
+    );
+    const stakingAmount = params.amount
+    const paymentAmount =
+      stakingAmount + 1234500 + 1e5 + Number(params.extraPayment || 0);
+    const owner = params.owner;
+    const funder = params.funder;
+    const delegate = params.delegate;
+    const period = Number(params.period || 0);
+    ci.setPaymentAmount(paymentAmount);
+    ci.setFee(10000);
+    const createR = await ci.create(owner, funder, delegate, period);
+    if (createR.success) {
+      return createR.txns;
+    } else {
+      throw new Error(createR.error);
+    }
   }
 
   async lock(

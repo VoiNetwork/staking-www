@@ -12,17 +12,18 @@ import {
   TableRow,
   TableCell,
 } from "@mui/material";
-import ContractPicker from "../ContractPicker/ContractPicker";
+import ContractPicker from "../../../Components/ContractPicker/ContractPicker";
 import { useSelector } from "react-redux";
-import { RootState, useAppDispatch } from "../../Redux/store";
+import { RootState, useAppDispatch } from "../../../Redux/store";
 import moment from "moment";
 import humanizeDuration from "humanize-duration";
-import Lockup from "../../Pages/Airdrop/Lockup/Lockup";
+import Lockup from "../Lockup/Lockup";
 import { useWallet } from "@txnlab/use-wallet-react";
 import {
   initAccountData,
   loadAccountData,
-} from "../../Redux/staking/userReducer";
+} from "../../../Redux/staking/userReducer";
+import { Link } from "react-router-dom";
 
 const formatNumber = (number: number): string => {
   return new Intl.NumberFormat("en-US", {
@@ -77,21 +78,17 @@ const HorizontalStepper: React.FC<LockupProps> = ({
   parent_id,
   rate,
 }) => {
-  const { account, staking, contract } = useSelector(
+  const { account } = useSelector(
     (state: RootState) => state.user
   );
 
   const { availableContracts, data: accountData } = account;
-
-  console.log({ accountData });
 
   const filteredContracts = availableContracts.filter(
     (contract) =>
       contract.global_funder === funder &&
       contract.global_parent_id === parent_id
   );
-
-  console.log({ filteredContracts });
 
   const dispatch = useAppDispatch();
 
@@ -119,7 +116,16 @@ const HorizontalStepper: React.FC<LockupProps> = ({
                   />
                 </TableCell>
                 <TableCell>
-                  {formatNumber(Number(contract.global_initial) / 1e6)} VOI
+                  {contract.global_initial !== "0" ? (
+                    `${formatNumber(Number(contract.global_initial) / 1e6)} VOI`
+                  ) : (
+                    <Link
+                      to={`https://voirewards.com/phase2/${activeAccount?.address || ""}?rewards=1`}
+                      target="_blank"
+                    >
+                      More info
+                    </Link>
+                  )}
                 </TableCell>
                 <TableCell>
                   {contract.global_period === 0
@@ -142,12 +148,21 @@ const HorizontalStepper: React.FC<LockupProps> = ({
                 </TableCell>
 
                 <TableCell>
-                  <CompoundInterest
-                    principal={Number(contract.global_initial) / 1e6}
-                    time={contract.global_period}
-                    rate={rate(contract.global_period)}
-                    compoundingsPerYear={1}
-                  />
+                  {contract.global_initial !== "0" ? (
+                    <CompoundInterest
+                      principal={Number(contract.global_initial) / 1e6}
+                      time={contract.global_period}
+                      rate={rate(contract.global_period)}
+                      compoundingsPerYear={1}
+                    />
+                  ) : (
+                    <Link
+                      to={`https://voirewards.com/phase2/${activeAccount?.address || ""}?rewards=1`}
+                      target="_blank"
+                    >
+                      More info
+                    </Link>
+                  )}
                 </TableCell>
                 <TableCell>
                   <div className="lockup-actions">

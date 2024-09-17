@@ -48,3 +48,12 @@ export type ParticipateParams = {
   voteKd: number | bigint;
   voteLst: number | bigint;
 };
+
+export type CreateParams = {
+  amount: number;
+  extraPayment?: number;
+  owner: string;
+  funder: string;
+  delegate: string;
+  period: number;
+}

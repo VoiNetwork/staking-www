@@ -17,7 +17,8 @@ import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
 import { Button, Grid } from "@mui/material";
 import { microalgosToAlgos } from "algosdk";
 import { NumericFormat } from "react-number-format";
-import Stepper from "../../Components/Stepper/Stepper";
+import Table from "./Table/Table";
+import axios from "axios";
 
 //import JsonViewer from "../../Components/JsonViewer/JsonViewer";
 
@@ -30,9 +31,7 @@ function Airdrop(): ReactElement {
   const { loading } = useSelector((state: RootState) => state.node);
   const { activeAccount } = useWallet();
 
-  const { account, staking, contract } = useSelector(
-    (state: RootState) => state.user
-  );
+  const { account, staking } = useSelector((state: RootState) => state.user);
 
   const { availableContracts } = account;
 
@@ -42,13 +41,7 @@ function Airdrop(): ReactElement {
     (contract) => contract.global_funder === funder
   );
 
-  const dispatch = useAppDispatch();
-
   const accountData = account.data;
-  const stakingAccount = staking.account;
-  const contractState = contract.state;
-
-  //const [isMetadataVisible, setMetadataVisibility] = useState<boolean>(false);
 
   const isDataLoading = loading || account.loading || staking.loading;
 
@@ -84,6 +77,18 @@ function Airdrop(): ReactElement {
       /* empty */
     }
   }
+
+  useEffect(() => {
+    if (!activeAccount) return;
+    axios
+      .get(`https://voirewards.com/api/phase2?wallet=${activeAccount.address}`)
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [activeAccount]);
 
   useEffect(() => {
     if (staking.account) {
@@ -123,11 +128,11 @@ function Airdrop(): ReactElement {
         <div className="overview-body">
           {isDataLoading && <LoadingTile></LoadingTile>}
           {!isDataLoading && accountData && filteredContracts.length > 0 ? (
-            <Stepper
+            <Table
               funder={step_funder}
               parent_id={step_parent_id}
               rate={step_rate}
-            ></Stepper>
+            ></Table>
           ) : null}
           {!isDataLoading && !accountData && filteredContracts.length === 0 ? (
             <div className="info-msg">

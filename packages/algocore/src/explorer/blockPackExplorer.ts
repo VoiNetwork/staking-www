@@ -19,6 +19,9 @@ export class BlockPackExplorer {
     if (this.nodeInstance.isVoiTestnet()) {
       return "https://voitest.blockpack.app/#/explorer";
     }
+    if (this.nodeInstance.isVoiMainnet()) {
+      return "https://explorer.voi.network/explorer";
+    }
   }
 
   openBlock(block: number): void {
