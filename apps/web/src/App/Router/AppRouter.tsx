@@ -11,10 +11,11 @@ import { loadAccountData } from "../../Redux/staking/userReducer";
 import Withdraw from "../../Pages/Withdraw/Withdraw";
 import Deposit from "../../Pages/Deposit/Deposit";
 import Transfer from "../../Pages/Transfer/Transfer";
-import ContractPicker from "../../Components/ContractPicker/ContractPicker";
+import ContractPicker from "../../Components/pickers/ContractPicker/ContractPicker";
 import Delegate from "../../Pages/Delegate/Delegate";
 import Airdrop from "../../Pages/Airdrop/Airdrop";
 //import Staking from "../../Pages/Staking/Staking";
+import Setting from "../../Pages/Setting/Setting";
 
 function AppRouter(): ReactElement {
   const { selectedNode } = useSelector((state: RootState) => state.nodes);
@@ -24,6 +25,7 @@ function AppRouter(): ReactElement {
 
   const isAirdrop = document.location?.pathname?.includes("airdrop");
   const isStaking = document.location?.pathname?.includes("staking");
+  const isSetting = document.location?.pathname?.includes("setting");
 
   useEffect(() => {
     if (activeAccount?.address) {
@@ -45,7 +47,7 @@ function AppRouter(): ReactElement {
                   <div>
                     <WalletWidget></WalletWidget>
                   </div>
-                  {!isAirdrop && !isStaking ? (
+                  {!isAirdrop && !isStaking && !isSetting ? (
                     <div>
                       <ContractPicker></ContractPicker>
                     </div>
@@ -84,6 +86,10 @@ function AppRouter(): ReactElement {
                           path="/staking"
                           element={<Staking></Staking>}
                           ></Route>*/}
+                        <Route
+                          path="/setting"
+                          element={<Setting></Setting>}
+                        ></Route>
                         <Route
                           path="*"
                           element={<Navigate to="/overview" replace />}

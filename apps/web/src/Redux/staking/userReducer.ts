@@ -53,9 +53,9 @@ export const loadAccountData: AsyncThunk<void, string, any> = createAsyncThunk(
     try {
       dispatch(resetUserState());
       dispatch(setAccountDataLoading(true));
-      const availableContracts = await new StakingClient().getAccountData(
-        address
-      );
+      const availableContracts = await new StakingClient(
+        voiStakingUtils.params
+      ).getAccountData(address);
       dispatch(setAvailableContracts(availableContracts));
 
       if (availableContracts.length > 0) {
