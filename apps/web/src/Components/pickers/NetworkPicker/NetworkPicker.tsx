@@ -1,5 +1,5 @@
 import React, { ReactElement } from "react";
-import "./ContractPicker.scss";
+import "./NetworkPicker.scss";
 import {
   Button,
   ListItemIcon,
@@ -7,27 +7,23 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import { ArrowDropDown, Done } from "@mui/icons-material";
-import { RootState, useAppDispatch } from "../../Redux/store";
+import { ArrowDropDown } from "@mui/icons-material";
+import { RootState, useAppDispatch } from "../../../Redux/store";
 import { useSelector } from "react-redux";
-import { AccountData, CoreStaker } from "@repo/voix";
-import { initAccountData } from "../../Redux/staking/userReducer";
-import { theme } from "@repo/theme";
+import { NodeConnectionParams } from "@repo/algocore";
+import { selectNode } from "../../../Redux/network/nodesReducer";
+import { loadAccountData } from "../../../Redux/staking/userReducer";
+import { useWallet } from "@txnlab/use-wallet-react";
 
-interface ContractPickerProps {
-  funder?: string;
-}
-function ContractPicker(props: ContractPickerProps): ReactElement {
+interface NetworkPickerProps {}
+function NetworkPicker(props: NetworkPickerProps): ReactElement {
+  const { activeAccount } = useWallet();
   const [menuAnchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const { account } = useSelector((state: RootState) => state.user);
+  const { nodes, selectedNode } = useSelector(
+    (state: RootState) => state.nodes
+  );
 
   const dispatch = useAppDispatch();
-
-  const { availableContracts, data } = account;
-
-  const filteredContracts = availableContracts.filter(
-    (contract) => !props.funder || contract.global_funder === props.funder
-  );
 
   function closeMenu() {
     setAnchorEl(null);
@@ -37,7 +33,7 @@ function ContractPicker(props: ContractPickerProps): ReactElement {
     <div className="contract-picker-wrapper">
       <div className="contract-picker-container">
         <div>
-          {data && filteredContracts.length > 0 && (
+          {nodes.length > 0 && (
             <div>
               <Button
                 variant="outlined"
@@ -48,7 +44,7 @@ function ContractPicker(props: ContractPickerProps): ReactElement {
                   setAnchorEl(ev.currentTarget);
                 }}
               >
-                {new CoreStaker(data).contractId()}
+                {selectedNode?.label || "Select Network"}
               </Button>
               <Menu
                 anchorEl={menuAnchorEl}
@@ -70,30 +66,23 @@ function ContractPicker(props: ContractPickerProps): ReactElement {
                 }}
                 onClose={closeMenu}
               >
-                {filteredContracts.map((accountData: AccountData) => {
-                  const staker = new CoreStaker(accountData);
+                {nodes.map((node: NodeConnectionParams) => {
                   return (
                     <MenuItem
-                      key={staker.contractId()}
+                      key={node.id}
                       onClick={(ev) => {
                         ev.stopPropagation();
                         ev.preventDefault();
                         closeMenu();
-                        dispatch(initAccountData(accountData));
+                        dispatch(selectNode(node.id));
+                        if (activeAccount?.address) {
+                          dispatch(loadAccountData(activeAccount.address));
+                        }
                       }}
                     >
-                      <ListItemIcon>
-                        {data.contractId === staker.contractId() ? (
-                          <Done
-                            fontSize="small"
-                            sx={{ color: theme.palette.common.black }}
-                          />
-                        ) : (
-                          ""
-                        )}
-                      </ListItemIcon>
+                      <ListItemIcon>&nbsp;</ListItemIcon>
                       <ListItemText disableTypography>
-                        {staker.contractId()}
+                        {node.label}
                       </ListItemText>
                     </MenuItem>
                   );
@@ -107,4 +96,4 @@ function ContractPicker(props: ContractPickerProps): ReactElement {
   );
 }
 
-export default ContractPicker;
+export default NetworkPicker;

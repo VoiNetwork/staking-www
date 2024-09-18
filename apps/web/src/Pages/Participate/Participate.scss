@@ -1,0 +1,82 @@
+@import "@repo/styles";
+
+.overview-wrapper {
+  .overview-container {
+    .overview-header {
+      padding: 10px 0 20px;
+      border-bottom: 1px solid map-get($grey-colors, "light-grey");
+      font-size: 20px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      column-gap: 20px;
+    }
+    .overview-body {
+      margin-top: 20px;
+      .props {
+        margin: 40px 0;
+        .prop {
+          margin: 20px 0;
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+          column-gap: 20px;
+          .key {
+            font-size: 14px;
+            width: 150px;
+          }
+          .val {
+            font-size: 14px;
+            color: map-get($grey-colors, "form-value");
+          }
+        }
+      }
+
+      .tile {
+        border-radius: 10px;
+        background: map-get($grey-colors, "F8F8F9");
+        padding: 40px;
+        height: 70px;
+        .title {
+          margin-bottom: 20px;
+          font-size: 20px;
+          color: map-get($grey-colors, "form-value");
+        }
+        .content {
+          font-size: 24px;
+        }
+      }
+      .overview-button-group {
+        margin-top: 20px;
+        display: flex;
+        justify-content: flex-start;
+        .overview-button {
+          width: 48%;
+        }
+      }
+      .lockup-details {
+        margin-top: 50px;
+        .lockup-details-header {
+          font-size: 20px;
+          margin-bottom: 20px;
+        }
+        .lockup-deadline {
+          margin-top: 20px;
+          display: flex;
+          flex-direction: column;
+          row-gap: 10px;
+          .key {
+            color: map-get($grey-colors, "form-label");
+          }
+          .value {
+            color: map-get($grey-colors, "A7A9AC");
+          }
+        }
+        .lockup-actions {
+          margin-top: 20px;
+        }
+      }
+    }
+  }
+}

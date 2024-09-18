@@ -29,6 +29,7 @@ function Stake(): ReactElement {
   );
 
   const dispatch = useAppDispatch();
+  
   const [isRegisterVisible, setRegisterVisibility] = useState<boolean>(false);
 
   const [txnId, setTxnId] = useState<string>("");
