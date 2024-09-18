@@ -35,7 +35,18 @@ function Airdrop(): ReactElement {
 
   const { availableContracts } = account;
 
-  const funder = "BNERIHFXRPMF5RI4UQHMB6CFZ4RVXIBOJUNYEUXKDUSETECXDNGWLW5EOY";
+
+  // TESTNET
+  /*
+  const step_funder =
+    "BNERIHFXRPMF5RI4UQHMB6CFZ4RVXIBOJUNYEUXKDUSETECXDNGWLW5EOY";
+  const step_parent_id = 87585701; 
+  */
+  // MAINNET
+  const funder = "62TIVJSZOS4DRSSYYDDZELQAGFYQC5JWKCHRBPPYKTZN2OOOXTGLB5ZJ4E";
+  const step_funder =
+    "62TIVJSZOS4DRSSYYDDZELQAGFYQC5JWKCHRBPPYKTZN2OOOXTGLB5ZJ4E";
+  const step_parent_id = 5211;
 
   const filteredContracts = availableContracts.filter(
     (contract) => contract.global_funder === funder
@@ -98,9 +109,6 @@ function Airdrop(): ReactElement {
     }
   }, [staking]);
 
-  const step_funder =
-    "BNERIHFXRPMF5RI4UQHMB6CFZ4RVXIBOJUNYEUXKDUSETECXDNGWLW5EOY";
-  const step_parent_id = 87585701;
   const step_rate = (period: number) => {
     switch (period) {
       case 1:

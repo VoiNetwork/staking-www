@@ -16,6 +16,7 @@ import Delegate from "../../Pages/Delegate/Delegate";
 import Airdrop from "../../Pages/Airdrop/Airdrop";
 //import Staking from "../../Pages/Staking/Staking";
 import Setting from "../../Pages/Setting/Setting";
+import Participate from "../../Pages/Participate/Participate";
 
 function AppRouter(): ReactElement {
   const { selectedNode } = useSelector((state: RootState) => state.nodes);
@@ -26,6 +27,7 @@ function AppRouter(): ReactElement {
   const isAirdrop = document.location?.pathname?.includes("airdrop");
   const isStaking = document.location?.pathname?.includes("staking");
   const isSetting = document.location?.pathname?.includes("setting");
+  const isAccount = document.location?.pathname?.includes("account");
 
   useEffect(() => {
     if (activeAccount?.address) {
@@ -47,7 +49,7 @@ function AppRouter(): ReactElement {
                   <div>
                     <WalletWidget></WalletWidget>
                   </div>
-                  {!isAirdrop && !isStaking && !isSetting ? (
+                  {!isAirdrop && !isStaking && !isSetting && !isAccount ? (
                     <div>
                       <ContractPicker></ContractPicker>
                     </div>
@@ -89,6 +91,10 @@ function AppRouter(): ReactElement {
                         <Route
                           path="/setting"
                           element={<Setting></Setting>}
+                        ></Route>
+                        <Route
+                          path="/account"
+                          element={<Participate></Participate>}
                         ></Route>
                         <Route
                           path="*"
