@@ -279,8 +279,7 @@ function Overview(): ReactElement {
                     </div>
                   </Grid>
                 </Grid>
-
-                <div className="lockup-details">
+                {/*<div className="lockup-details">
                   <div className="lockup-details-header">Lockup details</div>
                   <div className="lockup-details-body">
                     {contract.loading && <LoadingTile></LoadingTile>}
@@ -403,7 +402,7 @@ function Overview(): ReactElement {
                       </div>
                     )}
                   </div>
-                </div>
+                </div>*/}
               </div>
             )}
         </div>
