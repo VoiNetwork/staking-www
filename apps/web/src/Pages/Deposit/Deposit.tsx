@@ -16,6 +16,7 @@ import { CoreAccount, NodeClient } from "@repo/algocore";
 import { NumericFormat } from "react-number-format";
 import { AlgoAmount } from "@algorandfoundation/algokit-utils/types/amount";
 import { isNumber } from "@repo/utils";
+import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
 
 function Deposit(): ReactElement {
   const { transactionSigner, activeAccount } = useWallet();
@@ -90,6 +91,21 @@ function Deposit(): ReactElement {
       .then(setMinBalance);
   }, [activeAccount, accountData, contractState]);
 
+  const [availableBalance, setAvailableBalance] = useState<number>(-1);
+  useEffect(() => {
+    if (!activeAccount) return;
+    const algodClient = voiStakingUtils.network.getAlgodClient();
+
+    algodClient
+      .accountInformation(activeAccount.address)
+      .do()
+      .then((account) => {
+        setAvailableBalance(
+          new CoreAccount(account as AccountResult).availableBalance()
+        );
+      });
+  }, [activeAccount, stakingAccount]);
+
   return (
     <div className="deposit-wrapper">
       <div className="deposit-container">
@@ -118,7 +134,7 @@ function Deposit(): ReactElement {
                     </div>
                   </div>
                   <div className="prop">
-                    <div className="key">Available balance</div>
+                    <div className="key">Staking balance</div>
                     <div className="value">
                       <NumericFormat
                         value={
@@ -129,6 +145,19 @@ function Deposit(): ReactElement {
                                   stakingAccount
                                 ).availableBalance() - minBalance
                               )
+                        }
+                        suffix=" VOI"
+                        displayType={"text"}
+                        thousandSeparator={true}
+                      ></NumericFormat>
+                    </div>
+                  </div>
+                  <div className="prop">
+                    <div className="key">Wallet balance</div>
+                    <div className="value">
+                      <NumericFormat
+                        value={
+                          availableBalance < 0 ? "-" : availableBalance / 1e6
                         }
                         suffix=" VOI"
                         displayType={"text"}
