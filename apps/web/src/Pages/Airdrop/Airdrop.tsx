@@ -2,7 +2,7 @@ import "./Airdrop.scss";
 import { ReactElement, useEffect, useState } from "react";
 import { useWallet } from "@txnlab/use-wallet-react";
 import { LoadingTile } from "@repo/ui";
-import { CoreStaker } from "@repo/voix";
+import { AccountData, CoreStaker } from "@repo/voix";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../Redux/store";
 import {
@@ -14,7 +14,7 @@ import {
 } from "@repo/algocore";
 import voiStakingUtils from "../../utils/voiStakingUtils";
 import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
-import { Button, Grid } from "@mui/material";
+import { Box, Button, Grid, Tab, Tabs } from "@mui/material";
 import { microalgosToAlgos } from "algosdk";
 import { NumericFormat } from "react-number-format";
 import Table from "./Table/Table";
@@ -31,83 +31,57 @@ function Airdrop(): ReactElement {
   const { loading } = useSelector((state: RootState) => state.node);
   const { activeAccount } = useWallet();
 
-  const { account, staking } = useSelector((state: RootState) => state.user);
+  const { account } = useSelector((state: RootState) => state.user);
 
   const { availableContracts } = account;
 
-
-  // TESTNET
-  /*
-  const step_funder =
-    "BNERIHFXRPMF5RI4UQHMB6CFZ4RVXIBOJUNYEUXKDUSETECXDNGWLW5EOY";
-  const step_parent_id = 87585701; 
-  */
   // MAINNET
   const funder = "62TIVJSZOS4DRSSYYDDZELQAGFYQC5JWKCHRBPPYKTZN2OOOXTGLB5ZJ4E";
-  const step_funder =
-    "62TIVJSZOS4DRSSYYDDZELQAGFYQC5JWKCHRBPPYKTZN2OOOXTGLB5ZJ4E";
-  const step_parent_id = 5211;
+  const parent_id = 5211;
 
-  const filteredContracts = availableContracts.filter(
-    (contract) => contract.global_funder === funder
-  );
+  const [airdropContracts, setAirdropContracts] = useState<AccountData[]>([]);
+  const [airdrop2Contracts, setAirdrop2Contracts] = useState<AccountData[]>([]);
+  useEffect(() => {
+    if (!availableContracts) return;
+    setAirdropContracts(
+      availableContracts.filter(
+        (contract) =>
+          contract.global_funder === funder &&
+          contract.global_parent_id === parent_id &&
+          contract.global_initial !== "0"
+      )
+    );
+    setAirdrop2Contracts(
+      availableContracts.filter(
+        (contract) =>
+          contract.global_funder === funder &&
+          contract.global_parent_id === parent_id &&
+          contract.global_initial === "0"
+      )
+    );
+  }, [availableContracts]);
 
   const accountData = account.data;
 
-  const isDataLoading = loading || account.loading || staking.loading;
+  const isDataLoading = loading || account.loading;
 
-  const { genesis, health, versionsCheck, status, ready } = useSelector(
-    (state: RootState) => state.node
-  );
-  const coreNodeInstance = new CoreNode(
-    status,
-    versionsCheck,
-    genesis,
-    health,
-    ready
-  );
-
-  const [isLockupModalVisible, setLockupModalVisibility] =
-    useState<boolean>(false);
-
-  const [expiresIn, setExpiresIn] = useState<string>("--");
-
-  async function loadExpiresIn(account: AccountResult) {
-    try {
-      const status = await new NodeClient(voiStakingUtils.network).status();
-      const currentRound = status["last-round"];
-      const blockTimeMs = await new BlockClient(
-        voiStakingUtils.network
-      ).getAverageBlockTimeInMS();
-      const expiresIn = new CoreAccount(account).partKeyExpiresIn(
-        currentRound,
-        blockTimeMs
-      );
-      setExpiresIn(expiresIn);
-    } catch (e) {
-      /* empty */
-    }
-  }
-
+  const [estimatedReward, setEstimatedReward] = useState<number>(0);
   useEffect(() => {
     if (!activeAccount) return;
     axios
       .get(`https://voirewards.com/api/phase2?wallet=${activeAccount.address}`)
       .then((res) => {
-        console.log(res.data);
+        setEstimatedReward(res.data?.estimatedReward || 0);
       })
       .catch((err) => {
         console.log(err);
       });
   }, [activeAccount]);
 
-  useEffect(() => {
-    if (staking.account) {
-      if (new CoreAccount(staking.account).isOnline()) {
-        loadExpiresIn(staking.account);
-      }
-    }
-  }, [staking]);
+  const [tabIndex, setTabIndex] = useState(0); // Add tab state
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabIndex(newValue);
+  };
 
   const step_rate = (period: number) => {
     switch (period) {
@@ -131,22 +105,57 @@ function Airdrop(): ReactElement {
       <div className="overview-container">
         <div className="overview-header">
           <div>Airdrop</div>
-          {/*<Button variant="outlined">Go to dashbaord</Button>*/}
         </div>
         <div className="overview-body">
-          {isDataLoading && <LoadingTile></LoadingTile>}
-          {!isDataLoading && accountData && filteredContracts.length > 0 ? (
-            <Table
-              funder={step_funder}
-              parent_id={step_parent_id}
-              rate={step_rate}
-            ></Table>
-          ) : null}
-          {!isDataLoading && !accountData && filteredContracts.length === 0 ? (
-            <div className="info-msg">
-              No contract details found for your account.
+          <Tabs
+            value={tabIndex}
+            onChange={handleTabChange}
+            aria-label="Airdrop tabs"
+          >
+            <Tab label="Phase I" />
+            <Tab label="Phase II" />
+          </Tabs>
+
+          {tabIndex === 0 && (
+            <div>
+              {!isDataLoading && accountData && airdropContracts.length > 0 ? (
+                <Box sx={{ mt: 5 }}>
+                  <Table
+                    contracts={airdropContracts}
+                    funder={funder}
+                    parent_id={parent_id}
+                    rate={step_rate}
+                  ></Table>
+                </Box>
+              ) : (
+                <Box sx={{ mt: 5 }}>
+                  <div>No Testnet Phase I Airdrop found for your acount.</div>
+                </Box>
+              )}
             </div>
-          ) : null}
+          )}
+
+          {tabIndex === 1 && (
+            <div>
+              {!isDataLoading && accountData && airdrop2Contracts.length > 0 ? (
+                <Box sx={{ mt: 5 }}>
+                  <Table
+                    contracts={airdrop2Contracts.map((contract) => ({
+                      ...contract,
+                      global_initial: (estimatedReward * 1e6).toString(),
+                    }))} // Set the initial amount to the estimated reward
+                    funder={funder}
+                    parent_id={parent_id}
+                    rate={step_rate}
+                  ></Table>
+                </Box>
+              ) : (
+                <Box sx={{ mt: 5 }}>
+                  <div>No Testnet Phase II Airdrop found for your acount.</div>
+                </Box>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

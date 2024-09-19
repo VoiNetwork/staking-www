@@ -104,6 +104,11 @@ function LeftPanel(): ReactElement {
       icon: <HomeOutlined></HomeOutlined>,
     },
     {
+      label: "Airdrop",
+      value: "airdrop",
+      icon: <Redeem></Redeem>,
+    },
+    {
       label: "Stake",
       value: "stake",
       icon: <AdjustOutlined></AdjustOutlined>,
@@ -118,11 +123,13 @@ function LeftPanel(): ReactElement {
       value: "withdraw",
       icon: <Payments></Payments>,
     },
+    /*
     {
       label: "Transfer",
       value: "transfer",
       icon: <MoveDown></MoveDown>,
     },
+    */
     {
       label: "Delegate",
       value: "delegate",
@@ -143,7 +150,7 @@ function LeftPanel(): ReactElement {
             orientation={"vertical"}
             className="vertical-pills"
           >
-            {route === "airdrop"
+            {/*route === "airdrop"
               ? airdropTabs.map((tab) => (
                   <Tab
                     key={tab.value}
@@ -155,7 +162,7 @@ function LeftPanel(): ReactElement {
                     icon={tab.icon}
                   />
                 ))
-              : null}
+              : null*/}
             {route === "staking"
               ? stakingTabs.map((tab) => (
                   <Tab
@@ -182,7 +189,7 @@ function LeftPanel(): ReactElement {
                   />
                 ))
               : null}
-            {["airdrop", "staking", "setting"].indexOf(route) === -1
+            {["staking", "setting"].indexOf(route) === -1
               ? dashboardTabs.map((tab) => (
                   <Tab
                     key={tab.value}

@@ -20,6 +20,7 @@ import { NumericFormat } from "react-number-format";
 import JsonViewer from "../../Components/JsonViewer/JsonViewer";
 import Lockup from "./Lockup/Lockup";
 import { loadAccountData } from "../../Redux/staking/userReducer";
+import ContractPicker from "../../Components/pickers/ContractPicker/ContractPicker";
 
 function Overview(): ReactElement {
   const { loading } = useSelector((state: RootState) => state.node);
