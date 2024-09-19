@@ -19,9 +19,10 @@ function App(): ReactElement {
 
   const node = getPreConfiguredNodes()[0];
 
-  const walletConnectProjectId = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID;
-  if (!walletConnectProjectId)
-    throw Error("Must set env variable VITE_WALLET_CONNECT_PROJECT_ID");
+  let walletConnectProjectId = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID;
+  if (!walletConnectProjectId) {
+    walletConnectProjectId = "e2fef7cf17012eaba443b7cf615f7815";
+  }
 
   const walletManager = new WalletManager({
     wallets: [
