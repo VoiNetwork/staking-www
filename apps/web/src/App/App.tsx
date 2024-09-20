@@ -38,7 +38,7 @@ function App(): ReactElement {
           metadata: {
             name: "VoiX",
             url: "https://staking.voi.network",
-            description: "VoI Staking Platform",
+            description: "Voi Staking Platform",
             icons: ["https://staking.voi.network/favicon.ico"],
           },
           themeMode: "light",
