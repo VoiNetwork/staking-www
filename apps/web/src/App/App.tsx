@@ -1,4 +1,4 @@
-import { ReactElement, useEffect } from "react";
+import React,{ ReactElement, useEffect } from "react";
 import "./App.scss";
 import AppRouter from "./Router/AppRouter";
 import { useAppDispatch } from "../Redux/store";
