@@ -18,12 +18,31 @@ function App(): ReactElement {
   }, []);
 
   const node = getPreConfiguredNodes()[0];
+
+  let walletConnectProjectId = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID;
+  if (!walletConnectProjectId) {
+    walletConnectProjectId = "e2fef7cf17012eaba443b7cf615f7815";
+  }
+
   const walletManager = new WalletManager({
     wallets: [
       WalletId.KIBISIS,
       {
         id: WalletId.LUTE,
         options: { siteName: "VoiX" },
+      },
+      {
+        id: WalletId.WALLETCONNECT,
+        options: {
+          projectId: walletConnectProjectId,
+          metadata: {
+            name: "VoiX",
+            url: "https://staking.voi.network",
+            description: "VoI Staking Platform",
+            icons: ["https://staking.voi.network/favicon.ico"],
+          },
+          themeMode: "light",
+        },
       },
     ],
     algod: {
