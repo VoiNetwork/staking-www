@@ -1,4 +1,4 @@
-@import '@repo/styles';
+@import "@repo/styles";
 
 .overview-wrapper {
   .overview-container {
@@ -6,6 +6,16 @@
       padding: 10px 0 20px;
       border-bottom: 1px solid map-get($grey-colors, "light-grey");
       font-size: 20px;
+      font-weight: bold;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      column-gap: 20px;
+    }
+    .overview-subheader {
+      padding: 10px 0 20px;
+      border-bottom: 1px solid map-get($grey-colors, "light-grey");
+      font-size: 18px;
       font-weight: bold;
       display: flex;
       justify-content: space-between;

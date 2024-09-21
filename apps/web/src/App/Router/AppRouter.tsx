@@ -1,5 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { ReactElement, useEffect } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import LeftPanel from "../../Components/LeftPanel/LeftPanel";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../Redux/store";
@@ -17,6 +17,10 @@ import Airdrop from "../../Pages/Airdrop/Airdrop";
 //import Staking from "../../Pages/Staking/Staking";
 import Setting from "../../Pages/Setting/Setting";
 import Participate from "../../Pages/Participate/Participate";
+import voiStakingUtils from "../../utils/voiStakingUtils";
+import { CoreAccount } from "@repo/algocore";
+import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
+import { Box } from "@mui/material";
 
 function AppRouter(): ReactElement {
   const { selectedNode } = useSelector((state: RootState) => state.nodes);
@@ -35,6 +39,20 @@ function AppRouter(): ReactElement {
     }
   }, [activeAccount]);
 
+  const [availableBalance, setAvailableBalance] = useState<number>(-1);
+  useEffect(() => {
+    if (!activeAccount) return;
+    const algodClient = voiStakingUtils.network.getAlgodClient();
+    algodClient
+      .accountInformation(activeAccount.address)
+      .do()
+      .then((account) => {
+        setAvailableBalance(
+          new CoreAccount(account as AccountResult).availableBalance()
+        );
+      });
+  }, [activeAccount]);
+
   return (
     <BrowserRouter>
       <div className="app-container">
@@ -45,15 +63,24 @@ function AppRouter(): ReactElement {
           <div className="app-right">
             <div className="content-wrapper">
               <div className="content-container">
-                <div className="content-header">
-                  <div>
-                    <WalletWidget></WalletWidget>
-                  </div>
-                  {!isAirdrop && !isStaking && !isSetting && !isAccount ? (
-                    <div>
-                      <ContractPicker></ContractPicker>
-                    </div>
-                  ) : null}
+                <div
+                  className="content-header"
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "flex-end",
+                    alignItems: "center",
+                    gap: 10,
+                  }}
+                >
+                  <Box sx={{ display: { xs: "none", sm: "block" } }}>
+                    {availableBalance >= 0 ? (
+                      <div className="balance">
+                        {(availableBalance / 1e6).toFixed(6)} VOI
+                      </div>
+                    ) : null}
+                  </Box>
+                  <WalletWidget></WalletWidget>
                 </div>
                 {selectedNode && (
                   <div className="content-body">

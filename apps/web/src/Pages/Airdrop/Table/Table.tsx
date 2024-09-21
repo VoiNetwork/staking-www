@@ -89,7 +89,16 @@ const CompoundInterest: React.FC<CompoundInterestProps> = (
       props.compoundingsPerYear * props.time
     );
 
-  return <div>{formatNumber(A)} VOI</div>;
+  return (
+    <div
+      style={{
+        fontWeight: 900,
+        textShadow: "0 0 black",
+      }}
+    >
+      {formatNumber(A)} VOI
+    </div>
+  );
 };
 
 interface LockupProps {
@@ -125,8 +134,8 @@ const AirdropTable: React.FC<LockupProps> = ({
     const { activeAccount } = useWallet();
     const dispatch = useAppDispatch();
     return contracts.length > 0 ? (
-      <Stack gap={5} sx={{ minHeight: 300 }}>
-        <Grid spacing={2} container sx={{ alignItems: "center" }}>
+      <Stack gap={5} sx={{ mt: 5 }}>
+        {/*<Grid spacing={2} container sx={{ alignItems: "center" }}>
           <Grid item xs={12} md={6}>
             <Typography variant="h6">Deadline to configure</Typography>
           </Grid>
@@ -138,7 +147,7 @@ const AirdropTable: React.FC<LockupProps> = ({
               timestamp={Number(contracts[0].global_deadline)}
             />
           </Grid>
-        </Grid>
+              </Grid>*/}
         {selection &&
         contracts.length > 0 &&
         contracts[0].global_period !== selection.global_period ? (
@@ -205,7 +214,7 @@ const AirdropTable: React.FC<LockupProps> = ({
           </Fade>
         ) : null}
 
-        <Table>
+        <Table sx={{ display: { xs: "none", sm: "block" } }}>
           <TableHead>
             <TableRow>
               {/*<TableCell>Deadline</TableCell>*/}

@@ -95,7 +95,6 @@ function Deposit(): ReactElement {
   useEffect(() => {
     if (!activeAccount) return;
     const algodClient = voiStakingUtils.network.getAlgodClient();
-
     algodClient
       .accountInformation(activeAccount.address)
       .do()

@@ -15,6 +15,7 @@ import logo from "../../assets/images/full-logo.png";
 import { useWallet } from "@txnlab/use-wallet-react";
 import { loadAccountData } from "../../Redux/staking/userReducer";
 import { useAppDispatch } from "../../Redux/store";
+import LockClockIcon from "@mui/icons-material/LockClock";
 
 function LeftPanel(): ReactElement {
   const location = useLocation();
@@ -58,44 +59,44 @@ function LeftPanel(): ReactElement {
     }
   }, [activeAccount]);
 
-  const airdropTabs = [
-    {
-      label: "Overview",
-      value: "overview",
-      icon: <HomeOutlined></HomeOutlined>,
-    },
-    {
-      label: "Airdrop",
-      value: "airdrop",
-      icon: <Redeem></Redeem>,
-    },
-  ];
+  // const airdropTabs = [
+  //   {
+  //     label: "Overview",
+  //     value: "overview",
+  //     icon: <HomeOutlined></HomeOutlined>,
+  //   },
+  //   {
+  //     label: "Airdrop",
+  //     value: "airdrop",
+  //     icon: <Redeem></Redeem>,
+  //   },
+  // ];
 
-  const stakingTabs = [
-    {
-      label: "Overview",
-      value: "overview",
-      icon: <HomeOutlined></HomeOutlined>,
-    },
-    {
-      label: "Staking",
-      value: "staking",
-      icon: <AdjustOutlined></AdjustOutlined>,
-    },
-  ];
+  // const stakingTabs = [
+  //   {
+  //     label: "Overview",
+  //     value: "overview",
+  //     icon: <HomeOutlined></HomeOutlined>,
+  //   },
+  //   {
+  //     label: "Staking",
+  //     value: "staking",
+  //     icon: <AdjustOutlined></AdjustOutlined>,
+  //   },
+  // ];
 
-  const settingTabls = [
-    {
-      label: "Overview",
-      value: "overview",
-      icon: <HomeOutlined></HomeOutlined>,
-    },
-    {
-      label: "Setting",
-      value: "setting",
-      icon: <AdjustOutlined></AdjustOutlined>,
-    },
-  ];
+  // const settingTabls = [
+  //   {
+  //     label: "Overview",
+  //     value: "overview",
+  //     icon: <HomeOutlined></HomeOutlined>,
+  //   },
+  //   {
+  //     label: "Setting",
+  //     value: "setting",
+  //     icon: <AdjustOutlined></AdjustOutlined>,
+  //   },
+  // ];
 
   const dashboardTabs = [
     {
@@ -104,10 +105,11 @@ function LeftPanel(): ReactElement {
       icon: <HomeOutlined></HomeOutlined>,
     },
     {
-      label: "Airdrop",
+      label: "Lockup Config",
       value: "airdrop",
-      icon: <Redeem></Redeem>,
+      icon: <LockClockIcon></LockClockIcon>,
     },
+    /*
     {
       label: "Stake",
       value: "stake",
@@ -123,18 +125,17 @@ function LeftPanel(): ReactElement {
       value: "withdraw",
       icon: <Payments></Payments>,
     },
-    /*
     {
       label: "Transfer",
       value: "transfer",
       icon: <MoveDown></MoveDown>,
     },
-    */
     {
       label: "Delegate",
       value: "delegate",
       icon: <SupervisorAccount></SupervisorAccount>,
     },
+    */
   ];
   return (
     <div className="left-panel-wrapper">
@@ -163,7 +164,7 @@ function LeftPanel(): ReactElement {
                   />
                 ))
               : null*/}
-            {route === "staking"
+            {/* {route === "staking"
               ? stakingTabs.map((tab) => (
                   <Tab
                     key={tab.value}
@@ -175,7 +176,7 @@ function LeftPanel(): ReactElement {
                     icon={tab.icon}
                   />
                 ))
-              : null}
+              : null} */}
             {route === "setting"
               ? settingTabls.map((tab) => (
                   <Tab
