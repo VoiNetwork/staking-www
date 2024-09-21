@@ -33,6 +33,57 @@ import ContractPicker from "../../Components/pickers/ContractPicker/ContractPick
 import { LinearProgress, Typography } from "@mui/material";
 import moment from "moment";
 
+interface CountdownTimerProps {
+  deadlineTimestamp: number; // Timestamp in milliseconds
+}
+
+const CountdownTimer: React.FC<CountdownTimerProps> = ({
+  deadlineTimestamp,
+}) => {
+  const calculateTimeLeft = () => {
+    const now = moment();
+    const deadline = moment(deadlineTimestamp);
+    const difference = deadline.diff(now);
+
+    if (difference <= 0) {
+      return { hours: 0, minutes: 0, seconds: 0 }; // Timer reaches zero
+    }
+
+    const duration = moment.duration(difference);
+    return {
+      hours: Math.floor(duration.asHours()), // Convert to total hours
+      minutes: duration.minutes(),
+      seconds: duration.seconds(),
+    };
+  };
+
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000); // Update every second
+
+    return () => clearInterval(intervalId); // Cleanup on unmount
+  }, [deadlineTimestamp]);
+
+  return (
+    <Box>
+      {timeLeft.hours === 0 &&
+      timeLeft.minutes === 0 &&
+      timeLeft.seconds === 0 ? (
+        <Typography variant="body2" color="error">
+          Time's up!
+        </Typography>
+      ) : (
+        <Typography variant="body2">
+          {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s left
+        </Typography>
+      )}
+    </Box>
+  );
+};
+
 interface DeadlineProgressProps {
   deadlineTimestamp: number; // Timestamp in milliseconds
 }
@@ -65,7 +116,8 @@ const DeadlineProgress: React.FC<DeadlineProgressProps> = ({
   return (
     <Box>
       <Typography variant="body2" color="textSecondary">
-        Time left: {timeLeft > 0 ? timeLeftFormatted : "Deadline Passed"}
+        {timeLeft > 0 ? `Config ends ${timeLeftFormatted}` : "Deadline Passed"}
+        {/*<CountdownTimer deadlineTimestamp={deadlineTimestamp} />*/}
       </Typography>
       <LinearProgress variant="determinate" value={progress} />
     </Box>

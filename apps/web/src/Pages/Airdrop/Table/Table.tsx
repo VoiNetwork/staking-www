@@ -72,23 +72,35 @@ export function InfoTooltip(props: InfoTooltipProps) {
   );
 }
 
+const calculateCompoundInterest = (
+  principal: number,
+  rate: number,
+  time: number,
+  compoundingsPerYear: number
+) => {
+  const r = rate / 100; // Convert percentage to decimal
+  return (
+    principal *
+    Math.pow(1 + r / compoundingsPerYear, compoundingsPerYear * time)
+  );
+};
 interface CompoundInterestProps {
   principal: number;
   rate: number;
   time: number;
   compoundingsPerYear: number;
+  difference?: boolean;
 }
 const CompoundInterest: React.FC<CompoundInterestProps> = (
   props: CompoundInterestProps
 ) => {
   const r = props.rate / 100; // Convert percentage to decimal
-  const A =
-    props.principal *
-    Math.pow(
-      1 + r / props.compoundingsPerYear,
-      props.compoundingsPerYear * props.time
-    );
-
+  const A = calculateCompoundInterest(
+    props.principal,
+    props.rate,
+    props.time,
+    props.compoundingsPerYear
+  );
   return (
     <div
       style={{
@@ -96,7 +108,8 @@ const CompoundInterest: React.FC<CompoundInterestProps> = (
         textShadow: "0 0 black",
       }}
     >
-      {formatNumber(A)} VOI
+      {props.difference ? formatNumber(A - props.principal) : formatNumber(A)}{" "}
+      VOI
     </div>
   );
 };
@@ -116,6 +129,7 @@ const AirdropTable: React.FC<LockupProps> = ({
   const { account } = useSelector((state: RootState) => state.user);
 
   const oneWeekInSeconds = 6 * 24 * 60 * 60; // 1 week in seconds
+
   const calculateColor = (secondsRemaining: number) => {
     if (secondsRemaining > oneWeekInSeconds) {
       return "green";
@@ -183,6 +197,31 @@ const AirdropTable: React.FC<LockupProps> = ({
                     Number(selection.global_period_seconds) *
                     1000,
                   { units: ["y"], round: true }
+                )}
+                {((n) => (
+                  <div
+                    style={{
+                      marginLeft: "10px",
+                      color: n > 0 ? "green" : "red",
+                      fontWeight: 900,
+                      textAlign: "right",
+                    }}
+                  >
+                    ({formatNumber(n)} VOI)
+                  </div>
+                ))(
+                  calculateCompoundInterest(
+                    Number(selection.global_initial) / 1e6,
+                    rate(selection.global_period),
+                    selection.global_period,
+                    1
+                  ) -
+                    calculateCompoundInterest(
+                      Number(contracts[0].global_initial) / 1e6,
+                      rate(contracts[0].global_period),
+                      contracts[0].global_period,
+                      1
+                    )
                 )}
               </Box>
               <Box>
@@ -280,7 +319,24 @@ const AirdropTable: React.FC<LockupProps> = ({
                           The stakeable balance is the amount of tokens that can
                           be staked to earn rewards depending on the lockup
                           period. It is calculated based on the lockup period
-                          and zero lockup amount.
+                          and airdrop amount.
+                        </Typography>
+                      </div>
+                    }
+                  />
+                </Box>
+              </TableCell>
+              <TableCell>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  Lockup Bonus
+                  <InfoTooltip
+                    title={
+                      <div>
+                        <Typography variant="h6">Lockup Bonus</Typography>
+                        <Typography variant="body2">
+                          The bonus based on lockup period. This bonus is
+                          calculated based on the lockup period and airdrop
+                          amount.
                         </Typography>
                       </div>
                     }
@@ -320,29 +376,48 @@ const AirdropTable: React.FC<LockupProps> = ({
                 </TableCell>
 
                 <TableCell>
-                  {contract.global_initial !== "0" ? (
-                    !!selection ? (
-                      <CompoundInterest
-                        principal={Number(contract.global_initial) / 1e6}
-                        time={selection.global_period}
-                        rate={rate(contract.global_period)}
-                        compoundingsPerYear={1}
-                      />
-                    ) : (
-                      <CompoundInterest
-                        principal={Number(contract.global_initial) / 1e6}
-                        time={contract.global_period}
-                        rate={rate(contract.global_period)}
-                        compoundingsPerYear={1}
-                      />
-                    )
+                  {!!selection ? (
+                    <CompoundInterest
+                      principal={Number(contract.global_initial) / 1e6}
+                      time={selection.global_period}
+                      rate={rate(selection.global_period)}
+                      compoundingsPerYear={1}
+                    />
                   ) : (
-                    <Link
-                      to={`https://voirewards.com/phase2/${activeAccount?.address || ""}?rewards=1`}
-                      target="_blank"
-                    >
-                      More info
-                    </Link>
+                    <CompoundInterest
+                      principal={Number(contract.global_initial) / 1e6}
+                      time={contract.global_period}
+                      rate={rate(contract.global_period)}
+                      compoundingsPerYear={1}
+                    />
+                  )}
+                </TableCell>
+                <TableCell
+                  sx={{
+                    color:
+                      rate((selection || contract).global_period) > 0
+                        ? "green"
+                        : "inherit",
+                    fontWeight: 900,
+                    textAlign: "right",
+                  }}
+                >
+                  {!!selection ? (
+                    <CompoundInterest
+                      principal={Number(contract.global_initial) / 1e6}
+                      time={selection.global_period}
+                      rate={rate(selection.global_period)}
+                      compoundingsPerYear={1}
+                      difference={true}
+                    />
+                  ) : (
+                    <CompoundInterest
+                      principal={Number(contract.global_initial) / 1e6}
+                      time={contract.global_period}
+                      rate={rate(contract.global_period)}
+                      compoundingsPerYear={1}
+                      difference={true}
+                    />
                   )}
                 </TableCell>
               </TableRow>

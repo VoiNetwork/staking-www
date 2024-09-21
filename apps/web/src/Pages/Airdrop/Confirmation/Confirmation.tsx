@@ -176,10 +176,10 @@ function Confirmation({
                       <TableHead>
                         <TableRow>
                           <TableCell>Lockup Period</TableCell>
-                          <TableCell>Rate</TableCell>
+                          {/*<TableCell>Rate</TableCell>*/}
                           {accountData?.global_initial !== "0" ? (
                             <TableCell sx={{ textAlign: "right" }}>
-                              VOI
+                              Receive
                             </TableCell>
                           ) : null}
                         </TableRow>
@@ -188,7 +188,7 @@ function Confirmation({
                         {new Array(periodLimit + 1).fill(0).map((_, i) => {
                           return (
                             <TableRow selected={i === Number(period)}>
-                              <TableCell>
+                              <TableCell sx={{ p: 1 }}>
                                 {humanizeDuration(
                                   i *
                                     Number(accountData?.global_lockup_delay) *
@@ -197,9 +197,9 @@ function Confirmation({
                                   { units: ["y"], round: true }
                                 )}
                               </TableCell>
-                              <TableCell>{rate(i)}%</TableCell>
+                              {/*<TableCell>{rate(i)}%</TableCell>*/}
                               {accountData?.global_initial !== "0" ? (
-                                <TableCell sx={{ textAlign: "right" }}>
+                                <TableCell sx={{ textAlign: "right", p: 1 }}>
                                   <CompoundInterest
                                     principal={
                                       Number(accountData?.global_initial) / 1e6
@@ -208,6 +208,11 @@ function Confirmation({
                                     rate={rate(i)}
                                     compoundingsPerYear={1}
                                   />
+                                  <div
+                                    style={{ color: "gray", fontSize: "12px" }}
+                                  >
+                                    {i > 0 ? `+${rate(i)}%` : ""}&nbsp;
+                                  </div>
                                 </TableCell>
                               ) : null}
                             </TableRow>

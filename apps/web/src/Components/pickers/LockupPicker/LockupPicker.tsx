@@ -79,16 +79,26 @@ function LockupPicker(props: LockupPickerProps): ReactElement {
                           //setSelection(index);
                         }}
                       >
-                        <ListItemText disableTypography>
-                          {index === 0
-                            ? "No Lockup"
-                            : humanizeDuration(
-                                index *
-                                  Number(props.contract.global_lockup_delay) *
-                                  Number(props.contract.global_period_seconds) *
-                                  1000,
-                                { units: ["y"], round: true }
-                              )}
+                        <ListItemText
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                          disableTypography
+                        >
+                          <div>
+                            {index === 0
+                              ? "No Lockup"
+                              : humanizeDuration(
+                                  index *
+                                    Number(props.contract.global_lockup_delay) *
+                                    Number(
+                                      props.contract.global_period_seconds
+                                    ) *
+                                    1000,
+                                  { units: ["y"], round: true }
+                                )}
+                          </div>
                         </ListItemText>
                       </MenuItem>
                     );
