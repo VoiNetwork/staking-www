@@ -1,5 +1,5 @@
+import React, { ReactElement, useEffect, useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { ReactElement, useEffect, useState } from "react";
 import LeftPanel from "../../Components/LeftPanel/LeftPanel";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../Redux/store";
@@ -21,6 +21,7 @@ import voiStakingUtils from "../../utils/voiStakingUtils";
 import { CoreAccount } from "@repo/algocore";
 import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
 import { Box } from "@mui/material";
+import "../App.scss"
 
 function AppRouter(): ReactElement {
   const { selectedNode } = useSelector((state: RootState) => state.nodes);

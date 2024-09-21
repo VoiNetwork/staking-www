@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import React, { ReactElement, useState } from "react";
 import "./Confirmation.scss";
 import {
   Button,
@@ -21,6 +21,7 @@ import { useWallet } from "@txnlab/use-wallet-react";
 import { useLoader, useSnackbar } from "@repo/ui";
 import humanizeDuration from "humanize-duration";
 import party from "party-js";
+import { CompoundInterest } from "../Table/Table";
 
 const formatNumber = (number: number): string => {
   return new Intl.NumberFormat("en-US", {
@@ -30,6 +31,7 @@ const formatNumber = (number: number): string => {
   }).format(number);
 };
 
+/*
 interface CompoundInterestProps {
   principal: number;
   rate: number;
@@ -49,6 +51,7 @@ const CompoundInterest: React.FC<CompoundInterestProps> = (
 
   return <div>{formatNumber(A)} VOI</div>;
 };
+*/
 
 interface LockupProps {
   show: boolean;
@@ -197,7 +200,6 @@ function Confirmation({
                                   { units: ["y"], round: true }
                                 )}
                               </TableCell>
-                              {/*<TableCell>{rate(i)}%</TableCell>*/}
                               {accountData?.global_initial !== "0" ? (
                                 <TableCell sx={{ textAlign: "right", p: 1 }}>
                                   <CompoundInterest
@@ -211,7 +213,17 @@ function Confirmation({
                                   <div
                                     style={{ color: "gray", fontSize: "12px" }}
                                   >
-                                    {i > 0 ? `+${rate(i)}%` : ""}&nbsp;
+                                    <CompoundInterest
+                                      principal={
+                                        Number(accountData?.global_initial) /
+                                        1e6
+                                      }
+                                      time={i}
+                                      rate={rate(i)}
+                                      compoundingsPerYear={1}
+                                      difference={true}
+                                      showPercentIncrease={true}
+                                    />
                                   </div>
                                 </TableCell>
                               ) : null}
