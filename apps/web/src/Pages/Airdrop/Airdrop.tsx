@@ -84,6 +84,7 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
   );
 };
 
+
 interface DeadlineProgressProps {
   deadlineTimestamp: number; // Timestamp in milliseconds
 }
