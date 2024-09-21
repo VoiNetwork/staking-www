@@ -1,87 +1,18 @@
 import "./Airdrop.scss";
 import { ReactElement, useEffect, useState } from "react";
 import { useWallet } from "@txnlab/use-wallet-react";
-import { LoadingTile } from "@repo/ui";
-import { AccountData, CoreStaker } from "@repo/voix";
+import { AccountData } from "@repo/voix";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../Redux/store";
-import {
-  BlockClient,
-  BlockPackExplorer,
-  CoreAccount,
-  CoreNode,
-  NodeClient,
-} from "@repo/algocore";
-import voiStakingUtils from "../../utils/voiStakingUtils";
-import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
-import { Box, Button, Grid, Tab, Tabs } from "@mui/material";
-import { microalgosToAlgos } from "algosdk";
-import { NumericFormat } from "react-number-format";
+import { Box } from "@mui/material";
 import Table from "./Table/Table";
 import axios from "axios";
-
-//import JsonViewer from "../../Components/JsonViewer/JsonViewer";
-
-import Lockup from "./Lockup/Lockup";
-import {
-  initAccountData,
-  loadAccountData,
-} from "../../Redux/staking/userReducer";
-import { Contract } from "ulujs/types/arc200";
-import ContractPicker from "../../Components/pickers/ContractPicker/ContractPicker";
 
 import { LinearProgress, Typography } from "@mui/material";
 import moment from "moment";
 
-interface CountdownTimerProps {
-  deadlineTimestamp: number; // Timestamp in milliseconds
-}
-
-const CountdownTimer: React.FC<CountdownTimerProps> = ({
-  deadlineTimestamp,
-}) => {
-  const calculateTimeLeft = () => {
-    const now = moment();
-    const deadline = moment(deadlineTimestamp);
-    const difference = deadline.diff(now);
-
-    if (difference <= 0) {
-      return { hours: 0, minutes: 0, seconds: 0 }; // Timer reaches zero
-    }
-
-    const duration = moment.duration(difference);
-    return {
-      hours: Math.floor(duration.asHours()), // Convert to total hours
-      minutes: duration.minutes(),
-      seconds: duration.seconds(),
-    };
-  };
-
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft);
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setTimeLeft(calculateTimeLeft());
-    }, 1000); // Update every second
-
-    return () => clearInterval(intervalId); // Cleanup on unmount
-  }, [deadlineTimestamp]);
-
-  return (
-    <Box>
-      {timeLeft.hours === 0 &&
-      timeLeft.minutes === 0 &&
-      timeLeft.seconds === 0 ? (
-        <Typography variant="body2" color="error">
-          Time's up!
-        </Typography>
-      ) : (
-        <Typography variant="body2">
-          {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s left
-        </Typography>
-      )}
-    </Box>
-  );
+export const calculatePercentIncrease = (start: number, end: number) => {
+  return ((end - start) / start) * 100;
 };
 
 
@@ -118,7 +49,6 @@ const DeadlineProgress: React.FC<DeadlineProgressProps> = ({
     <Box>
       <Typography variant="body2" color="textSecondary">
         {timeLeft > 0 ? `Config ends ${timeLeftFormatted}` : "Deadline Passed"}
-        {/*<CountdownTimer deadlineTimestamp={deadlineTimestamp} />*/}
       </Typography>
       <LinearProgress variant="determinate" value={progress} />
     </Box>
@@ -131,8 +61,6 @@ function Airdrop(): ReactElement {
 
   const { account } = useSelector((state: RootState) => state.user);
   const { availableContracts } = account;
-
-  const dispatch = useAppDispatch();
 
   // MAINNET
   const funder = "62TIVJSZOS4DRSSYYDDZELQAGFYQC5JWKCHRBPPYKTZN2OOOXTGLB5ZJ4E";
@@ -222,38 +150,6 @@ function Airdrop(): ReactElement {
           }}
         >
           <div>Lockup Config</div>
-          {/*<Tabs
-            value={tabIndex}
-            onChange={handleTabChange}
-            aria-label="Airdrop tabs"
-          >
-            {airdropContracts.map((contract, index) => {
-              return (
-                <Tab
-                  key={contract.contractId}
-                  label="Phase I"
-                  {...a11yProps(index)}
-                  style={{ minHeight: "unset", padding: "6px 16px" }}
-                  onClick={() => {
-                    dispatch(initAccountData(contract));
-                  }}
-                />
-              );
-            })}
-            {airdrop2Contracts.map((contract, index) => {
-              return (
-                <Tab
-                  key={contract.contractId}
-                  label="Phase II"
-                  {...a11yProps(index)}
-                  style={{ minHeight: "unset", padding: "6px 16px" }}
-                  onClick={() => {
-                    dispatch(initAccountData(contract));
-                  }}
-                />
-              );
-            })}
-          </Tabs>*/}
         </div>
         <div className="overview-body">
           {!isDataLoading &&
