@@ -23,17 +23,63 @@ import axios from "axios";
 //import JsonViewer from "../../Components/JsonViewer/JsonViewer";
 
 import Lockup from "./Lockup/Lockup";
-import { loadAccountData } from "../../Redux/staking/userReducer";
+import {
+  initAccountData,
+  loadAccountData,
+} from "../../Redux/staking/userReducer";
 import { Contract } from "ulujs/types/arc200";
 import ContractPicker from "../../Components/pickers/ContractPicker/ContractPicker";
+
+import { LinearProgress, Typography } from "@mui/material";
+import moment from "moment";
+
+interface DeadlineProgressProps {
+  deadlineTimestamp: number; // Timestamp in milliseconds
+}
+
+const DeadlineProgress: React.FC<DeadlineProgressProps> = ({
+  deadlineTimestamp,
+}) => {
+  const [progress, setProgress] = useState<number>(0);
+  const currentTime = Date.now();
+  const totalDuration = deadlineTimestamp - currentTime;
+
+  useEffect(() => {
+    const updateProgress = () => {
+      const currentTime = Date.now();
+      const elapsedTime = currentTime - (currentTime - totalDuration);
+      const percentage = Math.min((elapsedTime / totalDuration) * 100, 100);
+      setProgress(percentage);
+    };
+
+    const interval = setInterval(updateProgress, 1000); // Update progress every second
+    return () => clearInterval(interval); // Cleanup interval on component unmount
+  }, [totalDuration]);
+
+  // Convert timestamp to a readable string using moment
+  const deadlineMoment = moment(deadlineTimestamp);
+  const currentMoment = moment();
+  const timeLeftFormatted = deadlineMoment.from(currentMoment); // e.g., "in 5 days", "in 3 hours", or "a few seconds ago"
+  const timeLeft = deadlineTimestamp - currentTime;
+
+  return (
+    <Box>
+      <Typography variant="body2" color="textSecondary">
+        Time left: {timeLeft > 0 ? timeLeftFormatted : "Deadline Passed"}
+      </Typography>
+      <LinearProgress variant="determinate" value={progress} />
+    </Box>
+  );
+};
 
 function Airdrop(): ReactElement {
   const { loading } = useSelector((state: RootState) => state.node);
   const { activeAccount } = useWallet();
 
   const { account } = useSelector((state: RootState) => state.user);
-
   const { availableContracts } = account;
+
+  const dispatch = useAppDispatch();
 
   // MAINNET
   const funder = "62TIVJSZOS4DRSSYYDDZELQAGFYQC5JWKCHRBPPYKTZN2OOOXTGLB5ZJ4E";
@@ -41,6 +87,7 @@ function Airdrop(): ReactElement {
 
   const [airdropContracts, setAirdropContracts] = useState<AccountData[]>([]);
   const [airdrop2Contracts, setAirdrop2Contracts] = useState<AccountData[]>([]);
+
   useEffect(() => {
     if (!availableContracts) return;
     setAirdropContracts(
@@ -78,7 +125,8 @@ function Airdrop(): ReactElement {
       });
   }, [activeAccount]);
 
-  const [tabIndex, setTabIndex] = useState(0); // Add tab state
+  const [tabIndex, setTabIndex] = useState(0);
+
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabIndex(newValue);
   };
@@ -100,26 +148,90 @@ function Airdrop(): ReactElement {
     }
   };
 
+  function a11yProps(index: number) {
+    return {
+      id: `simple-tab-${index}`,
+      "aria-controls": `simple-tabpanel-${index}`,
+    };
+  }
+
+  const deadline = "2024-09-25T00:00:00Z"; // Example deadline
+
   return (
     <div className="overview-wrapper">
       <div className="overview-container">
-        <div className="overview-header">
-          <div>Airdrop</div>
-        </div>
-        <div className="overview-body">
-          <Tabs
+        <div
+          className="overview-header"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+          }}
+        >
+          <div>Lockup Config</div>
+          {/*<Tabs
             value={tabIndex}
             onChange={handleTabChange}
             aria-label="Airdrop tabs"
           >
-            <Tab label="Phase I" />
-            <Tab label="Phase II" />
-          </Tabs>
-
-          {tabIndex === 0 && (
+            {airdropContracts.map((contract, index) => {
+              return (
+                <Tab
+                  key={contract.contractId}
+                  label="Phase I"
+                  {...a11yProps(index)}
+                  style={{ minHeight: "unset", padding: "6px 16px" }}
+                  onClick={() => {
+                    dispatch(initAccountData(contract));
+                  }}
+                />
+              );
+            })}
+            {airdrop2Contracts.map((contract, index) => {
+              return (
+                <Tab
+                  key={contract.contractId}
+                  label="Phase II"
+                  {...a11yProps(index)}
+                  style={{ minHeight: "unset", padding: "6px 16px" }}
+                  onClick={() => {
+                    dispatch(initAccountData(contract));
+                  }}
+                />
+              );
+            })}
+          </Tabs>*/}
+        </div>
+        <div className="overview-body">
+          {!isDataLoading &&
+          accountData &&
+          airdropContracts.length + airdrop2Contracts.length > 0 ? (
             <div>
               {!isDataLoading && accountData && airdropContracts.length > 0 ? (
-                <Box sx={{ mt: 5 }}>
+                <Box
+                  sx={{
+                    background: "space",
+                    padding: "20px",
+                    borderRadius: "20px",
+                    marginTop: "20px",
+                    boxShadow: "0 0 20px rgba(0, 0, 0, 0.1)",
+                  }}
+                >
+                  <div
+                    className="overview-subheader"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "flex-start",
+                    }}
+                  >
+                    <div>Phase I</div>
+                  </div>
+                  <DeadlineProgress
+                    deadlineTimestamp={
+                      airdropContracts[0].global_deadline * 1000
+                    }
+                  />
                   <Table
                     contracts={airdropContracts}
                     funder={funder}
@@ -127,18 +239,32 @@ function Airdrop(): ReactElement {
                     rate={step_rate}
                   ></Table>
                 </Box>
-              ) : (
-                <Box sx={{ mt: 5 }}>
-                  <div>No Testnet Phase I Airdrop found for your acount.</div>
-                </Box>
-              )}
-            </div>
-          )}
-
-          {tabIndex === 1 && (
-            <div>
+              ) : null}
               {!isDataLoading && accountData && airdrop2Contracts.length > 0 ? (
-                <Box sx={{ mt: 5 }}>
+                <Box
+                  sx={{
+                    background: "space",
+                    padding: "20px",
+                    borderRadius: "20px",
+                    marginTop: "20px",
+                    boxShadow: "0 0 20px rgba(0, 0, 0, 0.1)",
+                  }}
+                >
+                  <div
+                    className="overview-subheader"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "flex-start",
+                    }}
+                  >
+                    <div>Phase II</div>
+                  </div>
+                  <DeadlineProgress
+                    deadlineTimestamp={
+                      airdrop2Contracts[0].global_deadline * 1000
+                    }
+                  />
                   <Table
                     contracts={airdrop2Contracts.map((contract) => ({
                       ...contract,
@@ -149,12 +275,14 @@ function Airdrop(): ReactElement {
                     rate={step_rate}
                   ></Table>
                 </Box>
-              ) : (
-                <Box sx={{ mt: 5 }}>
-                  <div>No Testnet Phase II Airdrop found for your acount.</div>
-                </Box>
-              )}
+              ) : null}
             </div>
+          ) : (
+            <Box sx={{ mt: 5 }}>
+              <div className="info-msg">
+                No contracts found for your account.
+              </div>
+            </Box>
           )}
         </div>
       </div>

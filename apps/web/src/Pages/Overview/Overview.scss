@@ -1,4 +1,4 @@
-@import '@repo/styles';
+@import "@repo/styles";
 
 .overview-wrapper {
   .overview-container {
@@ -12,10 +12,20 @@
       align-items: center;
       column-gap: 20px;
     }
+    .overview-subheader {
+      padding: 10px 0 20px;
+      border-bottom: 1px solid map-get($grey-colors, "light-grey");
+      font-size: 14px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      column-gap: 20px;
+    }
     .overview-body {
       margin-top: 20px;
       .props {
-        margin: 40px 0;
+        margin: 20px 0;
         .prop {
           margin: 20px 0;
           display: flex;
@@ -42,6 +52,12 @@
           margin-bottom: 20px;
           font-size: 20px;
           color: map-get($grey-colors, "form-value");
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          .label {
+            margin-right: 5px;
+          }
         }
         .content {
           font-size: 24px;

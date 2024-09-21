@@ -2,7 +2,7 @@ import "./Overview.scss";
 import { ReactElement, useEffect, useState } from "react";
 import { useWallet } from "@txnlab/use-wallet-react";
 import { LoadingTile } from "@repo/ui";
-import { CoreStaker } from "@repo/voix";
+import { AccountData, CoreStaker } from "@repo/voix";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../Redux/store";
 import {
@@ -14,13 +14,16 @@ import {
 } from "@repo/algocore";
 import voiStakingUtils from "../../utils/voiStakingUtils";
 import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
-import { Button, Grid } from "@mui/material";
+import { Box, Button, Grid, Tab, Tabs, Typography } from "@mui/material";
 import { microalgosToAlgos } from "algosdk";
 import { NumericFormat } from "react-number-format";
 import JsonViewer from "../../Components/JsonViewer/JsonViewer";
 import Lockup from "./Lockup/Lockup";
-import { loadAccountData } from "../../Redux/staking/userReducer";
+import { initAccountData } from "../../Redux/staking/userReducer";
 import ContractPicker from "../../Components/pickers/ContractPicker/ContractPicker";
+import humanizeDuration from "humanize-duration";
+import { InfoTooltip } from "../../Components/InfoToolTip/InfoToolTip";
+import { Info } from "@mui/icons-material";
 
 function Overview(): ReactElement {
   const { loading } = useSelector((state: RootState) => state.node);
@@ -30,11 +33,49 @@ function Overview(): ReactElement {
     (state: RootState) => state.user
   );
 
+  const { availableContracts } = account;
+
+  const funder = "62TIVJSZOS4DRSSYYDDZELQAGFYQC5JWKCHRBPPYKTZN2OOOXTGLB5ZJ4E";
+  const parent_id = 5211;
+
+  const [airdropContracts, setAirdropContracts] = useState<AccountData[]>([]);
+  const [airdrop2Contracts, setAirdrop2Contracts] = useState<AccountData[]>([]);
+  const [otherContracts, setOtherContracts] = useState<AccountData[]>([]);
+
+  useEffect(() => {
+    if (!availableContracts) return;
+    setAirdropContracts(
+      availableContracts.filter(
+        (contract) =>
+          contract.global_funder === funder &&
+          contract.global_parent_id === parent_id &&
+          contract.global_initial !== "0"
+      )
+    );
+    setAirdrop2Contracts(
+      availableContracts.filter(
+        (contract) =>
+          contract.global_funder === funder &&
+          contract.global_parent_id === parent_id &&
+          contract.global_initial === "0"
+      )
+    );
+    setOtherContracts(
+      availableContracts.filter(
+        (contract) =>
+          contract.global_funder !== funder ||
+          contract.global_parent_id !== parent_id
+      )
+    );
+  }, [availableContracts]);
+
   const dispatch = useAppDispatch();
 
   const accountData = account.data;
   const stakingAccount = staking.account;
   const contractState = contract.state;
+
+  console.log({ accountData, stakingAccount, contractState });
 
   const [isMetadataVisible, setMetadataVisibility] = useState<boolean>(false);
 
@@ -90,42 +131,87 @@ function Overview(): ReactElement {
       .then(setMinBalance);
   }, [activeAccount, accountData, contractState]);
 
+  const [tab, setTab] = useState(0);
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTab(newValue);
+  };
+
+  function a11yProps(index: number) {
+    return {
+      id: `simple-tab-${index}`,
+      "aria-controls": `simple-tabpanel-${index}`,
+    };
+  }
+
   return (
     <div className="overview-wrapper">
       <div className="overview-container">
-        <div className="overview-header">
-          <div>Overview</div>
-          <div>
-            {accountData && (
-              <div>
-                <Button
-                  variant={"contained"}
-                  color={"primary"}
-                  size={"small"}
+        <div
+          className="overview-header"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+          }}
+        >
+          <div>Contracts</div>
+          <Tabs
+            sx={{ display: { xs: "none", sm: "flex" } }}
+            value={tab}
+            onChange={handleChange}
+            aria-label="simple tabs example"
+            style={{ minHeight: "unset", marginLeft: "20px" }} // Adjust margin if needed
+          >
+            {airdropContracts.map((contract, index) => {
+              return (
+                <Tab
+                  key={contract.contractId}
+                  label="Phase I"
+                  {...a11yProps(index)}
+                  style={{ minHeight: "unset", padding: "6px 16px" }}
                   onClick={() => {
-                    setMetadataVisibility(true);
+                    dispatch(initAccountData(contract));
                   }}
-                >
-                  Metadata
-                </Button>
-                <JsonViewer
-                  show={isMetadataVisible}
-                  onClose={() => {
-                    setMetadataVisibility(false);
+                />
+              );
+            })}
+
+            {airdrop2Contracts.map((contract, index) => {
+              return (
+                <Tab
+                  key={contract.contractId}
+                  label="Phase II"
+                  {...a11yProps(index)}
+                  style={{ minHeight: "unset", padding: "6px 16px" }}
+                  onClick={() => {
+                    dispatch(initAccountData(contract));
                   }}
-                  json={accountData}
-                  title="Metadata"
-                ></JsonViewer>
-              </div>
-            )}
-          </div>
+                />
+              );
+            })}
+
+            {otherContracts.map((contract, index) => {
+              return (
+                <Tab
+                  key={contract.contractId}
+                  label={contract.contractId}
+                  {...a11yProps(index)}
+                  style={{ minHeight: "unset", padding: "6px 16px" }}
+                  onClick={() => {
+                    dispatch(initAccountData(contract));
+                  }}
+                />
+              );
+            })}
+          </Tabs>
+          <Box sx={{ display: { xs: "block", sm: "none" } }}>
+            <ContractPicker />
+          </Box>
         </div>
         <div className="overview-body">
           {isDataLoading && <LoadingTile></LoadingTile>}
           {!isDataLoading && !accountData && (
-            <div className="info-msg">
-              No contract details found for your account.
-            </div>
+            <div className="info-msg">No contracts found for your account.</div>
           )}
           {!isDataLoading &&
             activeAccount &&
@@ -133,6 +219,214 @@ function Overview(): ReactElement {
             stakingAccount &&
             contractState && (
               <div>
+                <div
+                  className="overview-subheader"
+                  style={{
+                    marginTop: "20px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-start",
+                  }}
+                >
+                  <div>Contract Overview</div>
+                </div>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}></Grid>
+                  <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+                    <div className="tile">
+                      <div className="title">
+                        <div className="label">Balance</div>
+                        <InfoTooltip
+                          title={
+                            <div>
+                              <Typography variant="h6">Balance</Typography>
+                              <Typography variant="body2">
+                                Amount of Voi held by the staking contract. This
+                                does not include the amount before funding.
+                              </Typography>
+                            </div>
+                          }
+                        />
+                      </div>
+                      <div className="content">
+                        <NumericFormat
+                          value={microalgosToAlgos(
+                            new CoreAccount(stakingAccount).balance()
+                          )}
+                          suffix=" Voi"
+                          displayType={"text"}
+                          thousandSeparator={true}
+                        ></NumericFormat>
+                      </div>
+                    </div>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+                    <div className="tile">
+                      <div className="title">
+                        <div className="label">Available balance</div>
+                        <InfoTooltip
+                          title={
+                            <div>
+                              <Typography variant="h6">
+                                Available balance
+                              </Typography>
+                              <Typography variant="body2">
+                                Amount of Voi that can be withdrawn from the
+                                staking contract that does not include amount
+                                before funding.
+                              </Typography>
+                            </div>
+                          }
+                        />
+                      </div>
+                      <div className="content">
+                        <NumericFormat
+                          value={
+                            minBalance < 0
+                              ? "-"
+                              : microalgosToAlgos(
+                                  new CoreAccount(
+                                    stakingAccount
+                                  ).availableBalance() - minBalance
+                                )
+                          }
+                          suffix=" Voi"
+                          displayType={"text"}
+                          thousandSeparator={true}
+                        ></NumericFormat>
+                      </div>
+                    </div>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+                    <div className="tile">
+                      <div className="title">
+                        <div className="label">Status</div>
+                        <InfoTooltip
+                          title={
+                            <div>
+                              <Typography variant="h6">State</Typography>
+                              <Typography variant="body2">
+                                Online if the balance of the staking contract is
+                                participating in consensus, otherwise offline.
+                              </Typography>
+                            </div>
+                          }
+                        />
+                      </div>
+                      <div className="content">
+                        {new CoreAccount(stakingAccount).isOnline()
+                          ? "Online"
+                          : "Offline"}
+                      </div>
+                    </div>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+                    <div className="tile">
+                      <div className="title">
+                        <div className="label">Key expires</div>
+                        <InfoTooltip
+                          title={
+                            <div>
+                              <Typography variant="h6">Key expires</Typography>
+                              <Typography variant="body2">
+                                Time left for the participation key to expire.
+                              </Typography>
+                            </div>
+                          }
+                        />
+                      </div>
+                      <div className="content">{expiresIn}</div>
+                    </div>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+                    <div className="tile">
+                      <div className="title">
+                        <div className="label">Lockup</div>
+                        <InfoTooltip
+                          title={
+                            <div>
+                              <Typography variant="h6">Lockup</Typography>
+                              <Typography variant="body2">
+                                Configured lockup duration for the staking
+                                contract.
+                              </Typography>
+                            </div>
+                          }
+                        />
+                      </div>
+                      <div className="content">
+                        {humanizeDuration(
+                          (Number(accountData.global_period) *
+                            Number(accountData.global_lockup_delay) +
+                            Number(accountData.global_vesting_delay)) *
+                            Number(accountData.global_period_seconds) *
+                            1000,
+                          { units: ["mo"], round: true }
+                        )}
+                      </div>
+                    </div>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+                    <div className="tile">
+                      <div className="title">
+                        <div className="label">Vesting</div>
+                        <InfoTooltip
+                          title={
+                            <div>
+                              <Typography variant="h6">Vesting</Typography>
+                              <Typography variant="body2">
+                                Configured vesting duration for the staking
+                                contract. This is the time it takes for the
+                                entire amount to be released after lockup.
+                              </Typography>
+                            </div>
+                          }
+                        />
+                      </div>
+                      <div className="content">
+                        {humanizeDuration(
+                          Number(accountData.global_distribution_count) *
+                            Number(accountData.global_distribution_seconds) *
+                            1000,
+                          { units: ["mo"], round: true }
+                        )}
+                      </div>
+                    </div>
+                  </Grid>
+                </Grid>
+                <div
+                  className="overview-subheader"
+                  style={{
+                    marginTop: "20px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <div>Contract Details</div>
+                  {accountData && (
+                    <div>
+                      <Button
+                        variant={"contained"}
+                        color={"primary"}
+                        size={"small"}
+                        onClick={() => {
+                          setMetadataVisibility(true);
+                        }}
+                      >
+                        Metadata
+                      </Button>
+                      <JsonViewer
+                        show={isMetadataVisible}
+                        onClose={() => {
+                          setMetadataVisibility(false);
+                        }}
+                        json={accountData}
+                        title="Metadata"
+                      ></JsonViewer>
+                    </div>
+                  )}
+                </div>
                 <div className="props">
                   <div className="prop">
                     <div className="key">Your Account</div>
@@ -160,28 +454,7 @@ function Overview(): ReactElement {
                       {new CoreStaker(accountData).stakingAddress()}
                     </div>
                   </div>
-                  <div className="prop">
-                    <div className="key">Delegated to</div>
-                    <div
-                      className="val hover hover-underline underline"
-                      onClick={() => {
-                        const addr = new CoreStaker(
-                          accountData
-                        ).delegateAddress(contractState);
-                        if (addr) {
-                          new BlockPackExplorer(coreNodeInstance).openAddress(
-                            addr
-                          );
-                        }
-                      }}
-                    >
-                      {new CoreStaker(accountData).isDelegated(contractState)
-                        ? new CoreStaker(accountData).delegateAddress(
-                            contractState
-                          )
-                        : "--None--"}
-                    </div>
-                  </div>
+
                   <div className="prop">
                     <div className="key">Staking Contract</div>
                     <div
@@ -196,7 +469,7 @@ function Overview(): ReactElement {
                     </div>
                   </div>
 
-                  <div className="prop">
+                  {/*<div className="prop">
                     <div className="key">Deployer</div>
                     <div
                       className="val hover hover-underline underline"
@@ -208,9 +481,32 @@ function Overview(): ReactElement {
                     >
                       {new CoreStaker(accountData).deployer()}
                     </div>
-                  </div>
+                    </div>*/}
 
-                  <div className="prop">
+                  {new CoreStaker(accountData).isDelegated(contractState) ? (
+                    <div className="prop">
+                      <div className="key">Delegated to</div>
+                      <div
+                        className="val hover hover-underline underline"
+                        onClick={() => {
+                          const addr = new CoreStaker(
+                            accountData
+                          ).delegateAddress(contractState);
+                          if (addr) {
+                            new BlockPackExplorer(coreNodeInstance).openAddress(
+                              addr
+                            );
+                          }
+                        }}
+                      >
+                        {new CoreStaker(accountData).delegateAddress(
+                          contractState
+                        )}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {/*<div className="prop">
                     <div className="key">Messenger</div>
                     <div
                       className="val hover hover-underline underline"
@@ -222,63 +518,9 @@ function Overview(): ReactElement {
                     >
                       {new CoreStaker(accountData).messenger()}
                     </div>
-                  </div>
+                    </div>*/}
                 </div>
 
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
-                    <div className="tile">
-                      <div className="title">Balance</div>
-                      <div className="content">
-                        <NumericFormat
-                          value={microalgosToAlgos(
-                            new CoreAccount(stakingAccount).balance()
-                          )}
-                          suffix=" Voi"
-                          displayType={"text"}
-                          thousandSeparator={true}
-                        ></NumericFormat>
-                      </div>
-                    </div>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
-                    <div className="tile">
-                      <div className="title">Available balance</div>
-                      <div className="content">
-                        <NumericFormat
-                          value={
-                            minBalance < 0
-                              ? "-"
-                              : microalgosToAlgos(
-                                  new CoreAccount(
-                                    stakingAccount
-                                  ).availableBalance() - minBalance
-                                )
-                          }
-                          suffix=" Voi"
-                          displayType={"text"}
-                          thousandSeparator={true}
-                        ></NumericFormat>
-                      </div>
-                    </div>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
-                    <div className="tile">
-                      <div className="title">Status</div>
-                      <div className="content">
-                        {new CoreAccount(stakingAccount).isOnline()
-                          ? "Online"
-                          : "Offline"}
-                      </div>
-                    </div>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
-                    <div className="tile">
-                      <div className="title">Key expires</div>
-                      <div className="content">{expiresIn}</div>
-                    </div>
-                  </Grid>
-                </Grid>
                 {/*<div className="lockup-details">
                   <div className="lockup-details-header">Lockup details</div>
                   <div className="lockup-details-body">
