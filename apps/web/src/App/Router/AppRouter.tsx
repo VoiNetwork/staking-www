@@ -90,7 +90,7 @@ function AppRouter(): ReactElement {
                           path="/overview"
                           element={<Overview></Overview>}
                         ></Route>
-                        <Route path="/stake" element={<Stake></Stake>}></Route>
+                        {/*<Route path="/stake" element={<Stake></Stake>}></Route>
                         <Route
                           path="/deposit"
                           element={<Deposit></Deposit>}
@@ -102,11 +102,11 @@ function AppRouter(): ReactElement {
                         <Route
                           path="/transfer"
                           element={<Transfer></Transfer>}
-                        ></Route>
+                    ></Route>
                         <Route
                           path="/delegate"
                           element={<Delegate></Delegate>}
-                        ></Route>
+                    ></Route>*/}
                         <Route
                           path="/airdrop"
                           element={<Airdrop></Airdrop>}
@@ -115,10 +115,10 @@ function AppRouter(): ReactElement {
                           path="/staking"
                           element={<Staking></Staking>}
                           ></Route>*/}
-                        <Route
+                        {/*<Route
                           path="/setting"
                           element={<Setting></Setting>}
-                        ></Route>
+                        ></Route>*/}
                         <Route
                           path="/account"
                           element={<Participate></Participate>}

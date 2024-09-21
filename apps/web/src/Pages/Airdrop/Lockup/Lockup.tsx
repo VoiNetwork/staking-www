@@ -190,7 +190,7 @@ function Lockup({
                         <tr>
                           <th>Selection</th>
                           <th>Duraction</th>
-                          <th>Rate</th>
+                          {/*<th>Rate</th>*/}
                           {accountData?.global_initial !== "0" ? (
                             <th>VOI</th>
                           ) : null}
@@ -214,7 +214,7 @@ function Lockup({
                                   { units: ["y"], round: true }
                                 )}
                               </TableCell>
-                              <TableCell>{rate(i)}%</TableCell>
+                              {/*<TableCell>{rate(i)}%</TableCell>*/}
                               {accountData?.global_initial !== "0" ? (
                                 <TableCell>
                                   <CompoundInterest
