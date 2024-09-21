@@ -43,21 +43,6 @@
         }
       }
 
-      .tile {
-        border-radius: 10px;
-        background: map-get($grey-colors, "F8F8F9");
-        padding: 40px;
-        height: 70px;
-        .title {
-          margin-bottom: 20px;
-          font-size: 20px;
-          color: map-get($grey-colors, "form-value");
-        }
-        .content {
-          font-size: 24px;
-        }
-      }
-
       .lockup-details {
         margin-top: 50px;
         .lockup-details-header {
