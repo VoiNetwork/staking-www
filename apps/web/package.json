@@ -1,7 +1,7 @@
 {
   "name": "web",
   "version": "0.1.0",
-  "private": true,
+  "LICENSE": "AGPL-3.0",
   "dependencies": {
     "@agoralabs-sh/avm-web-provider": "^1.6.2",
     "@algorandfoundation/algokit-utils": "^6.0.5",
