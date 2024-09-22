@@ -1,4 +1,4 @@
-import React,{ ReactElement, useEffect } from "react";
+import React, { ReactElement, useEffect } from "react";
 import "./App.scss";
 import AppRouter from "./Router/AppRouter";
 import { useAppDispatch } from "../Redux/store";
@@ -46,7 +46,7 @@ function App(): ReactElement {
       },
     ],
     algod: {
-      baseServer: node.algod.url,
+      baseServer: node.algod.url || "https://mainnet-api.voi.nodely.dev", // HACK: Use voimain as default
       port: node.algod.port,
       token: node.algod.token,
     },

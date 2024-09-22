@@ -21,7 +21,7 @@ import voiStakingUtils from "../../utils/voiStakingUtils";
 import { CoreAccount } from "@repo/algocore";
 import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
 import { Box } from "@mui/material";
-import "../App.scss"
+import "../App.scss";
 
 function AppRouter(): ReactElement {
   const { selectedNode } = useSelector((state: RootState) => state.nodes);
@@ -91,7 +91,8 @@ function AppRouter(): ReactElement {
                           path="/overview"
                           element={<Overview></Overview>}
                         ></Route>
-                        {/*<Route path="/stake" element={<Stake></Stake>}></Route>
+                        <Route path="/stake" element={<Stake></Stake>}></Route>
+                        {/*
                         <Route
                           path="/deposit"
                           element={<Deposit></Deposit>}

@@ -1,5 +1,5 @@
 import "./Stake.scss";
-import { ReactElement, useState } from "react";
+import React, { ReactElement, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../Redux/store";
 import { useWallet } from "@txnlab/use-wallet-react";
@@ -13,6 +13,8 @@ import { waitForConfirmation } from "@algorandfoundation/algokit-utils";
 import { useConfirm } from "material-ui-confirm";
 import { confirmationProps } from "@repo/theme";
 import TransactionDetails from "../../Components/TransactionDetails/TransactionDetails";
+import { Contract } from "ulujs/types/arc200";
+import ContractPicker from "@/Components/pickers/ContractPicker/ContractPicker";
 
 function Stake(): ReactElement {
   const { transactionSigner, activeAccount } = useWallet();
@@ -25,11 +27,11 @@ function Stake(): ReactElement {
   const { loading } = useSelector((state: RootState) => state.node);
 
   const { account, staking, contract } = useSelector(
-    (state: RootState) => state.user,
+    (state: RootState) => state.user
   );
 
   const dispatch = useAppDispatch();
-  
+
   const [isRegisterVisible, setRegisterVisibility] = useState<boolean>(false);
 
   const [txnId, setTxnId] = useState<string>("");
@@ -63,12 +65,12 @@ function Stake(): ReactElement {
         {
           addr: activeAccount.address,
           signer: transactionSigner,
-        },
+        }
       );
       await waitForConfirmation(
         txnId,
         20,
-        voiStakingUtils.network.getAlgodClient(),
+        voiStakingUtils.network.getAlgodClient()
       );
 
       setTxnId(txnId);
@@ -86,6 +88,7 @@ function Stake(): ReactElement {
       <div className="stake-container">
         <div className="stake-header">
           <div>Stake</div>
+          <ContractPicker />
         </div>
         <div className="stake-body">
           {isDataLoading && <LoadingTile></LoadingTile>}
