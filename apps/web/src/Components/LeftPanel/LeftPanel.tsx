@@ -109,12 +109,12 @@ function LeftPanel(): ReactElement {
       value: "airdrop",
       icon: <LockClockIcon></LockClockIcon>,
     },
-    /*
     {
       label: "Stake",
       value: "stake",
       icon: <AdjustOutlined></AdjustOutlined>,
     },
+    /*
     {
       label: "Deposit",
       value: "deposit",
