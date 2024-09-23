@@ -1,9 +1,9 @@
-import React from "react"
 import "./Setting.scss";
 import { ReactElement } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import NetworkPicker from "../../Components/pickers/NetworkPicker/NetworkPicker";
+import { Typography } from "@mui/material";
 
 function Setting(): ReactElement {
   const node = useSelector((state: RootState) => state.node);

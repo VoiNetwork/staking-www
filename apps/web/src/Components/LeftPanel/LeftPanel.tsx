@@ -1,4 +1,3 @@
-import React from "react";
 import "./LeftPanel.scss";
 import { Tab, Tabs } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
@@ -7,6 +6,7 @@ import {
   AdfScannerOutlined,
   AdjustOutlined,
   HomeOutlined,
+  MoveDown,
   Payments,
   Redeem,
   SupervisorAccount,
@@ -138,9 +138,9 @@ function LeftPanel(): ReactElement {
     */
   ];
   return (
-    <div className="left-panel-wrapper ">
+    <div className="left-panel-wrapper">
       <div className="left-panel-container">
-        <div className="logo flex items-center justify-center">
+        <div className="logo">
           <img src={logo} alt={"logo"} />
         </div>
         <div className="nav-tabs">
