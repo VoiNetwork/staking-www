@@ -26,7 +26,6 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Confirmation from "../Confirmation/Confirmation";
 import { loadAccountData } from "../../../Redux/staking/userReducer";
 import { useDispatch } from "react-redux";
-import { calculatePercentIncrease } from "../Airdrop";
 
 const formatNumber = (number: number): string => {
   return new Intl.NumberFormat("en-US", {
@@ -91,9 +90,8 @@ interface CompoundInterestProps {
   time: number;
   compoundingsPerYear: number;
   difference?: boolean;
-  showPercentIncrease?: boolean;
 }
-export const CompoundInterest: React.FC<CompoundInterestProps> = (
+const CompoundInterest: React.FC<CompoundInterestProps> = (
   props: CompoundInterestProps
 ) => {
   const r = props.rate / 100; // Convert percentage to decimal
@@ -103,11 +101,6 @@ export const CompoundInterest: React.FC<CompoundInterestProps> = (
     props.time,
     props.compoundingsPerYear
   );
-  const increase = A - props.principal;
-  const percentIncrease = Math.round(
-    calculatePercentIncrease(props.principal, A) + 1
-  );
-
   return (
     <div
       style={{
@@ -115,13 +108,7 @@ export const CompoundInterest: React.FC<CompoundInterestProps> = (
         textShadow: "0 0 black",
       }}
     >
-      {props.difference
-        ? props.showPercentIncrease
-          ? increase > 0
-            ? `${formatNumber(increase)} (+${percentIncrease}%)`
-            : `${formatNumber(increase)}`
-          : formatNumber(A - props.principal)
-        : formatNumber(A)}{" "}
+      {props.difference ? formatNumber(A - props.principal) : formatNumber(A)}{" "}
       VOI
     </div>
   );
@@ -175,126 +162,95 @@ const AirdropTable: React.FC<LockupProps> = ({
             />
           </Grid>
               </Grid>*/}
-        {contracts.length > 0 ? (
-          selection &&
-          contracts[0].global_period !== selection.global_period ? (
-            <Fade in={true}>
-              <Stack
-                direction="row"
+        {selection &&
+        contracts.length > 0 &&
+        contracts[0].global_period !== selection.global_period ? (
+          <Fade in={true}>
+            <Stack
+              direction="row"
+              sx={{
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "10px",
+                border: "1px solid #ccc",
+                borderRadius: "5px",
+              }}
+            >
+              <Box
                 sx={{
-                  justifyContent: "space-between",
+                  display: "flex",
                   alignItems: "center",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  borderRadius: "5px",
                 }}
               >
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
-                  Lockup update:{" "}
-                  {humanizeDuration(
-                    Number(contracts[0].global_period) *
-                      Number(contracts[0].global_lockup_delay) *
-                      Number(contracts[0].global_period_seconds) *
-                      1000,
-                    { units: ["y"], round: true }
-                  )}
-                  <ArrowRightAltIcon />
-                  {humanizeDuration(
-                    Number(selection.global_period) *
-                      Number(selection.global_lockup_delay) *
-                      Number(selection.global_period_seconds) *
-                      1000,
-                    { units: ["y"], round: true }
-                  )}
-                  {((n) => (
-                    <div
-                      style={{
-                        marginLeft: "10px",
-                        color: n > 0 ? "green" : "red",
-                        fontWeight: 900,
-                        textAlign: "right",
-                      }}
-                    >
-                      ({formatNumber(n)} VOI)
-                    </div>
-                  ))(
-                    calculateCompoundInterest(
-                      Number(selection.global_initial) / 1e6,
-                      rate(selection.global_period),
-                      selection.global_period,
-                      1
-                    ) -
-                      calculateCompoundInterest(
-                        Number(contracts[0].global_initial) / 1e6,
-                        rate(contracts[0].global_period),
-                        contracts[0].global_period,
-                        1
-                      )
-                  )}
-                </Box>
-                <Box>
-                  <Button
-                    variant="outlined"
-                    onClick={(ev) => {
-                      ev.stopPropagation();
-                      ev.preventDefault();
-                      setShowConfirmation(true);
+                Lockup update:{" "}
+                {humanizeDuration(
+                  Number(contracts[0].global_period) *
+                    Number(contracts[0].global_lockup_delay) *
+                    Number(contracts[0].global_period_seconds) *
+                    1000,
+                  { units: ["y"], round: true }
+                )}
+                <ArrowRightAltIcon />
+                {humanizeDuration(
+                  Number(selection.global_period) *
+                    Number(selection.global_lockup_delay) *
+                    Number(selection.global_period_seconds) *
+                    1000,
+                  { units: ["y"], round: true }
+                )}
+                {((n) => (
+                  <div
+                    style={{
+                      marginLeft: "10px",
+                      color: n > 0 ? "green" : "red",
+                      fontWeight: 900,
+                      textAlign: "right",
                     }}
                   >
-                    Configure
-                  </Button>
-                  <Confirmation
-                    address={activeAccount?.address || ""}
-                    accountData={selection}
-                    show={showConfirmation}
-                    onClose={() => {
-                      setShowConfirmation(false);
-                    }}
-                    onSuccess={() => {
-                      setShowConfirmation(false);
-                      setSelection(null);
-                      dispatch(loadAccountData(activeAccount?.address || ""));
-                    }}
-                  />
-                </Box>
-              </Stack>
-            </Fade>
-          ) : (
-            <Fade in={true}>
-              <Stack
-                direction="row"
-                sx={{
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  borderRadius: "5px",
-                  minHeight: "36.5px",
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
+                    ({formatNumber(n)} VOI)
+                  </div>
+                ))(
+                  calculateCompoundInterest(
+                    Number(selection.global_initial) / 1e6,
+                    rate(selection.global_period),
+                    selection.global_period,
+                    1
+                  ) -
+                    calculateCompoundInterest(
+                      Number(contracts[0].global_initial) / 1e6,
+                      rate(contracts[0].global_period),
+                      contracts[0].global_period,
+                      1
+                    )
+                )}
+              </Box>
+              <Box>
+                <Button
+                  variant="outlined"
+                  onClick={(ev) => {
+                    ev.stopPropagation();
+                    ev.preventDefault();
+                    setShowConfirmation(true);
                   }}
                 >
-                  Lockup Duration:{" "}
-                  {humanizeDuration(
-                    Number(contracts[0]?.global_period) *
-                      Number(contracts[0]?.global_lockup_delay) *
-                      Number(contracts[0]?.global_period_seconds) *
-                      1000,
-                    { units: ["y"], round: true }
-                  )}
-                </Box>
-              </Stack>
-            </Fade>
-          )
+                  Configure
+                </Button>
+                <Confirmation
+                  address={activeAccount?.address || ""}
+                  accountData={selection}
+                  show={showConfirmation}
+                  onClose={() => {
+                    setShowConfirmation(false);
+                  }}
+                  onSuccess={() => {
+                    setShowConfirmation(false);
+                    setSelection(null);
+                    dispatch(loadAccountData(activeAccount?.address || ""));
+                  }}
+                />
+              </Box>
+            </Stack>
+          </Fade>
         ) : null}
 
         <Table sx={{ display: { xs: "none", sm: "block" } }}>
@@ -453,7 +409,6 @@ const AirdropTable: React.FC<LockupProps> = ({
                       rate={rate(selection.global_period)}
                       compoundingsPerYear={1}
                       difference={true}
-                      showPercentIncrease={true}
                     />
                   ) : (
                     <CompoundInterest
@@ -462,7 +417,6 @@ const AirdropTable: React.FC<LockupProps> = ({
                       rate={rate(contract.global_period)}
                       compoundingsPerYear={1}
                       difference={true}
-                      showPercentIncrease={true}
                     />
                   )}
                 </TableCell>

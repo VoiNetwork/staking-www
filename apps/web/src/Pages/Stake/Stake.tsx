@@ -13,8 +13,7 @@ import { waitForConfirmation } from "@algorandfoundation/algokit-utils";
 import { useConfirm } from "material-ui-confirm";
 import { confirmationProps } from "@repo/theme";
 import TransactionDetails from "../../Components/TransactionDetails/TransactionDetails";
-import { Contract } from "ulujs/types/arc200";
-import ContractPicker from "@/Components/pickers/ContractPicker/ContractPicker";
+import ContractPicker from "../../Components/pickers/ContractPicker/ContractPicker";
 
 function Stake(): ReactElement {
   const { transactionSigner, activeAccount } = useWallet();
