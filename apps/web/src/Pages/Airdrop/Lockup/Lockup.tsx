@@ -1,11 +1,16 @@
-import { ReactElement, useState } from "react";
-import "./Confirmation.scss";
+import { ReactElement, useMemo, useState } from "react";
+import "./Lockup.scss";
 import {
   Button,
   Dialog,
   DialogContent,
   DialogTitle,
+  FormControl,
+  FormLabel,
   Grid,
+  MenuItem,
+  Select,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -20,7 +25,6 @@ import { waitForConfirmation } from "@algorandfoundation/algokit-utils";
 import { useWallet } from "@txnlab/use-wallet-react";
 import { useLoader, useSnackbar } from "@repo/ui";
 import humanizeDuration from "humanize-duration";
-import party from "party-js";
 
 const formatNumber = (number: number): string => {
   return new Intl.NumberFormat("en-US", {
@@ -58,7 +62,7 @@ interface LockupProps {
   onSuccess: () => void;
 }
 
-function Confirmation({
+function Lockup({
   show,
   onClose,
   accountData,
@@ -120,10 +124,6 @@ function Confirmation({
       );
       await new Promise((resolve) => setTimeout(resolve, 8000)); // TODO replace with indexer confirmation
       showSnack("Transaction successful", "success");
-      party.confetti(document.body, {
-        count: party.variation.range(200, 300),
-        size: party.variation.range(1, 1.4),
-      });
       onSuccess();
     } catch (e) {
       showException(e);
@@ -150,7 +150,7 @@ function Confirmation({
           }}
         >
           <DialogTitle>
-            <div>Confirmation</div>
+            <div>Lockup</div>
             <div>
               <Close onClick={handleClose} className="close-modal" />
             </div>
@@ -160,35 +160,52 @@ function Confirmation({
               <div className="lockup-container">
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                    <div>
-                      Are you sure you want to lockup for{" "}
-                      {humanizeDuration(
-                        Number(accountData.global_period) *
-                          Number(accountData.global_lockup_delay) *
-                          Number(accountData.global_period_seconds) *
-                          1000,
-                        { units: ["y"], round: true }
-                      )}
-                    </div>
+                    <FormControl fullWidth variant="outlined">
+                      <FormLabel className="classic-label">Selection</FormLabel>
+                      <Select
+                        className="classic-select"
+                        value={period}
+                        onChange={(ev) => {
+                          setPeriod(ev.target.value);
+                        }}
+                        fullWidth
+                        color={"primary"}
+                      >
+                        {Array.from(
+                          { length: periodLimit + 1 },
+                          (_, i) => i
+                        ).map((dec) => {
+                          return (
+                            <MenuItem value={dec} key={dec}>
+                              {dec}
+                            </MenuItem>
+                          );
+                        })}
+                      </Select>
+                    </FormControl>
                   </Grid>
                   <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                     <Table>
                       <TableHead>
-                        <TableRow>
-                          <TableCell>Lockup Period</TableCell>
-                          {/*<TableCell>Rate</TableCell>*/}
+                        <tr>
+                          <th>Selection</th>
+                          <th>Duraction</th>
+                          {/*<th>Rate</th>*/}
                           {accountData?.global_initial !== "0" ? (
-                            <TableCell sx={{ textAlign: "right" }}>
-                              Receive
-                            </TableCell>
+                            <th>VOI</th>
                           ) : null}
-                        </TableRow>
+                        </tr>
                       </TableHead>
                       <TableBody>
                         {new Array(periodLimit + 1).fill(0).map((_, i) => {
                           return (
-                            <TableRow selected={i === Number(period)}>
-                              <TableCell sx={{ p: 1 }}>
+                            <TableRow
+                              selected={i === Number(period)}
+                              hover={true}
+                              onClick={() => setPeriod(i.toString())}
+                            >
+                              <TableCell>{i}</TableCell>
+                              <TableCell>
                                 {humanizeDuration(
                                   i *
                                     Number(accountData?.global_lockup_delay) *
@@ -199,7 +216,7 @@ function Confirmation({
                               </TableCell>
                               {/*<TableCell>{rate(i)}%</TableCell>*/}
                               {accountData?.global_initial !== "0" ? (
-                                <TableCell sx={{ textAlign: "right", p: 1 }}>
+                                <TableCell>
                                   <CompoundInterest
                                     principal={
                                       Number(accountData?.global_initial) / 1e6
@@ -208,11 +225,6 @@ function Confirmation({
                                     rate={rate(i)}
                                     compoundingsPerYear={1}
                                   />
-                                  <div
-                                    style={{ color: "gray", fontSize: "12px" }}
-                                  >
-                                    {i > 0 ? `+${rate(i)}%` : ""}&nbsp;
-                                  </div>
                                 </TableCell>
                               ) : null}
                             </TableRow>
@@ -258,4 +270,4 @@ function Confirmation({
   );
 }
 
-export default Confirmation;
+export default Lockup;
