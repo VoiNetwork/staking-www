@@ -1,6 +1,6 @@
 {
   "name": "voi-staking",
-  "private": true,
+  "license": "AGPL-3.0",
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
