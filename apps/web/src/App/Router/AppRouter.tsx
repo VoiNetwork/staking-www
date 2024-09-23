@@ -96,11 +96,12 @@ function AppRouter(): ReactElement {
                         <Route
                           path="/deposit"
                           element={<Deposit></Deposit>}
-                        ></Route>
+                    ></Route>*/}
                         <Route
                           path="/withdraw"
                           element={<Withdraw></Withdraw>}
                         ></Route>
+                        {/*
                         <Route
                           path="/transfer"
                           element={<Transfer></Transfer>}

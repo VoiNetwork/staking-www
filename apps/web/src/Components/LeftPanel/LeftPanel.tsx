@@ -1,7 +1,7 @@
 import "./LeftPanel.scss";
 import { Tab, Tabs } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
-import { ReactElement, useEffect } from "react";
+import React, { ReactElement, useEffect } from "react";
 import {
   AdfScannerOutlined,
   AdjustOutlined,
@@ -120,11 +120,13 @@ function LeftPanel(): ReactElement {
       value: "deposit",
       icon: <AdfScannerOutlined></AdfScannerOutlined>,
     },
+    */
     {
       label: "Withdraw",
       value: "withdraw",
       icon: <Payments></Payments>,
     },
+    /*
     {
       label: "Transfer",
       value: "transfer",
