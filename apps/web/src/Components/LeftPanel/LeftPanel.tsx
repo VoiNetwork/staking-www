@@ -1,7 +1,7 @@
 import "./LeftPanel.scss";
 import { Tab, Tabs } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
-import { ReactElement, useEffect } from "react";
+import React, { ReactElement, useEffect } from "react";
 import {
   AdfScannerOutlined,
   AdjustOutlined,
@@ -30,6 +30,7 @@ function LeftPanel(): ReactElement {
   const dashboardRoutes: string[] = [
     "overview",
     "stake",
+    "staking",
     "deposit",
     "withdraw",
     "transfer",
@@ -100,19 +101,26 @@ function LeftPanel(): ReactElement {
 
   const dashboardTabs = [
     {
-      label: "Overview",
+      label: "Contracts Overview",
       value: "overview",
       icon: <HomeOutlined></HomeOutlined>,
     },
+    /*
     {
       label: "Lockup Config",
       value: "airdrop",
       icon: <LockClockIcon></LockClockIcon>,
     },
+    */
     {
-      label: "Stake",
+      label: "Earn Block Rewards",
       value: "stake",
       icon: <AdjustOutlined></AdjustOutlined>,
+    },
+    {
+      label: "Staking Program",
+      value: "staking",
+      icon: <LockClockIcon></LockClockIcon>,
     },
     /*
     {
@@ -120,11 +128,13 @@ function LeftPanel(): ReactElement {
       value: "deposit",
       icon: <AdfScannerOutlined></AdfScannerOutlined>,
     },
+    */
     {
       label: "Withdraw",
       value: "withdraw",
       icon: <Payments></Payments>,
     },
+    /*
     {
       label: "Transfer",
       value: "transfer",
@@ -177,7 +187,7 @@ function LeftPanel(): ReactElement {
                   />
                 ))
               : null} */}
-            {route === "setting"
+            {/*route === "setting"
               ? settingTabls.map((tab) => (
                   <Tab
                     key={tab.value}
@@ -189,8 +199,8 @@ function LeftPanel(): ReactElement {
                     icon={tab.icon}
                   />
                 ))
-              : null}
-            {["staking", "setting"].indexOf(route) === -1
+              : null*/}
+            {["setting"].indexOf(route) === -1
               ? dashboardTabs.map((tab) => (
                   <Tab
                     key={tab.value}
