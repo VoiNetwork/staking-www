@@ -93,11 +93,13 @@ function LeftPanel(): ReactElement {
       value: "deposit",
       icon: <AdfScannerOutlined></AdfScannerOutlined>,
     },
+    */
     {
       label: "Withdraw",
       value: "withdraw",
       icon: <Payments></Payments>,
     },
+    /*
     {
       label: "Transfer",
       value: "transfer",
