@@ -27,7 +27,7 @@ import { CoreAccount, NodeClient } from "@repo/algocore";
 import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
 import TransactionDetails from "../../../Components/TransactionDetails/TransactionDetails";
 import { NumericFormat } from "react-number-format";
-import { microalgosToAlgos } from "algosdk";
+import { algosToMicroalgos, microalgosToAlgos } from "algosdk";
 
 interface LockupProps {
   show: boolean;
@@ -162,16 +162,7 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
                     <div className="deposit-body">
                       <div className="props">
                         <div className="prop">
-                          <div className="key">Staking account</div>
-                          <div className="value">
-                            {((str) =>
-                              str.slice(0, 12) + "..." + str.slice(-12))(
-                              new CoreStaker(accountData).stakingAddress()
-                            )}
-                          </div>
-                        </div>
-                        <div className="prop">
-                          <div className="key">Staking balance</div>
+                          <div className="key">Total Balance</div>
                           <div className="value">
                             <NumericFormat
                               value={
@@ -190,13 +181,13 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
                           </div>
                         </div>
                         <div className="prop">
-                          <div className="key">Wallet balance</div>
+                          <div className="key">Depositable balance</div>
                           <div className="value">
                             <NumericFormat
                               value={
-                                availableBalance < 0
+                                availableBalance < 5000
                                   ? "-"
-                                  : availableBalance / 1e6
+                                  : microalgosToAlgos(availableBalance - 5000)
                               }
                               suffix=" VOI"
                               displayType={"text"}
@@ -206,15 +197,36 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
                         </div>
                       </div>
                       <div className="deposit-widget">
-                        <Grid container spacing={2}>
+                        <Grid container spacing={0}>
                           <Grid item xs={12}>
                             <FormControl fullWidth variant="outlined">
                               <FormLabel className="classic-label flex">
                                 <div>Amount</div>
+                                <Button
+                                  disabled={availableBalance - 5000 <= 0}
+                                  variant="outlined"
+                                  onClick={() => {
+                                    setAmount(
+                                      microalgosToAlgos(
+                                        availableBalance - 5000
+                                      ).toString()
+                                    );
+                                  }}
+                                >
+                                  Max
+                                </Button>
                               </FormLabel>
                               <ShadedInput
+                                disabled={availableBalance - 5000 <= 0}
+                                placeholder={
+                                  availableBalance - 5000 <= 0
+                                    ? "Insufficient balance"
+                                    : "Enter amount"
+                                }
                                 value={amount}
                                 onChange={(ev) => {
+                                  console.log(availableBalance - 5000);
+                                  if (availableBalance - 5000 <= 0) return;
                                   setAmount(ev.target.value);
                                 }}
                                 fullWidth
@@ -222,16 +234,77 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
                               />
                             </FormControl>
                           </Grid>
-                          <Grid
-                            item
-                            xs={12}
-                            sm={12}
-                            md={12}
-                            lg={12}
-                            xl={12}
-                          ></Grid>
-                          <Grid item xs={12} sm={12} md={4} lg={3} xl={3}>
+                          <Grid item xs={12}>
+                            <div
+                              className="props"
+                              style={{
+                                border: "1px solid #e0e0e0",
+                                backgroundColor: "#f9f9f9",
+                                borderRadius: 10,
+                                padding: 10,
+                              }}
+                            >
+                              <div className="prop">
+                                <div className="key">Final Balance</div>
+                                <div className="value">
+                                  <NumericFormat
+                                    value={
+                                      minBalance < 0 || !isNumber(amount)
+                                        ? "-"
+                                        : microalgosToAlgos(
+                                            new CoreAccount(
+                                              stakingAccount
+                                            ).availableBalance() - minBalance
+                                          ) + Number(amount)
+                                    }
+                                    suffix=" VOI"
+                                    displayType={"text"}
+                                    thousandSeparator={true}
+                                    decimalScale={6}
+                                  ></NumericFormat>
+                                </div>
+                              </div>
+                              <div className="prop">
+                                <div className="key">Remaining Balance</div>
+                                <div
+                                  className="value"
+                                  style={{
+                                    color:
+                                      isNumber(amount) &&
+                                      availableBalance - 5000 <
+                                        algosToMicroalgos(Number(amount))
+                                        ? "red"
+                                        : "inherit",
+                                  }}
+                                >
+                                  <NumericFormat
+                                    value={
+                                      availableBalance < 5000 ||
+                                      !isNumber(amount)
+                                        ? "-"
+                                        : microalgosToAlgos(
+                                            availableBalance - 5000
+                                          ) - Number(amount)
+                                    }
+                                    suffix=" VOI"
+                                    displayType={"text"}
+                                    thousandSeparator={true}
+                                    decimalScale={6}
+                                  ></NumericFormat>
+                                </div>
+                              </div>
+                            </div>
+                          </Grid>
+                          <Grid item xs={12}>
                             <Button
+                              disabled={
+                                availableBalance - 5000 <= 0 ||
+                                (availableBalance < 5000
+                                  ? -1
+                                  : microalgosToAlgos(availableBalance - 5000) -
+                                    Number(amount)) <= 0 ||
+                                !isNumber(amount)
+                              }
                               fullWidth
                               variant={"contained"}
                               color={"primary"}
