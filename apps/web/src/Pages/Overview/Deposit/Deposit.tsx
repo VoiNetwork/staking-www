@@ -245,7 +245,9 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
                               }}
                             >
                               <div className="prop">
-                                <div className="key">Final Balance</div>
+                                <div className="key">
+                                  Final Contract Balance
+                                </div>
                                 <div className="value">
                                   <NumericFormat
                                     value={
@@ -265,7 +267,7 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
                                 </div>
                               </div>
                               <div className="prop">
-                                <div className="key">Remaining Balance</div>
+                                <div className="key">Final Account Balance</div>
                                 <div
                                   className="value"
                                   style={{
