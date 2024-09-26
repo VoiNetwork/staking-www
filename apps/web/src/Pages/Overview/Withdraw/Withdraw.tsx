@@ -29,10 +29,7 @@ import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
 import TransactionDetails from "../../../Components/TransactionDetails/TransactionDetails";
 import { NumericFormat } from "react-number-format";
 import { algosToMicroalgos, microalgosToAlgos } from "algosdk";
-<<<<<<< HEAD
 import Withdraw from "../../Withdraw/Withdraw";
-=======
->>>>>>> 67ab25b (add withdraw)
 
 interface LockupProps {
   show: boolean;
@@ -73,11 +70,7 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
   const isDataLoading =
     loading || account.loading || staking.loading || contract.loading;
 
-<<<<<<< HEAD
-  async function withdraw(data: AccountData) {
-=======
   async function deposit(data: AccountData) {
->>>>>>> 67ab25b (add withdraw)
     if (!activeAccount) {
       showSnack("Please connect your wallet", "error");
       return;
@@ -89,13 +82,8 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
     }
 
     try {
-<<<<<<< HEAD
-      showLoader("Withdrawal in progress");
-      const transaction = await new CoreStaker(data).withdraw(
-=======
       showLoader("Deposit in progress");
       const txnId = await new CoreStaker(data).deposit(
->>>>>>> 67ab25b (add withdraw)
         voiStakingUtils.network.getAlgodClient(),
         AlgoAmount.Algos(Number(amount)).microAlgos,
         {
@@ -105,25 +93,15 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
       );
 
       await waitForConfirmation(
-<<<<<<< HEAD
-        transaction.txID(),
-=======
         txnId,
->>>>>>> 67ab25b (add withdraw)
         20,
         voiStakingUtils.network.getAlgodClient()
       );
 
-<<<<<<< HEAD
-      setTxnId(transaction.txID());
-      setTxnMsg("You have withdrawn successfully.");
-      dispatch(loadAccountData(activeAccount.address));
-=======
       setTxnId(txnId);
       setTxnMsg("You have deposited successfully.");
       //dispatch(loadAccountData(activeAccount.address));
       resetState();
->>>>>>> 67ab25b (add withdraw)
     } catch (e) {
       showException(e);
     } finally {
@@ -137,14 +115,10 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
     const algod = new NodeClient(voiStakingUtils.network);
     new CoreStaker(accountData)
       .getMinBalance(algod.algod, contractState)
-<<<<<<< HEAD
       .then(setMinBalance)
       .catch((error) => {
         showException(error);
       });
-=======
-      .then(setMinBalance);
->>>>>>> 67ab25b (add withdraw)
   }, [activeAccount, accountData, contractState]);
 
   const [availableBalance, setAvailableBalance] = useState<number>(-1);
@@ -380,11 +354,7 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
                               color={"primary"}
                               size={"large"}
                               onClick={() => {
-<<<<<<< HEAD
-                                Withdraw(accountData);
-=======
                                 deposit(accountData);
->>>>>>> 67ab25b (add withdraw)
                               }}
                             >
                               Withdraw
