@@ -123,62 +123,61 @@ function ContractPicker(props: ContractPickerProps): ReactElement {
                 }}
                 onClose={closeMenu}
               >
-                {airdropContracts.map((accountData: AccountData) => {
-                  const staker = new CoreStaker(accountData);
-                  return (
-                    <MenuItem
-                      key={staker.contractId()}
-                      onClick={(ev) => {
-                        ev.stopPropagation();
-                        ev.preventDefault();
-                        closeMenu();
-                        dispatch(initAccountData(accountData));
-                      }}
-                    >
-                      <ListItemIcon>
-                        {data.contractId === staker.contractId() ? (
-                          <Done
-                            fontSize="small"
-                            sx={{ color: theme.palette.common.black }}
-                          />
-                        ) : (
-                          ""
-                        )}
-                      </ListItemIcon>
-                      <ListItemText disableTypography>
-                        Phase I: {staker.contractId()}
-                      </ListItemText>
-                    </MenuItem>
-                  );
-                })}
-                {airdrop2Contracts.map((accountData: AccountData) => {
-                  const staker = new CoreStaker(accountData);
-                  return (
-                    <MenuItem
-                      key={staker.contractId()}
-                      onClick={(ev) => {
-                        ev.stopPropagation();
-                        ev.preventDefault();
-                        closeMenu();
-                        dispatch(initAccountData(accountData));
-                      }}
-                    >
-                      <ListItemIcon>
-                        {data.contractId === staker.contractId() ? (
-                          <Done
-                            fontSize="small"
-                            sx={{ color: theme.palette.common.black }}
-                          />
-                        ) : (
-                          ""
-                        )}
-                      </ListItemIcon>
-                      <ListItemText disableTypography>
-                        Phase II: {staker.contractId()}
-                      </ListItemText>
-                    </MenuItem>
-                  );
-                })}
+function renderMenuItems(contracts: AccountData[], phaseLabel: string) {
+  return contracts.map((accountData: AccountData) => {
+    const staker = new CoreStaker(accountData);
+    return (
+      <MenuItem
+        key={staker.contractId()}
+        onClick={(ev) => {
+          ev.stopPropagation();
+          ev.preventDefault();
+          closeMenu();
+          dispatch(initAccountData(accountData));
+        }}
+      >
+        <ListItemIcon>
+          {data.contractId === staker.contractId() ? (
+            <Done
+              fontSize="small"
+              sx={{ color: theme.palette.common.black }}
+            />
+          ) : (
+            ""
+          )}
+        </ListItemIcon>
+        <ListItemText disableTypography>
+          {phaseLabel} {staker.contractId()}
+        </ListItemText>
+      </MenuItem>
+    );
+  });
+}
+
+<Menu
+  anchorEl={menuAnchorEl}
+  className="classic-menu"
+  open={Boolean(menuAnchorEl)}
+  disableAutoFocusItem={true}
+  anchorOrigin={{
+    vertical: "bottom",
+    horizontal: "right",
+  }}
+  transformOrigin={{
+    vertical: "top",
+    horizontal: "right",
+  }}
+  PaperProps={{
+    sx: {
+      transform: "translateX(0px) translateY(5px) !important",
+    },
+  }}
+  onClose={closeMenu}
+>
+  {renderMenuItems(airdropContracts, "Phase I:")}
+  {renderMenuItems(airdrop2Contracts, "Phase II:")}
+  {renderMenuItems(otherContracts, "")}
+</Menu>
                 {otherContracts.map((accountData: AccountData) => {
                   const staker = new CoreStaker(accountData);
                   return (
