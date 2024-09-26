@@ -19,10 +19,9 @@ import { waitForConfirmation } from "@algorandfoundation/algokit-utils";
 import { useWallet } from "@txnlab/use-wallet-react";
 import { useLoader, useSnackbar } from "@repo/ui";
 import { useSelector } from "react-redux";
-import { RootState, useAppDispatch } from "../../../Redux/store";
+import { RootState } from "../../../Redux/store";
 import { isNumber } from "@repo/utils";
 import { AlgoAmount } from "@algorandfoundation/algokit-utils/types/amount";
-import { loadAccountData } from "../../../Redux/staking/userReducer";
 import { CoreAccount, NodeClient } from "@repo/algocore";
 import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
 import TransactionDetails from "../../../Components/TransactionDetails/TransactionDetails";
@@ -35,7 +34,7 @@ interface LockupProps {
   onSuccess: () => void;
 }
 
-function Lockup({ show, onClose }: LockupProps): ReactElement {
+function Lockup({ show, onClose, onSuccess }: LockupProps): ReactElement {
   function handleClose() {
     onClose();
     resetState();
@@ -59,8 +58,6 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
   const { account, staking, contract } = useSelector(
     (state: RootState) => state.user
   );
-
-  const dispatch = useAppDispatch();
 
   const [txnId, setTxnId] = useState<string>("");
   const [txnMsg, setTxnMsg] = useState<string>("");
@@ -105,7 +102,7 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
       setTxnId(txnId);
       setTxnMsg("You have deposited successfully.");
       resetState();
-      onClose();
+      onSuccess();
     } catch (e) {
       showException(e);
     } finally {
