@@ -37,6 +37,20 @@ function ContractPicker(props: ContractPickerProps): ReactElement {
   const [airdrop2Contracts, setAirdrop2Contracts] = useState<AccountData[]>([]);
   const [otherContracts, setOtherContracts] = useState<AccountData[]>([]);
 
+  let contractLabel = "";
+  if (data) {
+    const staker = new CoreStaker(data);
+    if (airdropContracts.some((ac) => ac.contractId === data.contractId)) {
+      contractLabel = `Phase I: ${staker.contractId()}`;
+    } else if (
+      airdrop2Contracts.some((ac) => ac.contractId === data.contractId)
+    ) {
+      contractLabel = `Phase II: ${staker.contractId()}`;
+    } else {
+      contractLabel = staker.contractId().toString();
+    }
+  }
+
   useEffect(() => {
     if (!availableContracts) return;
     setAirdropContracts(
@@ -87,24 +101,7 @@ function ContractPicker(props: ContractPickerProps): ReactElement {
                   setAnchorEl(ev.currentTarget);
                 }}
               >
-                {airdropContracts.map((accountData: AccountData) => {
-                  const staker = new CoreStaker(accountData);
-                  return data.contractId === staker.contractId()
-                    ? `Phase I: ${staker.contractId()}`
-                    : "";
-                })}
-                {airdrop2Contracts.map((accountData: AccountData) => {
-                  const staker = new CoreStaker(accountData);
-                  return data.contractId === staker.contractId()
-                    ? `Phase II: ${staker.contractId()}`
-                    : "";
-                })}
-                {otherContracts.map((accountData: AccountData) => {
-                  const staker = new CoreStaker(accountData);
-                  return data.contractId === staker.contractId()
-                    ? staker.contractId()
-                    : "";
-                })}
+                {contractLabel}
               </Button>
               <Menu
                 anchorEl={menuAnchorEl}
