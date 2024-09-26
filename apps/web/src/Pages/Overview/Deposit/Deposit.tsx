@@ -133,6 +133,9 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
         setAvailableBalance(
           new CoreAccount(account as AccountResult).availableBalance()
         );
+      })
+      .catch((error) => {
+        showException(error);
       });
   }, [activeAccount, stakingAccount]);
 
