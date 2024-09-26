@@ -29,6 +29,7 @@ import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
 import TransactionDetails from "../../../Components/TransactionDetails/TransactionDetails";
 import { NumericFormat } from "react-number-format";
 import { algosToMicroalgos, microalgosToAlgos } from "algosdk";
+import Withdraw from "../../Withdraw/Withdraw";
 
 interface LockupProps {
   show: boolean;
@@ -69,7 +70,7 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
   const isDataLoading =
     loading || account.loading || staking.loading || contract.loading;
 
-  async function deposit(data: AccountData) {
+  async function withdraw(data: AccountData) {
     if (!activeAccount) {
       showSnack("Please connect your wallet", "error");
       return;
@@ -81,8 +82,8 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
     }
 
     try {
-      showLoader("Deposit in progress");
-      const txnId = await new CoreStaker(data).deposit(
+      showLoader("Withdrawal in progress");
+      const transaction = await new CoreStaker(data).withdraw(
         voiStakingUtils.network.getAlgodClient(),
         AlgoAmount.Algos(Number(amount)).microAlgos,
         {
@@ -92,15 +93,14 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
       );
 
       await waitForConfirmation(
-        txnId,
+        transaction.txID(),
         20,
         voiStakingUtils.network.getAlgodClient()
       );
 
-      setTxnId(txnId);
-      setTxnMsg("You have deposited successfully.");
-      //dispatch(loadAccountData(activeAccount.address));
-      resetState();
+      setTxnId(transaction.txID());
+      setTxnMsg("You have withdrawn successfully.");
+      dispatch(loadAccountData(activeAccount.address));
     } catch (e) {
       showException(e);
     } finally {
@@ -350,7 +350,7 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
                               color={"primary"}
                               size={"large"}
                               onClick={() => {
-                                deposit(accountData);
+                                Withdraw(accountData);
                               }}
                             >
                               Withdraw
