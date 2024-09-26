@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import React, { ReactElement, useState } from "react";
 import "./Confirmation.scss";
 import {
   Button,
@@ -197,7 +197,6 @@ function Confirmation({
                                   { units: ["y"], round: true }
                                 )}
                               </TableCell>
-                              {/*<TableCell>{rate(i)}%</TableCell>*/}
                               {accountData?.global_initial !== "0" ? (
                                 <TableCell sx={{ textAlign: "right", p: 1 }}>
                                   <CompoundInterest
@@ -211,7 +210,17 @@ function Confirmation({
                                   <div
                                     style={{ color: "gray", fontSize: "12px" }}
                                   >
-                                    {i > 0 ? `+${rate(i)}%` : ""}&nbsp;
+                                    <CompoundInterest
+                                      principal={
+                                        Number(accountData?.global_initial) /
+                                        1e6
+                                      }
+                                      time={i}
+                                      rate={rate(i)}
+                                      compoundingsPerYear={1}
+                                      difference={true}
+                                      showPercentIncrease={true}
+                                    />
                                   </div>
                                 </TableCell>
                               ) : null}

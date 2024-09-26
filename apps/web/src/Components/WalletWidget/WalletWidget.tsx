@@ -39,13 +39,24 @@ function WalletWidget(): ReactElement {
               <Button
                 variant="outlined"
                 color="primary"
-                className="blacffk-button"
+                className="blacffk-button !hidden sm:!flex"
                 endIcon={<ArrowDropDown></ArrowDropDown>}
                 onClick={(ev) => {
                   setAnchorEl(ev.currentTarget);
                 }}
               >
                 {ellipseString(activeAccount.address, 15)}
+              </Button>
+              <Button
+                variant="outlined"
+                color="primary"
+                className="blacffk-button sm:!hidden"
+                endIcon={<ArrowDropDown></ArrowDropDown>}
+                onClick={(ev) => {
+                  setAnchorEl(ev.currentTarget);
+                }}
+              >
+                {ellipseString(activeAccount.address, 5)}
               </Button>
               <Menu
                 anchorEl={menuAnchorEl}

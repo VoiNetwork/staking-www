@@ -1,5 +1,6 @@
+import React from "react";
 import "./Withdraw.scss";
-import React, { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../Redux/store";
 import { useWallet } from "@txnlab/use-wallet-react";
@@ -16,8 +17,6 @@ import { CoreAccount, NodeClient } from "@repo/algocore";
 import { NumericFormat } from "react-number-format";
 import { AlgoAmount } from "@algorandfoundation/algokit-utils/types/amount";
 import { isNumber } from "@repo/utils";
-import { Contract } from "ulujs/types/arc200";
-import ContractPicker from "../../Components/pickers/ContractPicker/ContractPicker";
 
 function Withdraw(): ReactElement {
   const { transactionSigner, activeAccount } = useWallet();
@@ -96,10 +95,9 @@ function Withdraw(): ReactElement {
     <div className="withdraw-wrapper">
       <div className="withdraw-container">
         <div className="withdraw-header">
-          <div>Withdraw</div>
-          <ContractPicker></ContractPicker>
+          <div className="px-2 sm:px-0">Withdraw</div>
         </div>
-        <div className="withdraw-body">
+        <div className="withdraw-body px-2 sm:px-0">
           {isDataLoading && <LoadingTile></LoadingTile>}
           {!isDataLoading && !accountData && (
             <div className="info-msg">
@@ -144,7 +142,7 @@ function Withdraw(): ReactElement {
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={12} md={4} lg={3} xl={3}>
                       <FormControl fullWidth variant="outlined">
-                        <FormLabel className="classic-label flex">
+                        <FormLabel className="classic-label flex ">
                           <div>Amount</div>
                           <div>
                             <Button

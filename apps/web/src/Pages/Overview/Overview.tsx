@@ -35,6 +35,8 @@ import {
 import ContractPicker from "../../Components/pickers/ContractPicker/ContractPicker";
 import humanizeDuration from "humanize-duration";
 import { InfoTooltip } from "../../Components/InfoToolTip/InfoToolTip";
+import { Copy } from "lucide-react";
+import CopyText from "@/Components/Copy";
 
 function Overview(): ReactElement {
   const { loading } = useSelector((state: RootState) => state.node);
@@ -164,7 +166,7 @@ function Overview(): ReactElement {
   };
 
   return (
-    <div className="overview-wrapper">
+    <div className="overview-wrapper-component">
       <div className="overview-container">
         <div
           className="overview-header"
@@ -174,7 +176,7 @@ function Overview(): ReactElement {
             justifyContent: "flex-start",
           }}
         >
-          <div>Contracts</div>
+          <div className="px-2 sm:px-0">Contracts</div>
           <Tabs
             sx={{ display: { xs: "none", sm: "flex" } }}
             value={tab}
@@ -185,6 +187,7 @@ function Overview(): ReactElement {
             {airdropContracts.map((contract, index) => {
               return (
                 <Tab
+                className="tab"
                   key={contract.contractId}
                   label="Phase I"
                   {...a11yProps(index)}
@@ -199,10 +202,11 @@ function Overview(): ReactElement {
             {airdrop2Contracts.map((contract, index) => {
               return (
                 <Tab
+                className="tab"
                   key={contract.contractId}
                   label="Phase II"
                   {...a11yProps(index)}
-                  style={{ minHeight: "unset", padding: "6px 16px" }}
+                  style={{ minHeight: "unset", padding: "6px 16px", }}
                   onClick={() => {
                     dispatch(initAccountData(contract));
                   }}
@@ -228,7 +232,7 @@ function Overview(): ReactElement {
             <ContractPicker />
           </Box>
         </div>
-        <div className="overview-body">
+        <div className="overview-body px-2 sm:px-0">
           {isDataLoading && <LoadingTile></LoadingTile>}
           {!isDataLoading && !accountData && (
             <div className="info-msg">No contracts found for your account.</div>
@@ -248,9 +252,11 @@ function Overview(): ReactElement {
                     justifyContent: "space-between",
                   }}
                 >
-                  <div>Contract Overview</div>
-                  <ButtonGroup variant="outlined">
+                  <div style={{
+                  }} className="py-2 sm:py-0 ">Contract Overview</div>
+                  <ButtonGroup  variant="outlined">
                     <Button
+                    className="button"
                       onClick={() => {
                         setDepositModalVisibility(true);
                       }}
@@ -258,6 +264,8 @@ function Overview(): ReactElement {
                       Deposit
                     </Button>
                     <Button
+                    className="button"
+
                       onClick={() => {
                         setWithdrawModalVisibility(true);
                       }}
@@ -277,9 +285,10 @@ function Overview(): ReactElement {
                   onSuccess={() => handleModalClose(setWithdrawModalVisibility)}
                 ></Withdraw>
 
-                <Grid container spacing={2}>
-                  <Grid item xs={12}></Grid>
-                  <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+                <Grid container spacing={2} className="overview-tiles">
+                  <Grid item xs={12} ></Grid>
+                  
+                  <Grid item  xs={12} sm={6} md={4} lg={4} xl={3}>
                     <div className="tile">
                       <div className="title">
                         <div className="label">Balance</div>
@@ -474,11 +483,11 @@ function Overview(): ReactElement {
                     </div>
                   )}
                 </div>
-                <div className="props">
+                <div  className="props">
                   <div className="prop">
-                    <div className="key">Your Account</div>
+                    <div className="key">Your Account <CopyText text={activeAccount?.address!} /></div>
                     <div
-                      className="val hover hover-underline underline"
+                      className="val hover hover-underline underline truncate"
                       onClick={() => {
                         new BlockPackExplorer(coreNodeInstance).openAddress(
                           activeAccount.address
@@ -489,9 +498,9 @@ function Overview(): ReactElement {
                     </div>
                   </div>
                   <div className="prop">
-                    <div className="key">Staking Account</div>
+                    <div className="key">Staking Account <CopyText text={new CoreStaker(accountData).stakingAddress()} /></div>
                     <div
-                      className="val hover hover-underline underline"
+                      className="val hover hover-underline underline truncate"
                       onClick={() => {
                         new BlockPackExplorer(coreNodeInstance).openAddress(
                           new CoreStaker(accountData).stakingAddress()
@@ -502,9 +511,9 @@ function Overview(): ReactElement {
                     </div>
                   </div>
                   <div className="prop">
-                    <div className="key">Staking Contract</div>
+                    <div className="key">Staking Contract <CopyText text={new CoreStaker(accountData).contractId()??""} /></div>
                     <div
-                      className="val hover hover-underline underline"
+                      className="val hover hover-underline underline truncate"
                       onClick={() => {
                         new BlockPackExplorer(coreNodeInstance).openApplication(
                           new CoreStaker(accountData).contractId()
@@ -516,9 +525,11 @@ function Overview(): ReactElement {
                   </div>
                   {new CoreStaker(accountData).isDelegated(contractState) ? (
                     <div className="prop">
-                      <div className="key">Delegated to</div>
+                      <div className="key">Delegated to <CopyText text={new CoreStaker(accountData).delegateAddress(
+                          contractState
+                        )??""} /></div>
                       <div
-                        className="val hover hover-underline underline"
+                        className="val hover hover-underline underline truncate"
                         onClick={() => {
                           const addr = new CoreStaker(
                             accountData

@@ -1,3 +1,4 @@
+import React from "react";
 import "./Airdrop.scss";
 import { ReactElement, useEffect, useState } from "react";
 import { useWallet } from "@txnlab/use-wallet-react";
@@ -36,6 +37,9 @@ import moment from "moment";
 interface CountdownTimerProps {
   deadlineTimestamp: number; // Timestamp in milliseconds
 }
+export const calculatePercentIncrease = (start: number, end: number) => {
+  return ((end - start) / start) * 100;
+};
 
 const CountdownTimer: React.FC<CountdownTimerProps> = ({
   deadlineTimestamp,
@@ -221,7 +225,7 @@ function Airdrop(): ReactElement {
             justifyContent: "flex-start",
           }}
         >
-          <div>Lockup Config</div>
+          <div className="px-2 sm:px-0">Lockup Config</div>
           {/*<Tabs
             value={tabIndex}
             onChange={handleTabChange}
@@ -255,7 +259,7 @@ function Airdrop(): ReactElement {
             })}
           </Tabs>*/}
         </div>
-        <div className="overview-body">
+        <div className="overview-body px-2 sm:px-0">
           {!isDataLoading &&
           accountData &&
           airdropContracts.length + airdrop2Contracts.length > 0 ? (
@@ -318,6 +322,7 @@ function Airdrop(): ReactElement {
                       airdrop2Contracts[0].global_deadline * 1000
                     }
                   />
+                  
                   <Table
                     contracts={airdrop2Contracts.map((contract) => ({
                       ...contract,

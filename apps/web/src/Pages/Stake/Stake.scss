@@ -1,9 +1,16 @@
-@import '@repo/styles';
+@import "@repo/styles";
 
 .stake-wrapper {
+  $sm: 640px;
+  $md: 768px;
+  $lg: 1024px;
+  $xl: 1280px;
+  $xxl: 1536px;
+  $side-width: 250px;
+  $padding: 0.5rem;
   .stake-container {
     .stake-header {
-      padding: 10px 0 20px;
+      padding: 8px;
       border-bottom: 1px solid map-get($grey-colors, "light-grey");
       font-size: 20px;
       font-weight: bold;
@@ -11,24 +18,50 @@
       justify-content: space-between;
       align-items: center;
       column-gap: 20px;
+      @media screen and (min-width: $sm) {
+      padding: 10px 0 20px;
+        
+      }
     }
     .stake-body {
       margin-top: 20px;
       .props {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        padding-inline: $padding;
         margin: 40px 0;
         .prop {
+          grid-column: 1/-1;
+          display: grid;
+          gap: 4 px;
+
           margin: 20px 0;
-          display: flex;
-          justify-content: flex-start;
-          align-items: center;
+    
           column-gap: 20px;
           .key {
-            font-size: 14px;
-            width: 150px;
+            font-size: 1rem;
+            // width: 150px;
+            margin-block: 0.5rem;
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+            svg {
+              cursor: pointer;
+            }
+            @media (min-width: $sm) {
+              justify-content: space-between;
+              width: 100%;
+            }
           }
-          .val {
-            font-size: 14px;
+          .value {
+            max-width: 100%;
+            font-size: 0.8rem !important;
+            text-wrap: wrap;
             color: map-get($grey-colors, "form-value");
+          }
+          @media (min-width: $sm) {
+            grid-template-columns: subgrid;
+            place-items: baseline;
           }
         }
       }

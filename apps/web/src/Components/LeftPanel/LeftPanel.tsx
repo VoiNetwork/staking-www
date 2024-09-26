@@ -1,12 +1,12 @@
+import React from "react";
 import "./LeftPanel.scss";
 import { Tab, Tabs } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
-import React, { ReactElement, useEffect } from "react";
+import { ReactElement, useEffect } from "react";
 import {
   AdfScannerOutlined,
   AdjustOutlined,
   HomeOutlined,
-  MoveDown,
   Payments,
   Redeem,
   SupervisorAccount,
@@ -16,6 +16,11 @@ import { useWallet } from "@txnlab/use-wallet-react";
 import { loadAccountData } from "../../Redux/staking/userReducer";
 import { useAppDispatch } from "../../Redux/store";
 import LockClockIcon from "@mui/icons-material/LockClock";
+import {
+  dashboardRoutes,
+  dashboardTabs,
+  settingRoutes,
+} from "../../constants/routes";
 
 function LeftPanel(): ReactElement {
   const location = useLocation();
@@ -27,17 +32,9 @@ function LeftPanel(): ReactElement {
   route = route.split("/");
   route = route[0];
 
-  const dashboardRoutes: string[] = [
-    "overview",
-    "stake",
-    "staking",
-    "deposit",
-    "withdraw",
-    "transfer",
-    "delegate",
-  ];
+  
 
-  const settingRoutes: string[] = ["setting"];
+  
 
   const routes: string[] = [...dashboardRoutes, ...settingRoutes];
 
@@ -64,56 +61,11 @@ function LeftPanel(): ReactElement {
   //   },
   // ];
 
-  const dashboardTabs = [
-    {
-      label: "Contracts Overview",
-      value: "overview",
-      icon: <HomeOutlined></HomeOutlined>,
-    },
-    /*
-    {
-      label: "Lockup Config",
-      value: "airdrop",
-      icon: <LockClockIcon></LockClockIcon>,
-    },
-    */
-    {
-      label: "Earn Block Rewards",
-      value: "stake",
-      icon: <AdjustOutlined></AdjustOutlined>,
-    },
-    {
-      label: "Staking Program",
-      value: "staking",
-      icon: <LockClockIcon></LockClockIcon>,
-    },
-    /*
-    {
-      label: "Deposit",
-      value: "deposit",
-      icon: <AdfScannerOutlined></AdfScannerOutlined>,
-    },
-    {
-      label: "Withdraw",
-      value: "withdraw",
-      icon: <Payments></Payments>,
-    },
-    {
-      label: "Transfer",
-      value: "transfer",
-      icon: <MoveDown></MoveDown>,
-    },
-    {
-      label: "Delegate",
-      value: "delegate",
-      icon: <SupervisorAccount></SupervisorAccount>,
-    },
-    */
-  ];
+  
   return (
-    <div className="left-panel-wrapper">
+    <div className="left-panel-wrapper ">
       <div className="left-panel-container">
-        <div className="logo">
+        <div className="logo flex items-center justify-center">
           <img src={logo} alt={"logo"} />
         </div>
         <div className="nav-tabs">

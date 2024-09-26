@@ -1,5 +1,5 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import React, { ReactElement, useEffect, useState } from "react";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import LeftPanel from "../../Components/LeftPanel/LeftPanel";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../Redux/store";
@@ -22,6 +22,8 @@ import voiStakingUtils from "../../utils/voiStakingUtils";
 import { CoreAccount } from "@repo/algocore";
 import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
 import { Box } from "@mui/material";
+import logo from "../../assets/images/full-logo.png";
+import MobileMenu from "../../Components/MobilePanel";
 import "../App.scss";
 
 function AppRouter(): ReactElement {
@@ -66,15 +68,25 @@ function AppRouter(): ReactElement {
             <div className="content-wrapper">
               <div className="content-container">
                 <div
-                  className="content-header"
+                  className="content-header justify-between "
                   style={{
                     display: "flex",
                     flexDirection: "row",
-                    justifyContent: "flex-end",
+                    // justifyContent: "flex-end",
                     alignItems: "center",
                     gap: 10,
                   }}
                 >
+                  <div  style={{ background: "#6f2ae2" }} className="p-2 sm:hidden mr-auto rounded-md! ">
+                    <img
+                    className=""
+                      style={{
+                        width: "40px",
+                      }}
+                      src={logo}
+                      alt={"logo"}
+                    />
+                  </div>
                   <Box sx={{ display: { xs: "none", sm: "block" } }}>
                     {availableBalance >= 0 ? (
                       <div className="balance">
@@ -82,7 +94,13 @@ function AppRouter(): ReactElement {
                       </div>
                     ) : null}
                   </Box>
+                  {/* Wallet connection widget */}
                   <WalletWidget></WalletWidget>
+                  {/* Mobile menu */}
+                  <div className="sm:hidden">
+                    <MobileMenu />
+                  </div>
+                  
                 </div>
                 {selectedNode && (
                   <div className="content-body">
@@ -144,6 +162,9 @@ function AppRouter(): ReactElement {
                     )}
                   </div>
                 )}
+                <footer  style={{
+                  minHeight: "50px",
+                }} className="sm:hidden"></footer>
               </div>
             </div>
           </div>

@@ -14,6 +14,7 @@ import { useConfirm } from "material-ui-confirm";
 import { confirmationProps } from "@repo/theme";
 import TransactionDetails from "../../Components/TransactionDetails/TransactionDetails";
 import ContractPicker from "../../Components/pickers/ContractPicker/ContractPicker";
+import CopyText from "@/Components/Copy";
 
 function Stake(): ReactElement {
   const { transactionSigner, activeAccount } = useWallet();
@@ -85,11 +86,11 @@ function Stake(): ReactElement {
   return (
     <div className="stake-wrapper">
       <div className="stake-container">
-        <div className="stake-header">
-          <div>Stake</div>
+        <div className="stake-header ">
+          <div className="">Stake</div>
           <ContractPicker />
         </div>
-        <div className="stake-body">
+        <div className="stake-body px-2 sm:px-0">
           {isDataLoading && <LoadingTile></LoadingTile>}
           {!isDataLoading && !accountData && (
             <div className="info-msg">
@@ -107,28 +108,28 @@ function Stake(): ReactElement {
                   <div>
                     <div className="props">
                       <div className="prop">
-                        <div className="key">Selection key</div>
-                        <div className="value">{accountData.part_sel_k}</div>
+                        <div className="key">Selection key <CopyText text={accountData.part_sel_k!} /></div>
+                        <div className="value truncate">{accountData.part_sel_k}</div>
                       </div>
                       <div className="prop">
-                        <div className="key">State proof key</div>
-                        <div className="value">{accountData.part_sp_key}</div>
+                        <div className="key">State proof key <CopyText text={accountData.part_sp_key!} /></div>
+                        <div className="value truncate">{accountData.part_sp_key}</div>
                       </div>
                       <div className="prop">
-                        <div className="key">Vote key</div>
-                        <div className="value">{accountData.part_vote_k}</div>
+                        <div className="key">Vote key <CopyText text={accountData.part_vote_k!} /></div>
+                        <div className="value truncate">{accountData.part_vote_k}</div>
                       </div>
                       <div className="prop">
-                        <div className="key">Vote key dilution</div>
-                        <div className="value">{accountData.part_vote_kd}</div>
+                        <div className="key">Vote key dilution <CopyText text={accountData.part_vote_kd!} /></div>
+                        <div className="value truncate">{accountData.part_vote_kd}</div>
                       </div>
                       <div className="prop">
-                        <div className="key">Vote first</div>
-                        <div className="value">{accountData.part_vote_fst}</div>
+                        <div className="key">Vote first <CopyText text={accountData.part_vote_fst!} /></div>
+                        <div className="value truncate">{accountData.part_vote_fst}</div>
                       </div>
                       <div className="prop">
-                        <div className="key">Vote last</div>
-                        <div className="value">{accountData.part_vote_lst}</div>
+                        <div className="key">Vote last <CopyText text={accountData.part_vote_lst!} /></div>
+                        <div className="value truncate">{accountData.part_vote_lst}</div>
                       </div>
                     </div>
                     <div>
