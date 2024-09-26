@@ -26,7 +26,8 @@ import {
 import { microalgosToAlgos } from "algosdk";
 import { NumericFormat } from "react-number-format";
 import JsonViewer from "../../Components/JsonViewer/JsonViewer";
-import Lockup from "./Deposit/Deposit";
+import Deposit from "./Deposit/Deposit";
+import Withdraw from "./Withdraw/Withdraw";
 import {
   initAccountData,
   loadAccountData,
@@ -101,7 +102,10 @@ function Overview(): ReactElement {
     ready
   );
 
-  const [isLockupModalVisible, setLockupModalVisibility] =
+  const [isDepositModalVisible, setDepositModalVisibility] =
+    useState<boolean>(false);
+
+  const [isWithdrawModalVisible, setWithdraModalVisibility] =
     useState<boolean>(false);
 
   const [expiresIn, setExpiresIn] = useState<string>("--");
@@ -241,25 +245,43 @@ function Overview(): ReactElement {
                   <ButtonGroup variant="outlined">
                     <Button
                       onClick={() => {
-                        setLockupModalVisibility(true);
+                        setDepositModalVisibility(true);
                       }}
                     >
                       Deposit
                     </Button>
-                    <Button>Withdraw</Button>
+                    <Button
+                      onClick={() => {
+                        setWithdraModalVisibility(true);
+                      }}
+                    >
+                      Withdraw
+                    </Button>
                   </ButtonGroup>
                 </div>
-                <Lockup
-                  show={isLockupModalVisible}
+                <Deposit
+                  show={isDepositModalVisible}
                   onClose={() => {
-                    setLockupModalVisibility(false);
+                    setDepositModalVisibility(false);
                     dispatch(loadAccountData(activeAccount.address));
                   }}
                   onSuccess={() => {
-                    setLockupModalVisibility(false);
+                    setDepositModalVisibility(false);
                     dispatch(loadAccountData(activeAccount.address));
                   }}
-                ></Lockup>
+                ></Deposit>
+                <Withdraw
+                  show={isWithdrawModalVisible}
+                  onClose={() => {
+                    setWithdraModalVisibility(false);
+                    dispatch(loadAccountData(activeAccount.address));
+                  }}
+                  onSuccess={() => {
+                    setWithdraModalVisibility(false);
+                    dispatch(loadAccountData(activeAccount.address));
+                  }}
+                ></Withdraw>
+
                 <Grid container spacing={2}>
                   <Grid item xs={12}></Grid>
                   <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
