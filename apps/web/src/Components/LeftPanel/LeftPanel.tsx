@@ -37,18 +37,9 @@ function LeftPanel(): ReactElement {
     "delegate",
   ];
 
-  const airdropRoutes: string[] = ["airdrop"];
-
-  const stakingRoutes: string[] = ["staking"];
-
   const settingRoutes: string[] = ["setting"];
 
-  const routes: string[] = [
-    ...dashboardRoutes,
-    ...airdropRoutes,
-    ...stakingRoutes,
-    ...settingRoutes,
-  ];
+  const routes: string[] = [...dashboardRoutes, ...settingRoutes];
 
   if (routes.indexOf(route) === -1) {
     route = false;
@@ -59,32 +50,6 @@ function LeftPanel(): ReactElement {
       dispatch(loadAccountData(activeAccount.address));
     }
   }, [activeAccount]);
-
-  // const airdropTabs = [
-  //   {
-  //     label: "Overview",
-  //     value: "overview",
-  //     icon: <HomeOutlined></HomeOutlined>,
-  //   },
-  //   {
-  //     label: "Airdrop",
-  //     value: "airdrop",
-  //     icon: <Redeem></Redeem>,
-  //   },
-  // ];
-
-  // const stakingTabs = [
-  //   {
-  //     label: "Overview",
-  //     value: "overview",
-  //     icon: <HomeOutlined></HomeOutlined>,
-  //   },
-  //   {
-  //     label: "Staking",
-  //     value: "staking",
-  //     icon: <AdjustOutlined></AdjustOutlined>,
-  //   },
-  // ];
 
   // const settingTabls = [
   //   {
@@ -122,13 +87,11 @@ function LeftPanel(): ReactElement {
       value: "staking",
       icon: <LockClockIcon></LockClockIcon>,
     },
-    /*
     {
       label: "Deposit",
       value: "deposit",
       icon: <AdfScannerOutlined></AdfScannerOutlined>,
     },
-    */
     {
       label: "Withdraw",
       value: "withdraw",
@@ -161,32 +124,6 @@ function LeftPanel(): ReactElement {
             orientation={"vertical"}
             className="vertical-pills"
           >
-            {/*route === "airdrop"
-              ? airdropTabs.map((tab) => (
-                  <Tab
-                    key={tab.value}
-                    label={tab.label}
-                    value={tab.value}
-                    iconPosition="start"
-                    component={Link}
-                    to={`/${tab.value}`}
-                    icon={tab.icon}
-                  />
-                ))
-              : null*/}
-            {/* {route === "staking"
-              ? stakingTabs.map((tab) => (
-                  <Tab
-                    key={tab.value}
-                    label={tab.label}
-                    value={tab.value}
-                    iconPosition="start"
-                    component={Link}
-                    to={`/${tab.value}`}
-                    icon={tab.icon}
-                  />
-                ))
-              : null} */}
             {/*route === "setting"
               ? settingTabls.map((tab) => (
                   <Tab

@@ -93,12 +93,10 @@ function AppRouter(): ReactElement {
                           element={<Overview></Overview>}
                         ></Route>
                         <Route path="/stake" element={<Stake></Stake>}></Route>
-                        {/*
                         <Route
                           path="/deposit"
                           element={<Deposit></Deposit>}
                         ></Route>
-                    */}
                         <Route
                           path="/withdraw"
                           element={<Withdraw></Withdraw>}
