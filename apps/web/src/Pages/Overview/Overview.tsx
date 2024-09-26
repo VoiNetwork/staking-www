@@ -105,7 +105,7 @@ function Overview(): ReactElement {
   const [isDepositModalVisible, setDepositModalVisibility] =
     useState<boolean>(false);
 
-  const [isWithdrawModalVisible, setWithdraModalVisibility] =
+  const [isWithdrawModalVisible, setWithdrawModalVisibility] =
     useState<boolean>(false);
 
   const [expiresIn, setExpiresIn] = useState<string>("--");
@@ -155,6 +155,14 @@ function Overview(): ReactElement {
       "aria-controls": `simple-tabpanel-${index}`,
     };
   }
+
+  const handleModalClose = (
+    setModalVisibility: React.Dispatch<React.SetStateAction<boolean>>
+  ) => {
+    if (!activeAccount) return;
+    setModalVisibility(false);
+    dispatch(loadAccountData(activeAccount.address));
+  };
 
   return (
     <div className="overview-wrapper">
@@ -252,7 +260,7 @@ function Overview(): ReactElement {
                     </Button>
                     <Button
                       onClick={() => {
-                        setWithdraModalVisibility(true);
+                        setWithdrawModalVisibility(true);
                       }}
                     >
                       Withdraw
@@ -261,25 +269,13 @@ function Overview(): ReactElement {
                 </div>
                 <Deposit
                   show={isDepositModalVisible}
-                  onClose={() => {
-                    setDepositModalVisibility(false);
-                    dispatch(loadAccountData(activeAccount.address));
-                  }}
-                  onSuccess={() => {
-                    setDepositModalVisibility(false);
-                    dispatch(loadAccountData(activeAccount.address));
-                  }}
+                  onClose={() => handleModalClose(setDepositModalVisibility)}
+                  onSuccess={() => handleModalClose(setDepositModalVisibility)}
                 ></Deposit>
                 <Withdraw
                   show={isWithdrawModalVisible}
-                  onClose={() => {
-                    setWithdraModalVisibility(false);
-                    dispatch(loadAccountData(activeAccount.address));
-                  }}
-                  onSuccess={() => {
-                    setWithdraModalVisibility(false);
-                    dispatch(loadAccountData(activeAccount.address));
-                  }}
+                  onClose={() => handleModalClose(setWithdrawModalVisibility)}
+                  onSuccess={() => handleModalClose(setWithdrawModalVisibility)}
                 ></Withdraw>
 
                 <Grid container spacing={2}>
