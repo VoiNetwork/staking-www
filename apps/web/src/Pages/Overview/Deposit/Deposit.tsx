@@ -130,6 +130,25 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
       });
   }, [activeAccount, stakingAccount]);
 
+  const errorMessage = (() => {
+    if (amount === "") {
+      return "";
+    }
+    if (!isNumber(amount)) {
+      return "Invalid amount";
+    }
+    if (Number(amount) <= 0) {
+      return "Amount should be greater than 0";
+    }
+    if (availableBalance < 5000) {
+      return "Insufficient balance";
+    }
+    if (availableBalance - 5000 < algosToMicroalgos(Number(amount))) {
+      return "Insufficient balance";
+    }
+    return "";
+  })();
+
   return (
     <div>
       {show ? (
@@ -199,7 +218,13 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
                       <div className="deposit-widget">
                         <Grid container spacing={0}>
                           <Grid item xs={12}>
-                            <FormControl fullWidth variant="outlined">
+                            <FormControl
+                              style={{
+                                minHeight: 100,
+                              }}
+                              fullWidth
+                              variant="outlined"
+                            >
                               <FormLabel className="classic-label flex">
                                 <div>Amount</div>
                                 <Button
@@ -232,6 +257,19 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
                                 fullWidth
                                 endAdornment={<div>VOI</div>}
                               />
+                              {errorMessage ? (
+                                <label
+                                  style={{
+                                    color: errorMessage ? "red" : "inherit",
+                                    fontSize: "0.75rem",
+                                    textAlign: "left",
+                                    marginTop: "5px",
+                                  }}
+                                  className="error"
+                                >
+                                  {errorMessage}
+                                </label>
+                              ) : null}
                             </FormControl>
                           </Grid>
                           <Grid item xs={12}>
@@ -270,14 +308,6 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
                                 <div className="key">Final Account Balance</div>
                                 <div
                                   className="value"
-                                  style={{
-                                    color:
-                                      isNumber(amount) &&
-                                      availableBalance - 5000 <
-                                        algosToMicroalgos(Number(amount))
-                                        ? "red"
-                                        : "inherit",
-                                  }}
                                 >
                                   <NumericFormat
                                     value={
