@@ -114,7 +114,10 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
     const algod = new NodeClient(voiStakingUtils.network);
     new CoreStaker(accountData)
       .getMinBalance(algod.algod, contractState)
-      .then(setMinBalance);
+      .then(setMinBalance)
+      .catch((error) => {
+        showException(error);
+      });
   }, [activeAccount, accountData, contractState]);
 
   const [availableBalance, setAvailableBalance] = useState<number>(-1);

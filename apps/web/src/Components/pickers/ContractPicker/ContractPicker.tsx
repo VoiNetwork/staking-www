@@ -10,7 +10,12 @@ import {
 import { ArrowDropDown, Done } from "@mui/icons-material";
 import { RootState, useAppDispatch } from "../../../Redux/store";
 import { useSelector } from "react-redux";
-import { AccountData, CoreStaker } from "@repo/voix";
+import {
+  AIRDROP_CTC_INFO,
+  AIRDROP_FUNDER,
+  AccountData,
+  CoreStaker,
+} from "@repo/voix";
 import { initAccountData } from "../../../Redux/staking/userReducer";
 import { theme } from "@repo/theme";
 
@@ -25,8 +30,8 @@ function ContractPicker(props: ContractPickerProps): ReactElement {
 
   const { availableContracts, data } = account;
 
-  const funder = "62TIVJSZOS4DRSSYYDDZELQAGFYQC5JWKCHRBPPYKTZN2OOOXTGLB5ZJ4E";
-  const parent_id = 5211;
+  const funder = AIRDROP_FUNDER;
+  const parent_id = AIRDROP_CTC_INFO;
 
   const [airdropContracts, setAirdropContracts] = useState<AccountData[]>([]);
   const [airdrop2Contracts, setAirdrop2Contracts] = useState<AccountData[]>([]);
