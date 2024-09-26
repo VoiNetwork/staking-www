@@ -41,7 +41,13 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
     resetState();
   }
 
-  function resetState() {}
+  function resetState() {
+    setAmount("");
+    setTxnId("");
+    setTxnMsg("");
+    setAvailableBalance(-1);
+    setMinBalance(-1);
+  }
 
   const { transactionSigner, activeAccount } = useWallet();
 
@@ -98,8 +104,8 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
 
       setTxnId(txnId);
       setTxnMsg("You have deposited successfully.");
-      //dispatch(loadAccountData(activeAccount.address));
       resetState();
+      onClose();
     } catch (e) {
       showException(e);
     } finally {
@@ -306,9 +312,7 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
                               </div>
                               <div className="prop">
                                 <div className="key">Final Account Balance</div>
-                                <div
-                                  className="value"
-                                >
+                                <div className="value">
                                   <NumericFormat
                                     value={
                                       availableBalance < 5000 ||

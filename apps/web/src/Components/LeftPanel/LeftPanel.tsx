@@ -87,6 +87,7 @@ function LeftPanel(): ReactElement {
       value: "staking",
       icon: <LockClockIcon></LockClockIcon>,
     },
+    /*
     {
       label: "Deposit",
       value: "deposit",
@@ -97,7 +98,6 @@ function LeftPanel(): ReactElement {
       value: "withdraw",
       icon: <Payments></Payments>,
     },
-    /*
     {
       label: "Transfer",
       value: "transfer",

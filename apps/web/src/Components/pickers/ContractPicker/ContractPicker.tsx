@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import "./ContractPicker.scss";
 import {
   Button,
@@ -25,6 +25,40 @@ function ContractPicker(props: ContractPickerProps): ReactElement {
 
   const { availableContracts, data } = account;
 
+  const funder = "62TIVJSZOS4DRSSYYDDZELQAGFYQC5JWKCHRBPPYKTZN2OOOXTGLB5ZJ4E";
+  const parent_id = 5211;
+
+  const [airdropContracts, setAirdropContracts] = useState<AccountData[]>([]);
+  const [airdrop2Contracts, setAirdrop2Contracts] = useState<AccountData[]>([]);
+  const [otherContracts, setOtherContracts] = useState<AccountData[]>([]);
+
+  useEffect(() => {
+    if (!availableContracts) return;
+    setAirdropContracts(
+      availableContracts.filter(
+        (contract) =>
+          contract.global_funder === funder &&
+          contract.global_parent_id === parent_id &&
+          contract.global_initial !== "0"
+      )
+    );
+    setAirdrop2Contracts(
+      availableContracts.filter(
+        (contract) =>
+          contract.global_funder === funder &&
+          contract.global_parent_id === parent_id &&
+          contract.global_initial === "0"
+      )
+    );
+    setOtherContracts(
+      availableContracts.filter(
+        (contract) =>
+          contract.global_funder !== funder ||
+          contract.global_parent_id !== parent_id
+      )
+    );
+  }, [availableContracts]);
+
   const filteredContracts = availableContracts.filter(
     (contract) => !props.funder || contract.global_funder === props.funder
   );
@@ -48,7 +82,24 @@ function ContractPicker(props: ContractPickerProps): ReactElement {
                   setAnchorEl(ev.currentTarget);
                 }}
               >
-                {new CoreStaker(data).contractId()}
+                {airdropContracts.map((accountData: AccountData) => {
+                  const staker = new CoreStaker(accountData);
+                  return data.contractId === staker.contractId()
+                    ? `Phase I: ${staker.contractId()}`
+                    : "";
+                })}
+                {airdrop2Contracts.map((accountData: AccountData) => {
+                  const staker = new CoreStaker(accountData);
+                  return data.contractId === staker.contractId()
+                    ? `Phase II: ${staker.contractId()}`
+                    : "";
+                })}
+                {otherContracts.map((accountData: AccountData) => {
+                  const staker = new CoreStaker(accountData);
+                  return data.contractId === staker.contractId()
+                    ? staker.contractId()
+                    : "";
+                })}
               </Button>
               <Menu
                 anchorEl={menuAnchorEl}
@@ -70,7 +121,63 @@ function ContractPicker(props: ContractPickerProps): ReactElement {
                 }}
                 onClose={closeMenu}
               >
-                {filteredContracts.map((accountData: AccountData) => {
+                {airdropContracts.map((accountData: AccountData) => {
+                  const staker = new CoreStaker(accountData);
+                  return (
+                    <MenuItem
+                      key={staker.contractId()}
+                      onClick={(ev) => {
+                        ev.stopPropagation();
+                        ev.preventDefault();
+                        closeMenu();
+                        dispatch(initAccountData(accountData));
+                      }}
+                    >
+                      <ListItemIcon>
+                        {data.contractId === staker.contractId() ? (
+                          <Done
+                            fontSize="small"
+                            sx={{ color: theme.palette.common.black }}
+                          />
+                        ) : (
+                          ""
+                        )}
+                      </ListItemIcon>
+                      <ListItemText disableTypography>
+                        Phase I: {staker.contractId()}
+                      </ListItemText>
+                    </MenuItem>
+                  );
+                })}
+                {airdrop2Contracts.map((accountData: AccountData) => {
+                  const staker = new CoreStaker(accountData);
+                  return (
+                    <MenuItem
+                      key={staker.contractId()}
+                      onClick={(ev) => {
+                        ev.stopPropagation();
+                        ev.preventDefault();
+                        closeMenu();
+                        dispatch(initAccountData(accountData));
+                      }}
+                    >
+                      <ListItemIcon>
+                        {data.contractId === staker.contractId() ? (
+                          <Done
+                            fontSize="small"
+                            sx={{ color: theme.palette.common.black }}
+                          />
+                        ) : (
+                          ""
+                        )}
+                      </ListItemIcon>
+                      <ListItemText disableTypography>
+                        Phase II: {staker.contractId()}
+                      </ListItemText>
+                    </MenuItem>
+                  );
+                })}
+                {otherContracts.map((accountData: AccountData) => {
                   const staker = new CoreStaker(accountData);
                   return (
                     <MenuItem
