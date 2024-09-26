@@ -35,7 +35,6 @@ import {
 import ContractPicker from "../../Components/pickers/ContractPicker/ContractPicker";
 import humanizeDuration from "humanize-duration";
 import { InfoTooltip } from "../../Components/InfoToolTip/InfoToolTip";
-import { Info } from "@mui/icons-material";
 
 function Overview(): ReactElement {
   const { loading } = useSelector((state: RootState) => state.node);
