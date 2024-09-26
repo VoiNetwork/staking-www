@@ -87,13 +87,11 @@ function LeftPanel(): ReactElement {
       value: "staking",
       icon: <LockClockIcon></LockClockIcon>,
     },
-    /*
     {
       label: "Deposit",
       value: "deposit",
       icon: <AdfScannerOutlined></AdfScannerOutlined>,
     },
-    */
     {
       label: "Withdraw",
       value: "withdraw",
