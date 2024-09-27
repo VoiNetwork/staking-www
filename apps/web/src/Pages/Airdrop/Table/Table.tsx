@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Button,
   Typography,
@@ -107,6 +107,30 @@ export const CompoundInterest: React.FC<CompoundInterestProps> = (
   const percentIncrease = Math.round(
     calculatePercentIncrease(props.principal, A) + 1
   );
+  const displayValue = useMemo(() => {
+    let value = "";
+    if (props.difference) {
+      if (props.showPercentIncrease) {
+        if (increase > 0) {
+          value = `${formatNumber(increase)} (+${percentIncrease}%)`;
+        } else {
+          value = `${formatNumber(increase)}`;
+        }
+      } else {
+        value = formatNumber(A - props.principal);
+      }
+    } else {
+      value = formatNumber(A);
+    }
+    return value
+  }, [
+    props.difference,
+    props.showPercentIncrease,
+    props.principal,
+    A,
+    increase,
+    percentIncrease,
+  ]);
 
   return (
     <div
@@ -116,14 +140,7 @@ export const CompoundInterest: React.FC<CompoundInterestProps> = (
       }}
     >
       {/* {props.difference ? formatNumber(A - props.principal) : formatNumber(A)}{" "} */}
-
-      {props.difference
-        ? props.showPercentIncrease
-          ? increase > 0
-            ? `${formatNumber(increase)} (+${percentIncrease}%)`
-            : `${formatNumber(increase)}`
-          : formatNumber(A - props.principal)
-        : formatNumber(A)}{" "}
+      {displayValue}{" "}
       VOI
     </div>
   );
@@ -299,8 +316,8 @@ const AirdropTable: React.FC<LockupProps> = ({
           )
         ) : null}
 
-        <section style={{width:"100%",overflow:"scroll"}}>
-          <Table className="" sx={{ }}>
+        <section style={{ width: "100%", overflow: "scroll" }}>
+          <Table className="" sx={{}}>
             <TableHead>
               <TableRow>
                 {/*<TableCell>Deadline</TableCell>*/}
@@ -346,9 +363,9 @@ const AirdropTable: React.FC<LockupProps> = ({
                         <div>
                           <Typography variant="h6">Vesting</Typography>
                           <Typography variant="body2">
-                            The duration of the vesting period. The vesting period
-                            is the time during which the locked up tokens can be
-                            withdrawn in equal parts such as monthly.
+                            The duration of the vesting period. The vesting
+                            period is the time during which the locked up tokens
+                            can be withdrawn in equal parts such as monthly.
                           </Typography>
                         </div>
                       }
@@ -361,12 +378,14 @@ const AirdropTable: React.FC<LockupProps> = ({
                     <InfoTooltip
                       title={
                         <div>
-                          <Typography variant="h6">Stakeable Balance</Typography>
+                          <Typography variant="h6">
+                            Stakeable Balance
+                          </Typography>
                           <Typography variant="body2">
-                            The stakeable balance is the amount of tokens that can
-                            be staked to earn rewards depending on the lockup
-                            period. It is calculated based on the lockup period
-                            and airdrop amount.
+                            The stakeable balance is the amount of tokens that
+                            can be staked to earn rewards depending on the
+                            lockup period. It is calculated based on the lockup
+                            period and airdrop amount.
                           </Typography>
                         </div>
                       }
@@ -422,7 +441,7 @@ const AirdropTable: React.FC<LockupProps> = ({
                     )}
                   </TableCell>
                   <TableCell>
-                    {!!selection ? (
+                    {selection ? (
                       <CompoundInterest
                         principal={Number(contract.global_initial) / 1e6}
                         time={selection.global_period}

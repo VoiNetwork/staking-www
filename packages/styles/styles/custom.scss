@@ -33,11 +33,7 @@
     }
   }
 }
-.truncate {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+
 
 .truncate\! {
   overflow: hidden !important;
@@ -84,6 +80,9 @@
 
 .mt-2 {
   margin-top: 0.5rem;
+}
+.mt-4 {
+  margin-top: 1rem;
 }
 .mt-2\! {
   margin-top: 0.5rem !important;
@@ -259,13 +258,8 @@
 .overflow-x-auto\! {  overflow-x: auto !important;}
 .overflow-y-auto {  overflow-y: auto;}
 .overflow-y-auto\! {  overflow-y: auto !important;}
-.overflow-hidden {  overflow: hidden;}
 .overflow-hidden\! {  overflow: hidden !important;}
-.sm\:overflow-hidden {
-  @media screen and (min-width: 640px) {
-    overflow: hidden;
-  }
-}
+
 .sm\:overflow-hidden\! {
   @media screen and (min-width: 640px) {
     overflow: hidden !important;
@@ -423,7 +417,7 @@
   @media screen and (min-width: 640px) {
     overflow: auto !important;
   }
-}add the overflow hidden variants
+}
 .sm\:overflow-hidden {
   @media screen and (min-width: 640px) {
     overflow: hidden;
@@ -474,11 +468,7 @@
     overflow-y: auto !important;
   }
 }
-.sm\:overflow-hidden {
-  @media screen and (min-width: 640px) {
-    overflow: hidden;
-  }
-}
+
 .sm\:\!overflow-hidden {
   @media screen and (min-width: 640px) {
     overflow: hidden !important;

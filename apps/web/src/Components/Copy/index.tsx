@@ -22,19 +22,33 @@ const Wrapper=styled.div`
     }
 `
 const CopyText = ({ text }: { text: string }) => {
-  const [copied, setCopied] = React.useState(false);
-  const handleCopy = () => {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
+  const [copyStatus, setCopyStatus] = React.useState<'idle' | 'success' | 'error'>('idle');
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopyStatus('success');
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+      setCopyStatus('error');
+    }
+
     setTimeout(() => {
-      setCopied(false);
+      setCopyStatus('idle');
     }, 2000);
   };
+
   return (
     <Wrapper className="relative">
-       
-      <Copy onClick={handleCopy} size={15} />
-      {copied&&<div className="absolute copied">Copied</div>}
+      <button
+        onClick={handleCopy}
+        aria-label="Copy to clipboard"
+        title="Copy to clipboard"
+      >
+        <Copy size={15} />
+      </button>
+      {copyStatus === 'success' && <div className="absolute copied" role="status">Copied!</div>}
+      {copyStatus === 'error' && <div className="absolute copied error" role="alert">Copy failed</div>}
     </Wrapper>
   );
 };

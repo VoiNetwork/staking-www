@@ -100,7 +100,6 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
 
       setTxnId(txnId);
       setTxnMsg("You have deposited successfully.");
-      //dispatch(loadAccountData(activeAccount.address));
       resetState();
     } catch (e) {
       showException(e);
