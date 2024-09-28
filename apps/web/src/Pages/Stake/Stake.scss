@@ -34,7 +34,6 @@
           grid-column: 1/-1;
           display: grid;
           gap: 4px;
-
           margin: 20px 0;
     
           column-gap: 20px;
@@ -61,7 +60,7 @@
           }
           @media (min-width: $sm) {
             grid-template-columns: subgrid;
-            place-items: baseline;
+            align-items: baseline;
           }
         }
       }

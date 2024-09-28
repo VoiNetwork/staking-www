@@ -86,7 +86,7 @@
           }
           @media (min-width: $sm) {
             grid-template-columns: subgrid;
-            place-items: baseline;
+            align-items: baseline;
           }
         }
         @media (min-width: $sm) {
