@@ -43,7 +43,13 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
     resetState();
   }
 
-  function resetState() {}
+  function resetState() {
+    setAmount("");
+    setTxnId("");
+    setTxnMsg("");
+    setAvailableBalance(-1);
+    setMinBalance(-1);
+  }
 
   const { transactionSigner, activeAccount } = useWallet();
 
@@ -56,7 +62,6 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
     (state: RootState) => state.user
   );
 
-  const dispatch = useAppDispatch();
 
   const [txnId, setTxnId] = useState<string>("");
   const [txnMsg, setTxnMsg] = useState<string>("");
@@ -70,7 +75,7 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
   const isDataLoading =
     loading || account.loading || staking.loading || contract.loading;
 
-  async function deposit(data: AccountData) {
+  async function withdraw(data: AccountData) {
     if (!activeAccount) {
       showSnack("Please connect your wallet", "error");
       return;
@@ -82,8 +87,8 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
     }
 
     try {
-      showLoader("Deposit in progress");
-      const txnId = await new CoreStaker(data).deposit(
+      showLoader("Withdrawal in progress");
+      const transaction = await new CoreStaker(data).withdraw(
         voiStakingUtils.network.getAlgodClient(),
         AlgoAmount.Algos(Number(amount)).microAlgos,
         {
@@ -91,7 +96,7 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
           signer: transactionSigner,
         }
       );
-
+      const txnId = transaction.txID();
       await waitForConfirmation(
         txnId,
         20,
@@ -99,7 +104,7 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
       );
 
       setTxnId(txnId);
-      setTxnMsg("You have deposited successfully.");
+      setTxnMsg("You have withdrawn successfully.");
       resetState();
     } catch (e) {
       showException(e);
@@ -184,14 +189,14 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
             </div>
           </DialogTitle>
           <DialogContent>
-            <div className="deposit-wrapper">
-              <div className="deposit-container">
+            <div className="withdraw-wrapper">
+              <div className="withdraw-container">
                 {!isDataLoading &&
                   activeAccount &&
                   accountData &&
                   stakingAccount &&
                   contractState && (
-                    <div className="deposit-body">
+                    <div className="withdraw-body">
                       <div className="props">
                         <div className="prop">
                           <div className="key">Total Balance</div>
@@ -228,7 +233,7 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
                           </div>
                         </div>
                       </div>
-                      <div className="deposit-widget">
+                      <div className="withdraw-widget">
                         <Grid container spacing={0}>
                           <Grid item xs={12}>
                             <FormControl
@@ -353,7 +358,7 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
                               color={"primary"}
                               size={"large"}
                               onClick={() => {
-                                deposit(accountData);
+                                withdraw(accountData);
                               }}
                             >
                               Withdraw
