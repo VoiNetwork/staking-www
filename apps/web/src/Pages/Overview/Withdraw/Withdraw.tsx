@@ -160,6 +160,9 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
     if (Number(amount) <= 0) {
       return "Amount should be greater than 0";
     }
+    if (withdrawableBalance < 0) {
+      return "Withdrawable balance not available";
+    }
     if (withdrawableBalance < Number(amount)) {
       return "Insufficient withdrawable balance";
     }
