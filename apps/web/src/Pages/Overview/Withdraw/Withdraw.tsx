@@ -225,11 +225,11 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
                               "-"
                             ) : (
                               <NumericFormat
-                                value={microalgosToAlgos(
+                                value={
                                   withdrawableBalance >= 0
                                     ? withdrawableBalance
                                     : 0
-                                )}
+                                }
                                 suffix=" VOI"
                                 displayType={"text"}
                                 thousandSeparator={true}
