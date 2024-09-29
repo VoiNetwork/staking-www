@@ -136,7 +136,7 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
           new CoreAccount(account as AccountResult).availableBalance()
         );
       });
-  }, [activeAccount, accountData, stakingAccount]);
+  }, [activeAccount]);
 
   const withdrawableBalance = useMemo(() => {
     if (minBalance < 0 || !stakingAccount) return -1;
