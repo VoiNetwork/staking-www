@@ -1,5 +1,5 @@
 import "./Overview.scss";
-import React, { ReactElement, useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useMemo, useState } from "react";
 import { useWallet } from "@txnlab/use-wallet-react";
 import { LoadingTile } from "@repo/ui";
 import { AccountData, CoreStaker } from "@repo/voix";
@@ -145,6 +145,14 @@ function Overview(): ReactElement {
       .then(setMinBalance);
   }, [activeAccount, accountData, contractState]);
 
+  const withdrawableBalance = useMemo(() => {
+    if (minBalance < 0 || !stakingAccount) return -1;
+    const balance =
+      new CoreAccount(stakingAccount).availableBalance() - minBalance;
+    const adjustedBalance = balance < 0 ? 0 : balance;
+    return microalgosToAlgos(adjustedBalance);
+  }, [minBalance, stakingAccount]);
+
   const [tab, setTab] = useState(0);
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTab(newValue);
@@ -187,7 +195,7 @@ function Overview(): ReactElement {
             {airdropContracts.map((contract, index) => {
               return (
                 <Tab
-                className="tab"
+                  className="tab"
                   key={contract.contractId}
                   label="Phase I"
                   {...a11yProps(index)}
@@ -202,11 +210,11 @@ function Overview(): ReactElement {
             {airdrop2Contracts.map((contract, index) => {
               return (
                 <Tab
-                className="tab"
+                  className="tab"
                   key={contract.contractId}
                   label="Phase II"
                   {...a11yProps(index)}
-                  style={{ minHeight: "unset", padding: "6px 16px", }}
+                  style={{ minHeight: "unset", padding: "6px 16px" }}
                   onClick={() => {
                     dispatch(initAccountData(contract));
                   }}
@@ -252,11 +260,12 @@ function Overview(): ReactElement {
                     justifyContent: "space-between",
                   }}
                 >
-                  <div style={{
-                  }} className="py-2 sm:py-0 ">Contract Overview</div>
-                  <ButtonGroup  variant="outlined">
+                  <div style={{}} className="py-2 sm:py-0 ">
+                    Contract Overview
+                  </div>
+                  <ButtonGroup variant="outlined">
                     <Button
-                    className="button"
+                      className="button"
                       onClick={() => {
                         setDepositModalVisibility(true);
                       }}
@@ -264,8 +273,7 @@ function Overview(): ReactElement {
                       Deposit
                     </Button>
                     <Button
-                    className="button"
-
+                      className="button"
                       onClick={() => {
                         setWithdrawModalVisibility(true);
                       }}
@@ -286,9 +294,9 @@ function Overview(): ReactElement {
                 ></Withdraw>
 
                 <Grid container spacing={2} className="overview-tiles">
-                  <Grid item xs={12} ></Grid>
-                  
-                  <Grid item  xs={12} sm={6} md={4} lg={4} xl={3}>
+                  <Grid item xs={12}></Grid>
+
+                  <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
                     <div className="tile">
                       <div className="title">
                         <div className="label">Balance</div>
@@ -338,13 +346,7 @@ function Overview(): ReactElement {
                       <div className="content">
                         <NumericFormat
                           value={
-                            minBalance < 0
-                              ? "-"
-                              : microalgosToAlgos(
-                                  new CoreAccount(
-                                    stakingAccount
-                                  ).availableBalance() - minBalance
-                                )
+                            withdrawableBalance > 0 ? withdrawableBalance : 0
                           }
                           suffix=" Voi"
                           displayType={"text"}
@@ -483,9 +485,11 @@ function Overview(): ReactElement {
                     </div>
                   )}
                 </div>
-                <div  className="props">
+                <div className="props">
                   <div className="prop">
-                    <div className="key">Your Account <CopyText text={activeAccount?.address!} /></div>
+                    <div className="key">
+                      Your Account <CopyText text={activeAccount?.address!} />
+                    </div>
                     <div
                       className="val hover hover-underline underline truncate"
                       onClick={() => {
@@ -498,7 +502,12 @@ function Overview(): ReactElement {
                     </div>
                   </div>
                   <div className="prop">
-                    <div className="key">Staking Account <CopyText text={new CoreStaker(accountData).stakingAddress()} /></div>
+                    <div className="key">
+                      Staking Account{" "}
+                      <CopyText
+                        text={new CoreStaker(accountData).stakingAddress()}
+                      />
+                    </div>
                     <div
                       className="val hover hover-underline underline truncate"
                       onClick={() => {
@@ -511,7 +520,12 @@ function Overview(): ReactElement {
                     </div>
                   </div>
                   <div className="prop">
-                    <div className="key">Staking Contract <CopyText text={new CoreStaker(accountData).contractId()??""} /></div>
+                    <div className="key">
+                      Staking Contract{" "}
+                      <CopyText
+                        text={new CoreStaker(accountData).contractId() ?? ""}
+                      />
+                    </div>
                     <div
                       className="val hover hover-underline underline truncate"
                       onClick={() => {
@@ -525,9 +539,16 @@ function Overview(): ReactElement {
                   </div>
                   {new CoreStaker(accountData).isDelegated(contractState) ? (
                     <div className="prop">
-                      <div className="key">Delegated to <CopyText text={new CoreStaker(accountData).delegateAddress(
-                          contractState
-                        )??""} /></div>
+                      <div className="key">
+                        Delegated to{" "}
+                        <CopyText
+                          text={
+                            new CoreStaker(accountData).delegateAddress(
+                              contractState
+                            ) ?? ""
+                          }
+                        />
+                      </div>
                       <div
                         className="val hover hover-underline underline truncate"
                         onClick={() => {

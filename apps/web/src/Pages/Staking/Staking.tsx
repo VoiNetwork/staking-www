@@ -59,10 +59,17 @@ function Staking(): ReactElement {
 
     return weeksPassed;
   }
-
-  const startTime = new Date("2024-09-20T00:00:00Z"); // UTC+0 start time (week 4)
+  //const startTime = new Date("2024-09-01T00:00:00Z"); // week 5
+  //const startTime = new Date("2024-09-08T00:00:00Z"); // week 4
+  //const startTime = new Date("2024-09-15T00:00:00Z"); // week 3
+  //const startTime = new Date("2024-09-22T00:00:00Z"); // week 2
+  const startTime = new Date("2024-09-29T00:00:00Z"); // week 1
 
   const weeksPassed = getWeeksFromTime(startTime);
+
+  // startTime as Unix timestamp
+  const startSeconds = moment(startTime).unix();
+  console.log({ startTime: startSeconds });
 
   console.log({ weeksPassed });
 
@@ -141,23 +148,39 @@ function Staking(): ReactElement {
             <Table
               funder={step_funder}
               parent_id={step_parent_id}
-              rate={computeRate(weeksPassed + 1)}
+              rate={computeRate}
+              start={startSeconds}
             ></Table>
           ) : null}
           {!isDataLoading && !accountData && filteredContracts.length === 0 ? (
-            <div className="info-msg">
+            <div className="info-msg" style={{ padding: "10px" }}>
               No staking contract found for your account. Learn more about Voi
               staking contracts and the staking program: <br />
               <br />
               <ul>
-                <li>
-                  <a
-                    target="_blank"
-                    href="https://medium.com/@voifoundation/understanding-voi-staking-contracts-delegation-and-other-key-features-e6b117bad0ac"
-                  >
-                    Understanding Voi Staking
-                  </a>
-                </li>
+                {[
+                  {
+                    slug: "understanding-voi-staking-contracts-delegation-and-other-key-features-e6b117bad0ac",
+                    title: "Understanding Voi Staking",
+                  },
+                  {
+                    slug: "airdrop-programs-everything-you-need-to-know-a84706bd8599",
+                    title: "Airdrop Programs: Everything You Need To Know",
+                  },
+                  {
+                    slug: "staking-program-how-to-guide-382ea5085dab",
+                    title: "Staking Program: How To Guide",
+                  },
+                ].map((item) => (
+                  <li style={{ padding: "5px", listStyle: "inside" }}>
+                    <a
+                      target="_blank"
+                      href={`https://medium.com/@voifoundation/${item.slug}`}
+                    >
+                      {item.title}
+                    </a>
+                  </li>
+                ))}
               </ul>
               <br />
               <Typography variant="h6">Steps</Typography>

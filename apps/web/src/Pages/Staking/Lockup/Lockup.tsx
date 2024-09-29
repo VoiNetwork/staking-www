@@ -375,6 +375,7 @@ function Lockup({
                                 suffix=" VOI available"
                                 displayType={"text"}
                                 thousandSeparator={true}
+                                decimalScale={6}
                               ></NumericFormat>
                             ) : (
                               `Insufficient balance (Min: ${microalgosToAlgos(txnCost)} VOI)`
@@ -476,14 +477,20 @@ function Lockup({
                                 {(rate(i + 1) * 100).toFixed(2)}%
                               </TableCell>
                               <TableCell>
-                                {!error && Number(amount) > 0
-                                  ? formatNumber(
-                                      ((amt, r) => amt + r * amt)(
-                                        Number(amount),
-                                        rate(i + 1)
-                                      )
-                                    )
-                                  : "-"}
+                                {!error && Number(amount) > 0 ? (
+                                  <NumericFormat
+                                    value={((amt, r) => amt + r * amt)(
+                                      Number(amount),
+                                      rate(i + 1)
+                                    )}
+                                    //suffix=" Voi"
+                                    displayType={"text"}
+                                    thousandSeparator={true}
+                                    decimalScale={6}
+                                  ></NumericFormat>
+                                ) : (
+                                  "-"
+                                )}
                               </TableCell>
                             </TableRow>
                           );
