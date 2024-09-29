@@ -138,8 +138,6 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
       });
   }, [activeAccount, accountData, stakingAccount]);
 
-  console.log("availableBalance", availableBalance);
-
   const withdrawableBalance = useMemo(() => {
     if (minBalance < 0 || !stakingAccount) return -1;
     return microalgosToAlgos(
@@ -148,8 +146,6 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
       )
     );
   }, [minBalance, stakingAccount]);
-
-  console.log("withdrawableBalance", withdrawableBalance);
 
   const errorMessage = (() => {
     if (amount === "") {
@@ -267,7 +263,6 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
                                 }
                                 value={amount}
                                 onChange={(ev) => {
-                                  console.log(availableBalance - 5000);
                                   if (availableBalance - 5000 <= 0) return;
                                   setAmount(ev.target.value);
                                 }}
