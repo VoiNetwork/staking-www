@@ -10,14 +10,14 @@ import Stake from "../../Pages/Stake/Stake";
 import { loadAccountData } from "../../Redux/staking/userReducer";
 import Withdraw from "../../Pages/Withdraw/Withdraw";
 import Deposit from "../../Pages/Deposit/Deposit";
+import Staking from "../../Pages/Staking/Staking";
+import Participate from "../../Pages/Participate/Participate";
+import Airdrop from "../../Pages/Airdrop/Airdrop";
 import Transfer from "../../Pages/Transfer/Transfer";
 import ContractPicker from "../../Components/pickers/ContractPicker/ContractPicker";
 import Delegate from "../../Pages/Delegate/Delegate";
-import Airdrop from "../../Pages/Airdrop/Airdrop";
-//import Staking from "../../Pages/Staking/Staking";
 import ComingSoon from "../../Pages/ComingSoon/ComingSoon";
 import Setting from "../../Pages/Setting/Setting";
-import Participate from "../../Pages/Participate/Participate";
 import voiStakingUtils from "../../utils/voiStakingUtils";
 import { CoreAccount } from "@repo/algocore";
 import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
@@ -77,9 +77,12 @@ function AppRouter(): ReactElement {
                     gap: 10,
                   }}
                 >
-                  <div  style={{ background: "#6f2ae2" }} className="p-2 sm:hidden mr-auto rounded-md! ">
+                  <div
+                    style={{ background: "#6f2ae2" }}
+                    className="p-2 sm:hidden mr-auto rounded-md! "
+                  >
                     <img
-                    className=""
+                      className=""
                       style={{
                         width: "40px",
                       }}
@@ -100,7 +103,6 @@ function AppRouter(): ReactElement {
                   <div className="sm:hidden">
                     <MobileMenu />
                   </div>
-                  
                 </div>
                 {selectedNode && (
                   <div className="content-body">
@@ -135,12 +137,7 @@ function AppRouter(): ReactElement {
                         {
                           <Route
                             path="/staking"
-                            element={
-                              <ComingSoon
-                                href="https://medium.com/@voifoundation/vois-staking-program-140mm-voi-4cbfd3a27f63"
-                                anchorText="Learn More about Voi’s Staking Program"
-                              />
-                            }
+                            element={<Staking></Staking>}
                           ></Route>
                         }
                         {/*<Route
@@ -162,9 +159,12 @@ function AppRouter(): ReactElement {
                     )}
                   </div>
                 )}
-                <footer  style={{
-                  minHeight: "50px",
-                }} className="sm:hidden"></footer>
+                <footer
+                  style={{
+                    minHeight: "50px",
+                  }}
+                  className="sm:hidden"
+                ></footer>
               </div>
             </div>
           </div>

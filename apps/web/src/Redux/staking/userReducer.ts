@@ -11,10 +11,11 @@ import {
   StakingContractState,
 } from "@repo/voix";
 import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
-import { AccountClient } from "@repo/algocore";
+import { AccountClient, CoreAccount } from "@repo/algocore";
 import voiStakingUtils from "../../utils/voiStakingUtils";
 
 export type UserState = {
+  availableBalance: number;
   account: {
     loading: boolean;
     data: AccountData | undefined;
@@ -31,6 +32,7 @@ export type UserState = {
 };
 
 const initialState: UserState = {
+  availableBalance: -1,
   account: {
     loading: false,
     data: undefined,
@@ -96,6 +98,29 @@ export const initAccountData: AsyncThunk<void, AccountData, any> =
     }
   );
 
+export const loadAvailableBalance: AsyncThunk<void, string, any> =
+  createAsyncThunk(
+    "user/loadAvailableBalance",
+    async (address: string, thunkAPI) => {
+      const { dispatch } = thunkAPI;
+      try {
+        const algodClient = voiStakingUtils.network.getAlgodClient();
+        algodClient
+          .accountInformation(address)
+          .do()
+          .then((account) => {
+            dispatch(
+              setAvailableBalance(
+                new CoreAccount(account as AccountResult).availableBalance()
+              )
+            );
+          });
+      } catch (e) {
+        /* empty */
+      }
+    }
+  );
+
 export const loadStakingAccount: AsyncThunk<void, string, any> =
   createAsyncThunk(
     "user/loadStakingAccount",
@@ -148,6 +173,9 @@ export const nodeSlice = createSlice({
     setAvailableContracts: (state, action: PayloadAction<AccountData[]>) => {
       state.account.availableContracts = action.payload;
     },
+    setAvailableBalance: (state, action: PayloadAction<number>) => {
+      state.availableBalance = action.payload;
+    },
     setStakingAccountLoading: (state, action: PayloadAction<boolean>) => {
       state.staking.loading = action.payload;
     },
@@ -168,6 +196,7 @@ export const {
   setAccountData,
   setAccountDataLoading,
   setStakingAccount,
+  setAvailableBalance,
   setContractStateLoading,
   setContractState,
   setAvailableContracts,

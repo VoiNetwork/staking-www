@@ -3,12 +3,12 @@
 .overview-wrapper {
   .overview-container {
     .overview-header {
-      padding: 10px 0 20px;
+      padding: 20px 0px 20px;
       border-bottom: 1px solid map-get($grey-colors, "light-grey");
       font-size: 20px;
       font-weight: bold;
       display: flex;
-      justify-content: flex-start;
+      justify-content: space-between;
       align-items: center;
       column-gap: 20px;
     }
@@ -42,7 +42,7 @@
           }
         }
       }
-      
+
       .tile {
         border-radius: 10px;
         background: map-get($grey-colors, "F8F8F9");

@@ -12,6 +12,7 @@ import {
   TableRow,
   TableCell,
   Tab,
+  Box,
 } from "@mui/material";
 import ContractPicker from "../../../Components/pickers/ContractPicker/ContractPicker";
 import { useSelector } from "react-redux";
@@ -24,7 +25,8 @@ import {
   initAccountData,
   loadAccountData,
 } from "../../../Redux/staking/userReducer";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { InfoTooltip } from "../../../Components/InfoToolTip/InfoToolTip";
 
 const formatNumber = (number: number): string => {
   return new Intl.NumberFormat("en-US", {
@@ -49,24 +51,35 @@ const UnixToDateTime: React.FC<{ timestamp: number }> = ({ timestamp }) => {
   );
 };
 
-interface CompoundInterestProps {
-  principal: number;
-  rate: number;
-  time: number;
-  compoundingsPerYear: number;
+function computeLockupMultiplier(B2: number, R1: number) {
+  if (B2 <= 12) {
+    return 0.45 * Math.pow(B2 / R1, 2);
+  } else {
+    return Math.pow(B2 / R1, 2);
+  }
 }
-const CompoundInterest: React.FC<CompoundInterestProps> = (
-  props: CompoundInterestProps
-) => {
-  const r = props.rate / 100; // Convert percentage to decimal
-  const A =
-    props.principal *
-    Math.pow(
-      1 + r / props.compoundingsPerYear,
-      props.compoundingsPerYear * props.time
-    );
 
-  return <div>{formatNumber(A)} VOI</div>;
+function computeTimingMultiplier(week: number) {
+  switch (week) {
+    case 1:
+      return 1;
+    case 2:
+      return 0.8;
+    case 3:
+      return 0.6;
+    case 4:
+      return 0.4;
+    default:
+      return 0;
+  }
+}
+
+const period_limit = 18;
+
+const computeRate = (week: number) => (period: number) => {
+  const lockupMultiplier = computeLockupMultiplier(period, period_limit);
+  const timingMultiplier = computeTimingMultiplier(week);
+  return lockupMultiplier * timingMultiplier;
 };
 
 interface LockupProps {
@@ -75,13 +88,12 @@ interface LockupProps {
   rate: (period: number) => number;
 }
 const StakingTable: React.FC<LockupProps> = ({ funder, parent_id, rate }) => {
+  const navigate = useNavigate();
   const { account, staking, contract } = useSelector(
     (state: RootState) => state.user
   );
 
   const { availableContracts, data: accountData } = account;
-
-  console.log({ accountData });
 
   const filteredContracts = availableContracts.filter(
     (contract) =>
@@ -100,10 +112,75 @@ const StakingTable: React.FC<LockupProps> = ({ funder, parent_id, rate }) => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Amount</TableCell>
-              <TableCell>Lockup</TableCell>
-              <TableCell>Vesting</TableCell>
-              <TableCell>Total</TableCell>
+              <TableCell>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  Amount
+                  <InfoTooltip
+                    title={
+                      <div>
+                        <Typography variant="h6">Amount</Typography>
+                        <Typography variant="body2">
+                          The minimum amount of VOI tokens that will be locked
+                          up after funding that does not include lockup bonus
+                          tokens.
+                        </Typography>
+                      </div>
+                    }
+                  />
+                </Box>
+              </TableCell>
+              <TableCell>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  Lockup
+                  <InfoTooltip
+                    title={
+                      <div>
+                        <Typography variant="h6">Lockup</Typography>
+                        <Typography variant="body2">
+                          The duration of the lockup period. The lockup period
+                          is the time during which the locked up tokens cannot
+                          be withdrawn.
+                        </Typography>
+                      </div>
+                    }
+                  />
+                </Box>
+              </TableCell>
+              <TableCell>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  Vesting
+                  <InfoTooltip
+                    title={
+                      <div>
+                        <Typography variant="h6">Vesting</Typography>
+                        <Typography variant="body2">
+                          The duration of the lockup period. The lockup period
+                          is the time during which the locked up tokens cannot
+                          be withdrawn.
+                        </Typography>
+                      </div>
+                    }
+                  />
+                </Box>
+              </TableCell>
+              <TableCell>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  Stakeable Balance
+                  <InfoTooltip
+                    title={
+                      <div>
+                        <Typography variant="h6">Stakeable Balance</Typography>
+                        <Typography variant="body2">
+                          The stakeable balance is the amount of tokens that can
+                          be staked to earn rewards depending on the lockup
+                          period. It is calculated based on the lockup period
+                          and airdrop amount.
+                        </Typography>
+                      </div>
+                    }
+                  />
+                </Box>
+              </TableCell>
               <TableCell>Action</TableCell>
             </TableRow>
           </TableHead>
@@ -133,31 +210,27 @@ const StakingTable: React.FC<LockupProps> = ({ funder, parent_id, rate }) => {
                 </TableCell>
                 <TableCell>
                   {Number(contract.global_initial) > 0
-                    ? formatNumber(
+                    ? `${formatNumber(
                         ((amt, r) => amt + r * amt)(
                           Number(contract.global_initial) / 1e6,
                           rate(contract.global_period + 1)
                         )
-                      )
+                      )} VOI`
                     : "-"}
                 </TableCell>
                 <TableCell>
                   <div className="lockup-actions">
-                    {accountData?.contractId !== contract.contractId ? (
-                      <Button
-                        onClick={(ev) => {
-                          ev.stopPropagation();
-                          ev.preventDefault();
-                          dispatch(initAccountData(contract));
-                        }}
-                      >
-                        Select
-                      </Button>
-                    ) : (
-                      <NavLink to="/overview">
-                        <Button variant="outlined">Go to dashbaord</Button>
-                      </NavLink>
-                    )}
+                    <Button
+                      variant="outlined"
+                      onClick={(ev) => {
+                        ev.stopPropagation();
+                        ev.preventDefault();
+                        dispatch(initAccountData(contract));
+                        navigate("/overview");
+                      }}
+                    >
+                      View
+                    </Button>
                   </div>
                 </TableCell>
               </TableRow>

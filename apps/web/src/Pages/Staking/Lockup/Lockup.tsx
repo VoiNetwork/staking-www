@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useMemo, useState } from "react";
+import React, { ReactElement, useEffect, useMemo, useState } from "react";
 import "./Lockup.scss";
 import {
   Box,
@@ -32,14 +32,139 @@ import { useWallet } from "@txnlab/use-wallet-react";
 import { useLoader, useSnackbar } from "@repo/ui";
 import humanizeDuration from "humanize-duration";
 import { useSelector } from "react-redux";
-import { RootState } from "../../../Redux/store";
+import { RootState, useAppDispatch } from "../../../Redux/store";
 import { NumericFormat } from "react-number-format";
 import algosdk, { algosToMicroalgos, microalgosToAlgos } from "algosdk";
 import { CoreAccount, NodeClient, ZERO_ADDRESS_STRING } from "@repo/algocore";
+import { loadAvailableBalance } from "@/Redux/staking/userReducer";
 
-const CTC_INFO_STAKING_FACTORY = 87502365; // staking factory apid
+const StakingBreakdown = ({
+  stakeAmount,
+  lockupDuration,
+  vestingDuration,
+  stakeableAmount,
+}) => {
+  return (
+    <div
+      style={{
+        //width: "350px",
+        border: "1px solid #ccc",
+        padding: "20px",
+        borderRadius: "8px",
+        backgroundColor: "#f9f9f9",
+      }}
+    >
+      <h2 style={{ textAlign: "center" }}>Staking Breakdown</h2>
+      <hr />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "10px",
+        }}
+      >
+        <span>Stake Amount:</span>
+        <span>{stakeAmount.toFixed(3)} VOI</span>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "10px",
+        }}
+      >
+        <span>Lockup Duration:</span>
+        <span>{lockupDuration}</span>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "10px",
+        }}
+      >
+        <span>Vesting Duration:</span>
+        <span>{vestingDuration}</span>
+      </div>
+      <hr />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          fontWeight: "bold",
+        }}
+      >
+        <span>
+          Stakeable Amount&nbsp;
+          <sup style={{ fontSize: "10px", color: "darkgray" }}>1:</sup>
+        </span>
+        <span>{stakeableAmount.toFixed(3)} VOI</span>
+      </div>
+      <div style={{ marginTop: "10px", color: "darkgray" }}>
+        <sup style={{ fontSize: "10px" }}>1</sup>
+        {` `}
+        <span style={{ color: "darkgray", fontSize: "12px" }}>
+          Actual amount may vary depending on conditions of staking program
+        </span>
+      </div>
+    </div>
+  );
+};
+
+const CostBreakdown = ({ stakeAmount, txnCost }) => {
+  const totalCost = (stakeAmount + txnCost).toFixed(4);
+
+  return (
+    <div
+      style={{
+        //width: "300px",
+        border: "1px solid #ccc",
+        padding: "20px",
+        borderRadius: "8px",
+        backgroundColor: "#f9f9f9",
+      }}
+    >
+      <h2 style={{ textAlign: "center" }}>Token Transfer Breakdown</h2>
+      <hr />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginTop: "10px",
+          marginBottom: "10px",
+        }}
+      >
+        <span>Stake Amount:</span>
+        <span>{stakeAmount.toFixed(4)} VOI</span>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "10px",
+        }}
+      >
+        <span>Transcation Costs:</span>
+        <span>{txnCost.toFixed(4)} VOI</span>
+      </div>
+      <hr />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          fontWeight: "900",
+        }}
+      >
+        <span>Total Tokens Transfered:</span>
+        <span>{totalCost} VOI</span>
+      </div>
+    </div>
+  );
+};
+
+const CTC_INFO_STAKING_FACTORY = 295512; // staking factory apid
 const ADDR_STAKING_FUNDER =
-  "BNERIHFXRPMF5RI4UQHMB6CFZ4RVXIBOJUNYEUXKDUSETECXDNGWLW5EOY";
+  "FYWCMNT4URFQ4VTQ746KBJDMD53VELRRLBJXRKONC6BFF5XIOYLLQPQILU";
 
 const formatNumber = (number: number): string => {
   return new Intl.NumberFormat("en-US", {
@@ -52,23 +177,33 @@ const formatNumber = (number: number): string => {
 interface LockupProps {
   show: boolean;
   onClose: () => void;
-  accountData: AccountData;
   address: string;
   onSuccess: () => void;
   rate: (period: number) => number;
 }
 
+const txnCost = (1.3455 + 0.5) * 1e6;
+
 function Lockup({
   show,
   onClose,
-  accountData,
   address,
   onSuccess,
   rate,
 }: LockupProps): ReactElement {
   const { transactionSigner, activeAccount, signTransactions } = useWallet();
 
+  const dispatch = useAppDispatch();
+
   const [amount, setAmount] = useState<string>("");
+
+  const { availableBalance } = useSelector((state: RootState) => state.user);
+  useEffect(() => {
+    if (!activeAccount) return;
+    dispatch(loadAvailableBalance(activeAccount.address));
+  }, [activeAccount]);
+
+  console.log({ availableBalance });
 
   const [accountInfo, setAccountInfo] = useState<any>(null);
   useEffect(() => {
@@ -83,14 +218,14 @@ function Lockup({
     }
   }, [activeAccount]);
 
+  console.log({ accountInfo });
+
   const { showException, showSnack } = useSnackbar();
   const { showLoader, hideLoader } = useLoader();
 
-  const periodLimit = new CoreStaker(accountData).lockupPeriodLimit();
+  const periodLimit = 17;
 
-  const [period, setPeriod] = useState<string>(
-    String(accountData.global_period)
-  );
+  const [period, setPeriod] = useState<string>("0");
 
   function handleClose() {
     onClose();
@@ -139,28 +274,26 @@ function Lockup({
   }
 
   const error = useMemo(() => {
+    if (availableBalance <= txnCost) return false;
     return (
       amount !== "" &&
       (isNaN(Number(amount)) ||
         Number(amount) <= 0 ||
-        Number(amount) >
-          microalgosToAlgos(
-            new CoreAccount(accountInfo).availableBalance() - 2e6
-          ))
+        Number(amount) > microalgosToAlgos(availableBalance - txnCost))
     );
   }, [amount]);
 
   const errorMessage = useMemo(() => {
+    if (availableBalance <= txnCost) return "No balance available";
     if (error) {
       if (isNaN(Number(amount))) {
         return "Please enter a valid number";
       } else if (Number(amount) <= 0) {
         return "Please enter a positive number";
       } else if (
-        Number(amount) >
-        microalgosToAlgos(new CoreAccount(accountInfo).availableBalance() - 2e6)
+        Number(amount) > microalgosToAlgos(availableBalance - txnCost)
       ) {
-        return "Insufficient balance";
+        return `Insufficient balance (Min: ${microalgosToAlgos(txnCost)} VOI)`;
       }
     }
     return "";
@@ -194,21 +327,15 @@ function Lockup({
               <div className="lockup-container">
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                    <h6>Step 1: Specify stake amount</h6>
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                     {/* add text input for stake amount */}
                     <FormControl fullWidth variant="outlined">
                       <FormLabel className="classic-label">Amount</FormLabel>
                       <Input
-                        error={
-                          amount !== "" &&
-                          (isNaN(Number(amount)) ||
-                            Number(amount) <= 0 ||
-                            Number(amount) >
-                              microalgosToAlgos(
-                                new CoreAccount(
-                                  accountInfo
-                                ).availableBalance() - 2e6
-                              ))
-                        }
+                        disabled={availableBalance <= txnCost}
+                        error={error}
                         value={amount}
                         onChange={(e: any) => {
                           setAmount(e.target.value);
@@ -226,54 +353,54 @@ function Lockup({
                         </FormHelperText>
                       )}
 
-                      <Box
-                        mt={1}
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        {activeAccount ? (
-                          <Typography variant="caption">
-                            <NumericFormat
-                              value={Math.max(
-                                0,
-                                microalgosToAlgos(
-                                  new CoreAccount(
-                                    accountInfo
-                                  ).availableBalance() - 2e6
-                                )
-                              )}
-                              suffix=" VOI available"
-                              displayType={"text"}
-                              thousandSeparator={true}
-                            ></NumericFormat>
-                          </Typography>
-                        ) : null}
-                        <Button
-                          size="small"
-                          variant="text"
-                          color="primary"
-                          onClick={() => {
-                            setAmount(
-                              Math.max(
-                                0,
-                                microalgosToAlgos(
-                                  new CoreAccount(
-                                    accountInfo
-                                  ).availableBalance() - 2e6
-                                )
-                              ).toString()
-                            );
+                      {
+                        <Box
+                          mt={1}
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
                           }}
                         >
-                          Max
-                        </Button>
-                      </Box>
+                          <Typography variant="caption">
+                            {accountInfo &&
+                            availableBalance >= txnCost &&
+                            algosToMicroalgos(Number(amount)) <=
+                              availableBalance - txnCost ? (
+                              <NumericFormat
+                                value={Math.max(
+                                  0,
+                                  microalgosToAlgos(availableBalance - txnCost)
+                                )}
+                                suffix=" VOI available"
+                                displayType={"text"}
+                                thousandSeparator={true}
+                              ></NumericFormat>
+                            ) : (
+                              `Insufficient balance (Min: ${microalgosToAlgos(txnCost)} VOI)`
+                            )}
+                          </Typography>
+                          {activeAccount && availableBalance > txnCost ? (
+                            <Button
+                              size="small"
+                              variant="text"
+                              color="primary"
+                              onClick={() => {
+                                setAmount(
+                                  microalgosToAlgos(
+                                    availableBalance - txnCost
+                                  ).toString()
+                                );
+                              }}
+                            >
+                              Max
+                            </Button>
+                          ) : null}
+                        </Box>
+                      }
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                  {/*<Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                     <FormControl fullWidth variant="outlined">
                       <FormLabel className="classic-label">Selection</FormLabel>
                       <Select
@@ -297,6 +424,9 @@ function Lockup({
                         })}
                       </Select>
                     </FormControl>
+                      </Grid>*/}
+                  <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                    <h6>Step 2: Choose lockup</h6>
                   </Grid>
                   <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                     <Table>
@@ -312,15 +442,23 @@ function Lockup({
                         {new Array(periodLimit + 1).fill(0).map((_, i) => {
                           return (
                             <TableRow
-                              selected={i === Number(period)}
+                              selected={
+                                availableBalance > txnCost &&
+                                i === Number(period) &&
+                                !error
+                              }
                               hover={true}
-                              onClick={() => setPeriod(i.toString())}
+                              onClick={() => {
+                                if (availableBalance <= txnCost || error)
+                                  return;
+                                setPeriod(i.toString());
+                              }}
                             >
                               <TableCell>
                                 {humanizeDuration(
                                   (i + 1) *
-                                    Number(accountData?.global_lockup_delay) *
-                                    Number(accountData?.global_period_seconds) *
+                                    1 * // lockup delay
+                                    2_630_000 * // period seconds
                                     1000,
                                   { units: ["mo"], round: true }
                                 )}
@@ -354,20 +492,47 @@ function Lockup({
                     </Table>
                   </Grid>
                   <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                    {Number(period) === 0 ? (
-                      <div>--None--</div>
-                    ) : (
-                      <div>
-                        Lockup duration:{" "}
-                        {new CoreStaker(accountData).getPeriodInDuration(
-                          Number(period),
-                          { units: ["y"], round: true }
-                        )}
-                      </div>
-                    )}
+                    <h6>Step 3: Confirm lockup</h6>
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                    <StakingBreakdown
+                      stakeAmount={Number(amount)}
+                      lockupDuration={humanizeDuration(
+                        2630000 * (Number(period) + 1) * 1000,
+                        {
+                          units: ["mo"],
+                          round: true,
+                        }
+                      )}
+                      vestingDuration={humanizeDuration(
+                        Math.min(Number(period) + 1, 12) * 2630000 * 1000,
+                        {
+                          units: ["mo"],
+                          round: true,
+                        }
+                      )}
+                      stakeableAmount={
+                        !error && Number(amount) > 0
+                          ? ((amt, r) => amt + r * amt)(
+                              Number(amount),
+                              rate(Number(period) + 1)
+                            )
+                          : 0
+                      }
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                    <h6>Step 4: Confirm token transfer</h6>
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                    <CostBreakdown
+                      stakeAmount={Number(amount)}
+                      txnCost={microalgosToAlgos(txnCost)}
+                    />
                   </Grid>
                   <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                     <Button
+                      disabled={txnCost >= availableBalance || error || !amount}
                       sx={{ marginTop: "20px" }}
                       variant={"contained"}
                       fullWidth
