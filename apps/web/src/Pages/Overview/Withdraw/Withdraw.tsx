@@ -140,11 +140,10 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
 
   const withdrawableBalance = useMemo(() => {
     if (minBalance < 0 || !stakingAccount) return -1;
-    return microalgosToAlgos(
-      ((v) => (v < 0 ? 0 : v))(
-        new CoreAccount(stakingAccount).availableBalance() - minBalance
-      )
-    );
+    const balance =
+      new CoreAccount(stakingAccount).availableBalance() - minBalance;
+    const adjustedBalance = balance < 0 ? 0 : balance;
+    return microalgosToAlgos(adjustedBalance);
   }, [minBalance, stakingAccount]);
 
   const errorMessage = (() => {
@@ -226,7 +225,11 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
                               "-"
                             ) : (
                               <NumericFormat
-                                value={withdrawableBalance}
+                                value={microalgosToAlgos(
+                                  withdrawableBalance >= 0
+                                    ? withdrawableBalance
+                                    : 0
+                                )}
                                 suffix=" VOI"
                                 displayType={"text"}
                                 thousandSeparator={true}
