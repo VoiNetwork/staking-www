@@ -251,7 +251,14 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
                                   disabled={availableBalance - 5000 <= 0}
                                   variant="outlined"
                                   onClick={() => {
-                                    setAmount(withdrawableBalance.toString());
+                                    if (withdrawableBalance > 0) {
+                                      setAmount(withdrawableBalance.toString());
+                                    } else {
+                                      showSnack(
+                                        "Withdrawable balance not available",
+                                        "error"
+                                      );
+                                    }
                                   }}
                                 >
                                   Max
