@@ -435,8 +435,8 @@ function Lockup({
                         <tr>
                           <th>Lockup</th>
                           <th>Vesting</th>
-                          <th>Rate</th>
-                          <th>Total</th>
+                          {/*<th>Rate</th>*/}
+                          <th>Stakeable Balance</th>
                         </tr>
                       </TableHead>
                       <TableBody>
@@ -473,20 +473,21 @@ function Lockup({
                                   }
                                 )}
                               </TableCell>
-                              <TableCell>
+                              {/*<TableCell>
                                 {(rate(i + 1) * 100).toFixed(2)}%
-                              </TableCell>
-                              <TableCell>
+                              </TableCell>*/}
+                              <TableCell sx={{ textAlign: "right" }}>
                                 {!error && Number(amount) > 0 ? (
                                   <NumericFormat
                                     value={((amt, r) => amt + r * amt)(
                                       Number(amount),
                                       rate(i + 1)
                                     )}
-                                    //suffix=" Voi"
+                                    suffix=" Voi"
                                     displayType={"text"}
                                     thousandSeparator={true}
                                     decimalScale={6}
+                                    fixedDecimalScale={true}
                                   ></NumericFormat>
                                 ) : (
                                   "-"
