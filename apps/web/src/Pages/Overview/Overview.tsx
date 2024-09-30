@@ -603,13 +603,11 @@ function Overview(): ReactElement {
                     <div className="prop">
                       <div className="key">
                         Delegated to{" "}
-                        <CopyText
-                          text={
-                            new CoreStaker(accountData).delegateAddress(
-                              contractState
-                            ) ?? ""
-                          }
-                        />
+                        {new CoreStaker(accountData).delegateAddress(contractState) && (
+                          <CopyText
+                            text={new CoreStaker(accountData).delegateAddress(contractState)}
+                          />
+                        )}
                       </div>
                       <div
                         className="val hover hover-underline underline truncate"
