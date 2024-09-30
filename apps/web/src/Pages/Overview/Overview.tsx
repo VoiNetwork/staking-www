@@ -352,6 +352,7 @@ function Overview(): ReactElement {
                       setRegisterVisibility(false);
                       dispatch(loadAccountData(activeAccount.address));
                     }}
+                    accountData={accountData}
                   ></Register>
                 ) : null}
 

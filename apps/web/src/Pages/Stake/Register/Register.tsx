@@ -76,7 +76,6 @@ function Register({
       return;
     }
 
-
     if (!selectionKey) {
       showSnack("Invalid selection key", "error");
       return;
