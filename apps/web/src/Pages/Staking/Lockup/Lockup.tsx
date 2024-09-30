@@ -298,7 +298,7 @@ function Lockup({
     if (availableBalance <= txnCost) return false;
     return (
       amount !== "" &&
-      (isNaN(Number(amount)) ||
+      (Number.isNaN(Number(amount)) ||
         Number(amount) <= 0 ||
         Number(amount) > microalgosToAlgos(availableBalance - txnCost))
     );
@@ -307,7 +307,7 @@ function Lockup({
   const errorMessage = useMemo(() => {
     if (availableBalance <= txnCost) return "No balance available";
     if (error) {
-      if (isNaN(Number(amount))) {
+      if (Number.isNaN(Number(amount))) {
         return "Please enter a valid number";
       } else if (Number(amount) <= 0) {
         return "Please enter a positive number";

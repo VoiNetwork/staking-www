@@ -124,8 +124,6 @@ const StakingTable: React.FC<StakingTableProps> = ({
                       </div>
                     }
                   />
-                  + <Typography variant="h6">Vesting</Typography>+{" "}
-                  <Typography variant="body2">+ </Typography>
                 </Box>
               </TableCell>
 
