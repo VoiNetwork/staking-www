@@ -152,16 +152,12 @@ function Staking(): ReactElement {
               <ul>
                 {[
                   {
-                    slug: "understanding-voi-staking-contracts-delegation-and-other-key-features-e6b117bad0ac",
-                    title: "Understanding Voi Staking",
-                  },
-                  {
-                    slug: "airdrop-programs-everything-you-need-to-know-a84706bd8599",
-                    title: "Airdrop Programs: Everything You Need To Know",
-                  },
-                  {
                     slug: "staking-program-how-to-guide-382ea5085dab",
                     title: "Staking Program: How To Guide",
+                  },
+                  {
+                    slug: "vois-staking-program-140mm-voi-4cbfd3a27f63",
+                    title: "Voi's Staking Program: 140mm VOI",
                   },
                 ].map((item) => (
                   <li
