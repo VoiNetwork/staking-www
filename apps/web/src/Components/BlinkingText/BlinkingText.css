@@ -6,7 +6,7 @@
 @keyframes blink {
   0%,
   100% {
-    opacity: e1;
+    opacity: 1;
   }
   50% {
     opacity: 0;
