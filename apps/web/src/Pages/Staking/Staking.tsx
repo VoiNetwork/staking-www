@@ -157,7 +157,7 @@ function Staking(): ReactElement {
                   },
                   {
                     slug: "vois-staking-program-140mm-voi-4cbfd3a27f63",
-                    title: "Voi's Staking Program: 140mm VOI",
+                    title: "Staking Program: Explained",
                   },
                 ].map((item) => (
                   <li
