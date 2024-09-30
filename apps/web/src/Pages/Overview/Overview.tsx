@@ -44,7 +44,7 @@ import humanizeDuration from "humanize-duration";
 import { InfoTooltip } from "../../Components/InfoToolTip/InfoToolTip";
 import { Copy } from "lucide-react";
 import CopyText from "@/Components/Copy";
-import Register from "./Register/Register";
+import Register from "../Stake/Register/Register";
 
 function Overview(): ReactElement {
   const { loading } = useSelector((state: RootState) => state.node);
@@ -603,9 +603,13 @@ function Overview(): ReactElement {
                     <div className="prop">
                       <div className="key">
                         Delegated to{" "}
-                        {new CoreStaker(accountData).delegateAddress(contractState) && (
+                        {new CoreStaker(accountData).delegateAddress(
+                          contractState
+                        ) && (
                           <CopyText
-                            text={new CoreStaker(accountData).delegateAddress(contractState)}
+                            text={new CoreStaker(accountData).delegateAddress(
+                              contractState
+                            )}
                           />
                         )}
                       </div>

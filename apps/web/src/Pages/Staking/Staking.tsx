@@ -164,7 +164,10 @@ function Staking(): ReactElement {
                     title: "Staking Program: How To Guide",
                   },
                 ].map((item) => (
-                  <li style={{ padding: "5px", listStyle: "inside" }}>
+                  <li
+                    key={item.slug}
+                    style={{ padding: "5px", listStyle: "inside" }}
+                  >
                     <a
                       target="_blank"
                       href={`https://medium.com/@voifoundation/${item.slug}`}

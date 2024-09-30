@@ -39,7 +39,7 @@ function Register({
   const { showException, showSnack } = useSnackbar();
   const { showLoader, hideLoader } = useLoader();
 
-  const [participationId, setParticipationId] = useState<string>("");
+  //const [participationId, setParticipationId] = useState<string>("");
   const [parentAddress, setParentAddress] = useState<string>("");
 
   const [selectionKey, setSelectionKey] = useState<string>("");
