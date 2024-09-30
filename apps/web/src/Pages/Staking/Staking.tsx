@@ -14,6 +14,7 @@ import {
 import moment from "moment";
 import { Button, Stack, Typography } from "@mui/material";
 import BlinkingText from "../../Components/BlinkingText/BlinkingText";
+import { STAKING_CTC_INFO, STAKING_FUNDER } from "@repo/voix";
 
 function Staking(): ReactElement {
   const { loading } = useSelector((state: RootState) => state.node);
@@ -25,15 +26,13 @@ function Staking(): ReactElement {
 
   const { availableContracts } = account;
 
-  const funder = "FYWCMNT4URFQ4VTQ746KBJDMD53VELRRLBJXRKONC6BFF5XIOYLLQPQILU";
-  const step_funder =
-    "FYWCMNT4URFQ4VTQ746KBJDMD53VELRRLBJXRKONC6BFF5XIOYLLQPQILU";
-  const step_parent_id = 295512;
+  const funder = STAKING_FUNDER;
+  const parent_id = STAKING_CTC_INFO;
 
   const filteredContracts = availableContracts.filter(
     (contract) =>
       contract.global_funder === funder &&
-      contract.global_parent_id === step_parent_id &&
+      contract.global_parent_id === parent_id &&
       contract.global_owner === activeAccount?.address
   );
 
@@ -59,11 +58,7 @@ function Staking(): ReactElement {
 
     return weeksPassed;
   }
-  //const startTime = new Date("2024-09-01T00:00:00Z"); // week 5
-  //const startTime = new Date("2024-09-08T00:00:00Z"); // week 4
-  //const startTime = new Date("2024-09-15T00:00:00Z"); // week 3
-  //const startTime = new Date("2024-09-22T00:00:00Z"); // week 2
-  const startTime = new Date("2024-09-29T00:00:00Z"); // week 1
+  const startTime = new Date("2024-09-30T00:00:00Z"); // start of week 1
 
   const weeksPassed = getWeeksFromTime(startTime);
 
@@ -146,8 +141,8 @@ function Staking(): ReactElement {
           {isDataLoading && <LoadingTile></LoadingTile>}
           {!isDataLoading && accountData && filteredContracts.length > 0 ? (
             <Table
-              funder={step_funder}
-              parent_id={step_parent_id}
+              funder={funder}
+              parent_id={parent_id}
               rate={computeRate}
               start={startSeconds}
             ></Table>

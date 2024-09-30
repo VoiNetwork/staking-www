@@ -2,12 +2,11 @@ import React from "react";
 import { AdjustOutlined, HomeOutlined, Payments } from "@mui/icons-material";
 import LockClockIcon from "@mui/icons-material/LockClock";
 
+export const airdropRoutes: string[] = ["airdrop"];
 
-export   const airdropRoutes: string[] = ["airdrop"];
+export const stakingRoutes: string[] = ["staking"];
 
-export   const stakingRoutes: string[] = ["staking"];
-
-export   const settingRoutes: string[] = ["setting"];
+export const settingRoutes: string[] = ["setting"];
 export const dashboardRoutes: string[] = [
   "overview",
   "stake",
@@ -19,7 +18,7 @@ export const dashboardRoutes: string[] = [
 ];
 // The commented out tabs are for future use
 
-export  const dashboardTabs = [
+export const dashboardTabs = [
   {
     label: "Contracts Overview",
     value: "overview",
@@ -31,12 +30,12 @@ export  const dashboardTabs = [
     value: "airdrop",
     icon: <LockClockIcon></LockClockIcon>,
   },
-  */
   {
     label: "Earn Block Rewards",
     value: "stake",
     icon: <AdjustOutlined></AdjustOutlined>,
   },
+  */
   {
     label: "Staking Program",
     value: "staking",

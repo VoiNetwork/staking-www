@@ -17,6 +17,7 @@ import { initAccountData } from "../../../Redux/staking/userReducer";
 import { useNavigate } from "react-router-dom";
 import { InfoTooltip } from "../../../Components/InfoToolTip/InfoToolTip";
 import { NumericFormat } from "react-number-format";
+import { microalgosToAlgos } from "algosdk";
 
 const formatNumber = (number: number): string => {
   return new Intl.NumberFormat("en-US", {
@@ -51,8 +52,6 @@ const StakingTable: React.FC<StakingTableProps> = ({
       contract.global_parent_id === parent_id
   );
 
-  console.log({ filteredContracts });
-
   const dispatch = useAppDispatch();
 
   const Step1Select = () => {
@@ -61,7 +60,7 @@ const StakingTable: React.FC<StakingTableProps> = ({
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>
+              {/*<TableCell>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   Amount
                   <InfoTooltip
@@ -77,9 +76,9 @@ const StakingTable: React.FC<StakingTableProps> = ({
                     }
                   />
                 </Box>
-              </TableCell>
+              </TableCell>*/}
               <TableCell>
-              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
                   Week
                   <InfoTooltip
                     title={
@@ -127,18 +126,53 @@ const StakingTable: React.FC<StakingTableProps> = ({
                   />
                 </Box>
               </TableCell>
+
               <TableCell>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
-                  Stakeable Balance
+                  Bonus Rate
                   <InfoTooltip
                     title={
                       <div>
-                        <Typography variant="h6">Stakeable Balance</Typography>
+                        <Typography variant="h6">Bonus Rate</Typography>
                         <Typography variant="body2">
-                          The stakeable balance is the amount of tokens that can
-                          be staked to earn rewards depending on the lockup
-                          period. It is calculated based on the lockup period
-                          and airdrop amount.
+                          The bonus rate is the percentage of the balance that
+                          will be added as a bonus to the stakeable balance.
+                        </Typography>
+                      </div>
+                    }
+                  />
+                </Box>
+              </TableCell>
+
+              <TableCell>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  Bonus Tokens
+                  <InfoTooltip
+                    title={
+                      <div>
+                        <Typography variant="h6">Bonus Tokens</Typography>
+                        <Typography variant="body2">
+                          The bonus tokens are the tokens that will be added to
+                          the stakeable balance as a bonus.
+                        </Typography>
+                      </div>
+                    }
+                  />
+                </Box>
+              </TableCell>
+
+              <TableCell>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  Total Tokens
+                  <InfoTooltip
+                    title={
+                      <div>
+                        <Typography variant="h6">Total Tokens</Typography>
+                        <Typography variant="body2">
+                          Total tokens or stakeable balance is the amount of
+                          tokens that can be staked to earn rewards depending on
+                          the lockup period. It is the sum of the initial tokens
+                          and the bonus tokens.
                         </Typography>
                       </div>
                     }
@@ -152,15 +186,16 @@ const StakingTable: React.FC<StakingTableProps> = ({
             {filteredContracts.map((contract) => {
               const week =
                 Math.floor((contract.global_deadline - start) / 604800) + 1;
+              const bonusRate = rate(week)(contract.global_period + 1);
               const stakeableBalance = ((amt, r) => amt + r * amt)(
                 Number(contract.global_initial) / 1e6,
-                rate(week)(contract.global_period + 1)
+                bonusRate
               );
               return (
                 <TableRow key={contract.contractId}>
-                  <TableCell>
+                  {/*<TableCell>
                     {formatNumber(Number(contract.global_initial) / 1e6)} VOI
-                  </TableCell>
+                  </TableCell>*/}
                   <TableCell>Week {week}</TableCell>
                   <TableCell>
                     {humanizeDuration(
@@ -178,6 +213,35 @@ const StakingTable: React.FC<StakingTableProps> = ({
                         Number(contract.global_distribution_seconds) *
                         1000,
                       { units: ["mo"], round: true }
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {Number(contract.global_initial) > 0 ? (
+                      <NumericFormat
+                        value={bonusRate * 100}
+                        suffix="%"
+                        displayType={"text"}
+                        thousandSeparator={true}
+                        decimalScale={2}
+                      ></NumericFormat>
+                    ) : (
+                      "-"
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {Number(contract.global_initial) > 0 ? (
+                      <NumericFormat
+                        value={
+                          stakeableBalance -
+                          microalgosToAlgos(Number(contract.global_initial))
+                        }
+                        suffix=" Voi"
+                        displayType={"text"}
+                        thousandSeparator={true}
+                        decimalScale={6}
+                      ></NumericFormat>
+                    ) : (
+                      "-"
                     )}
                   </TableCell>
                   <TableCell>

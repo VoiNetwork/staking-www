@@ -15,6 +15,8 @@ import {
   AIRDROP_FUNDER,
   AccountData,
   CoreStaker,
+  STAKING_CTC_INFO,
+  STAKING_FUNDER,
 } from "@repo/voix";
 import { initAccountData } from "../../../Redux/staking/userReducer";
 import { theme } from "@repo/theme";
@@ -30,11 +32,15 @@ function ContractPicker(props: ContractPickerProps): ReactElement {
 
   const { availableContracts, data } = account;
 
-  const funder = AIRDROP_FUNDER;
-  const parent_id = AIRDROP_CTC_INFO;
+  const airdrop_funder = AIRDROP_FUNDER;
+  const airdrop_parent_id = AIRDROP_CTC_INFO;
+
+  const staking_funder = STAKING_FUNDER;
+  const staking_parent_id = STAKING_CTC_INFO;
 
   const [airdropContracts, setAirdropContracts] = useState<AccountData[]>([]);
   const [airdrop2Contracts, setAirdrop2Contracts] = useState<AccountData[]>([]);
+  const [stakingContracts, setStakingContracts] = useState<AccountData[]>([]);
   const [otherContracts, setOtherContracts] = useState<AccountData[]>([]);
 
   let contractLabel = "";
@@ -46,6 +52,10 @@ function ContractPicker(props: ContractPickerProps): ReactElement {
       airdrop2Contracts.some((ac) => ac.contractId === data.contractId)
     ) {
       contractLabel = `Phase II: ${staker.contractId()}`;
+    } else if (
+      stakingContracts.some((ac) => ac.contractId === data.contractId)
+    ) {
+      contractLabel = `Staking: ${stakingContracts.findIndex((ac) => ac.contractId === data.contractId) + 1}`;
     } else {
       contractLabel = staker.contractId().toString();
     }
@@ -56,24 +66,33 @@ function ContractPicker(props: ContractPickerProps): ReactElement {
     setAirdropContracts(
       availableContracts.filter(
         (contract) =>
-          contract.global_funder === funder &&
-          contract.global_parent_id === parent_id &&
+          contract.global_funder === airdrop_funder &&
+          contract.global_parent_id === airdrop_parent_id &&
           contract.global_initial !== "0"
       )
     );
     setAirdrop2Contracts(
       availableContracts.filter(
         (contract) =>
-          contract.global_funder === funder &&
-          contract.global_parent_id === parent_id &&
+          contract.global_funder === airdrop_funder &&
+          contract.global_parent_id === airdrop_parent_id &&
           contract.global_initial === "0"
+      )
+    );
+    setStakingContracts(
+      availableContracts.filter(
+        (contract) =>
+          contract.global_funder === staking_funder &&
+          contract.global_parent_id === staking_parent_id
       )
     );
     setOtherContracts(
       availableContracts.filter(
         (contract) =>
-          contract.global_funder !== funder ||
-          contract.global_parent_id !== parent_id
+          (contract.global_funder !== airdrop_funder ||
+            contract.global_parent_id !== airdrop_parent_id) &&
+          (contract.global_funder !== staking_funder ||
+            contract.global_parent_id !== staking_parent_id)
       )
     );
   }, [availableContracts]);
@@ -179,6 +198,36 @@ function ContractPicker(props: ContractPickerProps): ReactElement {
                     </MenuItem>
                   );
                 })}
+                {stakingContracts.map(
+                  (accountData: AccountData, index: number) => {
+                    const staker = new CoreStaker(accountData);
+                    return (
+                      <MenuItem
+                        key={staker.contractId()}
+                        onClick={(ev) => {
+                          ev.stopPropagation();
+                          ev.preventDefault();
+                          closeMenu();
+                          dispatch(initAccountData(accountData));
+                        }}
+                      >
+                        <ListItemIcon>
+                          {data.contractId === staker.contractId() ? (
+                            <Done
+                              fontSize="small"
+                              sx={{ color: theme.palette.common.black }}
+                            />
+                          ) : (
+                            ""
+                          )}
+                        </ListItemIcon>
+                        <ListItemText disableTypography>
+                          Staking: {index + 1}
+                        </ListItemText>
+                      </MenuItem>
+                    );
+                  }
+                )}
                 {otherContracts.map((accountData: AccountData) => {
                   const staker = new CoreStaker(accountData);
                   return (

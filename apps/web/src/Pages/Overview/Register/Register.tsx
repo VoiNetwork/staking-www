@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from "react";
+import { ReactElement, useState } from "react";
 import "./Register.scss";
 import {
   Button,
@@ -18,11 +18,12 @@ import { useWallet } from "@txnlab/use-wallet-react";
 import { useLoader, useSnackbar } from "@repo/ui";
 import { isNumber } from "@repo/utils";
 import party from "party-js";
+import algosdk from "algosdk";
 
 interface RegisterProps {
   show: boolean;
   onClose: () => void;
-  accountData: AccountData;
+  //accountData: AccountData;
   address: string;
   onSuccess: (id: string) => void;
 }
@@ -30,7 +31,7 @@ interface RegisterProps {
 function Register({
   show,
   onClose,
-  accountData,
+  //accountData,
   address,
   onSuccess,
 }: RegisterProps): ReactElement {
@@ -38,9 +39,6 @@ function Register({
 
   const { showException, showSnack } = useSnackbar();
   const { showLoader, hideLoader } = useLoader();
-
-  const [participationId, setParticipationId] = useState<string>("");
-  const [parentAddress, setParentAddress] = useState<string>("");
 
   const [selectionKey, setSelectionKey] = useState<string>("");
   const [stateProofKey, setStateProofKey] = useState<string>("");
@@ -56,27 +54,6 @@ function Register({
   }
 
   async function register() {
-    /*
-    if(!participationId) {
-      showSnack("Invalid participation ID", "error");
-      return;
-    }
-    */
-
-    if (!parentAddress) {
-      showSnack("Invalid parent address", "error");
-      return;
-    }
-
-    if (accountData.contractAddress !== parentAddress) {
-      showSnack(
-        "Invalid parent address (must match contract address)",
-        "error"
-      );
-      return;
-    }
-
-
     if (!selectionKey) {
       showSnack("Invalid selection key", "error");
       return;
@@ -108,27 +85,25 @@ function Register({
 
     try {
       showLoader("Registering your participation key");
-      const txnId = await new CoreStaker(accountData).stake(
-        voiStakingUtils.network.getAlgodClient(),
-        {
-          selK: new Uint8Array(Buffer.from(selectionKey, "base64")),
-          spKey: new Uint8Array(Buffer.from(stateProofKey, "base64")),
-          voteK: new Uint8Array(Buffer.from(voteKey, "base64")),
-          voteKd: Number(voteKeyDilution),
-          voteFst: Number(voteFirst),
-          voteLst: Number(voteLast),
-        },
-        {
-          addr: address,
-          signer: transactionSigner,
-        }
-      );
-      await waitForConfirmation(
-        txnId,
-        20,
-        voiStakingUtils.network.getAlgodClient()
-      );
-
+      const atc = new algosdk.AtomicTransactionComposer();
+      const algodClient = voiStakingUtils.network.getAlgodClient();
+      const suggestedParams = await algodClient.getTransactionParams().do();
+      const keyRegTxn =
+        algosdk.makeKeyRegistrationTxnWithSuggestedParamsFromObject({
+          from: address,
+          selectionKey: new Uint8Array(Buffer.from(selectionKey, "base64")),
+          stateProofKey: new Uint8Array(Buffer.from(stateProofKey, "base64")),
+          voteKey: new Uint8Array(Buffer.from(voteKey, "base64")),
+          voteFirst: Number(voteFirst),
+          voteLast: Number(voteLast),
+          voteKeyDilution: Number(voteKeyDilution),
+          suggestedParams,
+          note: new Uint8Array(Buffer.from("voix:uparticipate1")),
+        });
+      atc.addTransaction({ txn: keyRegTxn, signer: transactionSigner });
+      const {
+        txIDs: [txnId],
+      } = await atc.execute(algodClient, 4);
       party.confetti(document.body, {
         count: party.variation.range(200, 300),
         size: party.variation.range(1, 1.4),
@@ -168,87 +143,10 @@ function Register({
             <div className="register-wrapper">
               <div className="register-container">
                 <Grid container spacing={2}>
-                  {/*
                   <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                     <FormControl fullWidth variant="outlined">
                       <FormLabel className="classic-label">
-                        Participation ID:
-                      </FormLabel>
-                      <ShadedInput
-                        value={selectionKey}
-                        onChange={(ev) => {
-                          //setSelectionKey(ev.target.value);
-                        }}
-                        multiline
-                        rows={2}
-                        fullWidth
-                      />
-                    </FormControl>
-                  </Grid>
-                  */}
-                  <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                    <FormControl fullWidth variant="outlined">
-                      <FormLabel className="classic-label">
-                        Parent address:
-                      </FormLabel>
-                      <ShadedInput
-                        value={parentAddress}
-                        onChange={(ev) => {
-                          setParentAddress(ev.target.value);
-                        }}
-                        multiline
-                        rows={2}
-                        fullWidth
-                      />
-                    </FormControl>
-                  </Grid>
-
-                  <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-                    <FormControl fullWidth variant="outlined">
-                      <FormLabel className="classic-label">
-                        First round:
-                      </FormLabel>
-                      <ShadedInput
-                        value={voteFirst}
-                        onChange={(ev) => {
-                          setVoteFirst(ev.target.value);
-                        }}
-                        fullWidth
-                      />
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-                    <FormControl fullWidth variant="outlined">
-                      <FormLabel className="classic-label">
-                        Last round:
-                      </FormLabel>
-                      <ShadedInput
-                        value={voteLast}
-                        onChange={(ev) => {
-                          setVoteLast(ev.target.value);
-                        }}
-                        fullWidth
-                      />
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                    <FormControl fullWidth variant="outlined">
-                      <FormLabel className="classic-label">
-                        Key dilution:
-                      </FormLabel>
-                      <ShadedInput
-                        value={voteKeyDilution}
-                        onChange={(ev) => {
-                          setVoteKeyDilution(ev.target.value);
-                        }}
-                        fullWidth
-                      />
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                    <FormControl fullWidth variant="outlined">
-                      <FormLabel className="classic-label">
-                        Selection key:
+                        Selection key
                       </FormLabel>
                       <ShadedInput
                         value={selectionKey}
@@ -264,8 +162,22 @@ function Register({
                   <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                     <FormControl fullWidth variant="outlined">
                       <FormLabel className="classic-label">
-                        Voting key:
+                        State proof key
                       </FormLabel>
+                      <ShadedInput
+                        value={stateProofKey}
+                        onChange={(ev) => {
+                          setStateProofKey(ev.target.value);
+                        }}
+                        multiline
+                        rows={3}
+                        fullWidth
+                      />
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                    <FormControl fullWidth variant="outlined">
+                      <FormLabel className="classic-label">Vote key</FormLabel>
                       <ShadedInput
                         value={voteKey}
                         onChange={(ev) => {
@@ -280,20 +192,45 @@ function Register({
                   <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                     <FormControl fullWidth variant="outlined">
                       <FormLabel className="classic-label">
-                        State proof key:
+                        Vote key dilution
                       </FormLabel>
                       <ShadedInput
-                        value={stateProofKey}
+                        value={voteKeyDilution}
                         onChange={(ev) => {
-                          setStateProofKey(ev.target.value);
+                          setVoteKeyDilution(ev.target.value);
                         }}
-                        multiline
-                        rows={3}
                         fullWidth
                       />
                     </FormControl>
                   </Grid>
-
+                  <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                    <FormControl fullWidth variant="outlined">
+                      <FormLabel className="classic-label">
+                        Vote first valid
+                      </FormLabel>
+                      <ShadedInput
+                        value={voteFirst}
+                        onChange={(ev) => {
+                          setVoteFirst(ev.target.value);
+                        }}
+                        fullWidth
+                      />
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                    <FormControl fullWidth variant="outlined">
+                      <FormLabel className="classic-label">
+                        Vote last valid
+                      </FormLabel>
+                      <ShadedInput
+                        value={voteLast}
+                        onChange={(ev) => {
+                          setVoteLast(ev.target.value);
+                        }}
+                        fullWidth
+                      />
+                    </FormControl>
+                  </Grid>
                   <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                     <Button
                       sx={{ marginTop: "20px" }}

@@ -43,6 +43,7 @@ const StakingBreakdown = ({
   lockupDuration,
   vestingDuration,
   stakeableAmount,
+  bonusRate,
 }) => {
   return (
     <div
@@ -86,6 +87,26 @@ const StakingBreakdown = ({
         <span>Vesting Duration:</span>
         <span>{vestingDuration}</span>
       </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "10px",
+        }}
+      >
+        <span>Bonus Rate:</span>
+        <span>{(bonusRate * 100).toFixed(2)}%</span>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "10px",
+        }}
+      >
+        <span>Bonus Tokens:</span>
+        <span>{(stakeableAmount - stakeAmount).toFixed(3)}</span>
+      </div>
       <hr />
       <div
         style={{
@@ -95,7 +116,7 @@ const StakingBreakdown = ({
         }}
       >
         <span>
-          Stakeable Amount&nbsp;
+          Total Tokens&nbsp;
           <sup style={{ fontSize: "10px", color: "darkgray" }}>1:</sup>
         </span>
         <span>{stakeableAmount.toFixed(3)} VOI</span>
@@ -124,7 +145,7 @@ const CostBreakdown = ({ stakeAmount, txnCost }) => {
         backgroundColor: "#f9f9f9",
       }}
     >
-      <h2 style={{ textAlign: "center" }}>Token Transfer Breakdown</h2>
+      <h2 style={{ textAlign: "center" }}>Transaction Breakdown</h2>
       <hr />
       <div
         style={{
@@ -144,7 +165,7 @@ const CostBreakdown = ({ stakeAmount, txnCost }) => {
           marginBottom: "10px",
         }}
       >
-        <span>Transcation Costs:</span>
+        <span>Transaction Costs:</span>
         <span>{txnCost.toFixed(4)} VOI</span>
       </div>
       <hr />
@@ -155,7 +176,7 @@ const CostBreakdown = ({ stakeAmount, txnCost }) => {
           fontWeight: "900",
         }}
       >
-        <span>Total Tokens Transfered:</span>
+        <span>Total Tokens:</span>
         <span>{totalCost} VOI</span>
       </div>
     </div>
@@ -182,7 +203,7 @@ interface LockupProps {
   rate: (period: number) => number;
 }
 
-const txnCost = (1.3455 + 0.5) * 1e6;
+const txnCost = 1.3455 * 1e6;
 
 function Lockup({
   show,
@@ -312,7 +333,7 @@ function Lockup({
           maxWidth={"sm"}
           sx={{
             ".MuiPaper-root": {
-              width: "500px",
+              width: "600px",
             },
           }}
         >
@@ -435,8 +456,9 @@ function Lockup({
                         <tr>
                           <th>Lockup</th>
                           <th>Vesting</th>
-                          {/*<th>Rate</th>*/}
-                          <th>Stakeable Balance</th>
+                          <th>Bonus Rate</th>
+                          <th>Bonus Tokens</th>
+                          <th>Total Tokens</th>
                         </tr>
                       </TableHead>
                       <TableBody>
@@ -473,9 +495,28 @@ function Lockup({
                                   }
                                 )}
                               </TableCell>
-                              {/*<TableCell>
+                              <TableCell>
                                 {(rate(i + 1) * 100).toFixed(2)}%
-                              </TableCell>*/}
+                              </TableCell>
+                              <TableCell sx={{ textAlign: "right" }}>
+                                {!error && Number(amount) > 0 ? (
+                                  <NumericFormat
+                                    value={
+                                      ((amt, r) => amt + r * amt)(
+                                        Number(amount),
+                                        rate(i + 1)
+                                      ) - Number(amount)
+                                    }
+                                    suffix=" Voi"
+                                    displayType={"text"}
+                                    thousandSeparator={true}
+                                    decimalScale={6}
+                                    fixedDecimalScale={true}
+                                  ></NumericFormat>
+                                ) : (
+                                  "-"
+                                )}
+                              </TableCell>
                               <TableCell sx={{ textAlign: "right" }}>
                                 {!error && Number(amount) > 0 ? (
                                   <NumericFormat
@@ -504,6 +545,7 @@ function Lockup({
                   </Grid>
                   <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                     <StakingBreakdown
+                      bonusRate={rate(Number(period) + 1)}
                       stakeAmount={Number(amount)}
                       lockupDuration={humanizeDuration(
                         2630000 * (Number(period) + 1) * 1000,
@@ -530,7 +572,7 @@ function Lockup({
                     />
                   </Grid>
                   <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                    <h6>Step 4: Confirm token transfer</h6>
+                    <h6>Step 4: Confirm transaction</h6>
                   </Grid>
                   <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                     <CostBreakdown

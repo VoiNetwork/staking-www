@@ -2,7 +2,14 @@ import "./Overview.scss";
 import React, { ReactElement, useEffect, useMemo, useState } from "react";
 import { useWallet } from "@txnlab/use-wallet-react";
 import { LoadingTile } from "@repo/ui";
-import { AccountData, CoreStaker } from "@repo/voix";
+import {
+  AccountData,
+  AIRDROP_CTC_INFO,
+  AIRDROP_FUNDER,
+  CoreStaker,
+  STAKING_CTC_INFO,
+  STAKING_FUNDER,
+} from "@repo/voix";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../Redux/store";
 import {
@@ -37,6 +44,7 @@ import humanizeDuration from "humanize-duration";
 import { InfoTooltip } from "../../Components/InfoToolTip/InfoToolTip";
 import { Copy } from "lucide-react";
 import CopyText from "@/Components/Copy";
+import Register from "./Register/Register";
 
 function Overview(): ReactElement {
   const { loading } = useSelector((state: RootState) => state.node);
@@ -48,11 +56,15 @@ function Overview(): ReactElement {
 
   const { availableContracts } = account;
 
-  const funder = "62TIVJSZOS4DRSSYYDDZELQAGFYQC5JWKCHRBPPYKTZN2OOOXTGLB5ZJ4E";
-  const parent_id = 5211;
+  const airdrop_funder = AIRDROP_FUNDER;
+  const airdrop_parent_id = AIRDROP_CTC_INFO;
+
+  const staking_funder = STAKING_FUNDER;
+  const staking_parent_id = STAKING_CTC_INFO;
 
   const [airdropContracts, setAirdropContracts] = useState<AccountData[]>([]);
   const [airdrop2Contracts, setAirdrop2Contracts] = useState<AccountData[]>([]);
+  const [stakingContracts, setStakingContracts] = useState<AccountData[]>([]);
   const [otherContracts, setOtherContracts] = useState<AccountData[]>([]);
 
   useEffect(() => {
@@ -60,24 +72,33 @@ function Overview(): ReactElement {
     setAirdropContracts(
       availableContracts.filter(
         (contract) =>
-          contract.global_funder === funder &&
-          contract.global_parent_id === parent_id &&
+          contract.global_funder === airdrop_funder &&
+          contract.global_parent_id === airdrop_parent_id &&
           contract.global_initial !== "0"
       )
     );
     setAirdrop2Contracts(
       availableContracts.filter(
         (contract) =>
-          contract.global_funder === funder &&
-          contract.global_parent_id === parent_id &&
+          contract.global_funder === airdrop_funder &&
+          contract.global_parent_id === airdrop_parent_id &&
           contract.global_initial === "0"
+      )
+    );
+    setStakingContracts(
+      availableContracts.filter(
+        (contract) =>
+          contract.global_funder === staking_funder &&
+          contract.global_parent_id === staking_parent_id
       )
     );
     setOtherContracts(
       availableContracts.filter(
         (contract) =>
-          contract.global_funder !== funder ||
-          contract.global_parent_id !== parent_id
+          (contract.global_funder !== airdrop_funder ||
+            contract.global_parent_id !== airdrop_parent_id) &&
+          (contract.global_funder !== staking_funder ||
+            contract.global_parent_id !== staking_parent_id)
       )
     );
   }, [availableContracts]);
@@ -108,6 +129,10 @@ function Overview(): ReactElement {
 
   const [isWithdrawModalVisible, setWithdrawModalVisibility] =
     useState<boolean>(false);
+
+  const [isRegisterVisible, setRegisterVisibility] = useState<boolean>(false);
+  const [txnId, setTxnId] = useState<string>("");
+  const [txnMsg, setTxnMsg] = useState<string>("");
 
   const [expiresIn, setExpiresIn] = useState<string>("--");
 
@@ -221,7 +246,20 @@ function Overview(): ReactElement {
                 />
               );
             })}
-
+            {stakingContracts.map((contract, index) => {
+              return (
+                <Tab
+                  className="tab"
+                  key={contract.contractId}
+                  label={`Staking ${index + 1}`}
+                  {...a11yProps(index)}
+                  style={{ minHeight: "unset", padding: "6px 16px" }}
+                  onClick={() => {
+                    dispatch(initAccountData(contract));
+                  }}
+                />
+              );
+            })}
             {otherContracts.map((contract, index) => {
               return (
                 <Tab
@@ -280,6 +318,14 @@ function Overview(): ReactElement {
                     >
                       Withdraw
                     </Button>
+                    <Button
+                      className="button"
+                      onClick={() => {
+                        setRegisterVisibility(true);
+                      }}
+                    >
+                      Earn Block Rewards
+                    </Button>
                   </ButtonGroup>
                 </div>
                 <Deposit
@@ -292,6 +338,22 @@ function Overview(): ReactElement {
                   onClose={() => handleModalClose(setWithdrawModalVisibility)}
                   onSuccess={() => handleModalClose(setWithdrawModalVisibility)}
                 ></Withdraw>
+                {activeAccount ? (
+                  <Register
+                    show={isRegisterVisible}
+                    onClose={() => {
+                      setRegisterVisibility(false);
+                    }}
+                    //accountData={accountData}
+                    address={activeAccount.address}
+                    onSuccess={(txnId: string) => {
+                      setTxnId(txnId);
+                      setTxnMsg("You have registered successfully.");
+                      setRegisterVisibility(false);
+                      dispatch(loadAccountData(activeAccount.address));
+                    }}
+                  ></Register>
+                ) : null}
 
                 <Grid container spacing={2} className="overview-tiles">
                   <Grid item xs={12}></Grid>
@@ -488,7 +550,7 @@ function Overview(): ReactElement {
                 <div className="props">
                   <div className="prop">
                     <div className="key">
-                      Your Account <CopyText text={activeAccount?.address!} />
+                      Owner Account <CopyText text={activeAccount?.address!} />
                     </div>
                     <div
                       className="val hover hover-underline underline truncate"
@@ -503,7 +565,7 @@ function Overview(): ReactElement {
                   </div>
                   <div className="prop">
                     <div className="key">
-                      Staking Account{" "}
+                      Contract Account{" "}
                       <CopyText
                         text={new CoreStaker(accountData).stakingAddress()}
                       />
@@ -521,7 +583,7 @@ function Overview(): ReactElement {
                   </div>
                   <div className="prop">
                     <div className="key">
-                      Staking Contract{" "}
+                      Contract Id{" "}
                       <CopyText
                         text={new CoreStaker(accountData).contractId() ?? ""}
                       />
