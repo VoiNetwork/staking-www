@@ -64,9 +64,6 @@ function Staking(): ReactElement {
 
   // startTime as Unix timestamp
   const startSeconds = moment(startTime).unix();
-  console.log({ startTime: startSeconds });
-
-  console.log({ weeksPassed });
 
   // utils
 
