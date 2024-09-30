@@ -117,13 +117,15 @@ const StakingTable: React.FC<StakingTableProps> = ({
                       <div>
                         <Typography variant="h6">Vesting</Typography>
                         <Typography variant="body2">
-                          The duration of the lockup period. The lockup period
-                          is the time during which the locked up tokens cannot
-                          be withdrawn.
+                          The period during which the locked-up tokens are
+                          gradually released and become available for
+                          withdrawal.
                         </Typography>
                       </div>
                     }
                   />
+                  + <Typography variant="h6">Vesting</Typography>+{" "}
+                  <Typography variant="body2">+ </Typography>
                 </Box>
               </TableCell>
 
