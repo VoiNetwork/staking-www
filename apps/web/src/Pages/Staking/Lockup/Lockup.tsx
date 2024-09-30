@@ -25,7 +25,12 @@ import {
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { ModalGrowTransition } from "@repo/theme";
-import { AccountData, CoreStaker } from "@repo/voix";
+import {
+  AccountData,
+  CoreStaker,
+  STAKING_CTC_INFO,
+  STAKING_FUNDER,
+} from "@repo/voix";
 import voiStakingUtils from "../../../utils/voiStakingUtils";
 import { waitForConfirmation } from "@algorandfoundation/algokit-utils";
 import { useWallet } from "@txnlab/use-wallet-react";
@@ -183,9 +188,8 @@ const CostBreakdown = ({ stakeAmount, txnCost }) => {
   );
 };
 
-const CTC_INFO_STAKING_FACTORY = 295512; // staking factory apid
-const ADDR_STAKING_FUNDER =
-  "FYWCMNT4URFQ4VTQ746KBJDMD53VELRRLBJXRKONC6BFF5XIOYLLQPQILU";
+const staking_parent_id = STAKING_CTC_INFO;
+const staking_funder = STAKING_FUNDER;
 
 const formatNumber = (number: number): string => {
   return new Intl.NumberFormat("en-US", {
@@ -266,10 +270,10 @@ function Lockup({
       const algod = voiStakingUtils.network.getAlgodClient();
       const txns = await CoreStaker.create(
         algod,
-        CTC_INFO_STAKING_FACTORY,
+        staking_parent_id,
         {
           amount: algosToMicroalgos(Number(amount)),
-          funder: ADDR_STAKING_FUNDER,
+          funder: staking_funder,
           owner: activeAccount.address,
           delegate: ZERO_ADDRESS_STRING,
           period: Number(period),
