@@ -44,7 +44,7 @@ import humanizeDuration from "humanize-duration";
 import { InfoTooltip } from "../../Components/InfoToolTip/InfoToolTip";
 import { Copy } from "lucide-react";
 import CopyText from "@/Components/Copy";
-import Register from "../Stake/Register/Register";
+import Register from "./Register/Register";
 
 function Overview(): ReactElement {
   const { loading } = useSelector((state: RootState) => state.node);
