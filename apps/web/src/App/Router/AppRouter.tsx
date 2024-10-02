@@ -126,10 +126,11 @@ function AppRouter(): ReactElement {
                           path="/transfer"
                           element={<Transfer></Transfer>}
                     ></Route>
+                    */}
                         <Route
                           path="/delegate"
                           element={<Delegate></Delegate>}
-                    ></Route>*/}
+                        ></Route>
                         <Route
                           path="/airdrop"
                           element={<Airdrop></Airdrop>}

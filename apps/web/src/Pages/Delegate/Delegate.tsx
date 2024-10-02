@@ -1,5 +1,5 @@
 import "./Delegate.scss";
-import { ReactElement, useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../Redux/store";
 import { useWallet } from "@txnlab/use-wallet-react";
@@ -15,6 +15,8 @@ import { isValidAddress, microalgosToAlgos } from "algosdk";
 import { CoreAccount, NodeClient, ZERO_ADDRESS_STRING } from "@repo/algocore";
 import { NumericFormat } from "react-number-format";
 import { useConfirm } from "material-ui-confirm";
+import { Contract } from "ulujs/types/arc200";
+import ContractPicker from "@/Components/pickers/ContractPicker/ContractPicker";
 
 function Delegate(): ReactElement {
   const confirmation = useConfirm();
@@ -97,6 +99,7 @@ function Delegate(): ReactElement {
       <div className="delegate-container">
         <div className="delegate-header">
           <div>Delegate</div>
+          <ContractPicker />
         </div>
         <div className="delegate-body">
           {isDataLoading && <LoadingTile></LoadingTile>}
