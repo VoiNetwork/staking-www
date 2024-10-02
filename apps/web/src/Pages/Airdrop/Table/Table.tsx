@@ -122,7 +122,7 @@ export const CompoundInterest: React.FC<CompoundInterestProps> = (
     } else {
       value = formatNumber(A);
     }
-    return value
+    return value;
   }, [
     props.difference,
     props.showPercentIncrease,
@@ -140,8 +140,7 @@ export const CompoundInterest: React.FC<CompoundInterestProps> = (
       }}
     >
       {/* {props.difference ? formatNumber(A - props.principal) : formatNumber(A)}{" "} */}
-      {displayValue}{" "}
-      VOI
+      {displayValue} VOI
     </div>
   );
 };
@@ -151,12 +150,14 @@ interface LockupProps {
   parent_id: number;
   rate: (period: number) => number;
   contracts: AccountData[];
+  readOnly?: boolean;
 }
 const AirdropTable: React.FC<LockupProps> = ({
   funder,
   parent_id,
   rate,
   contracts,
+  readOnly,
 }) => {
   const { account } = useSelector((state: RootState) => state.user);
 
@@ -427,10 +428,20 @@ const AirdropTable: React.FC<LockupProps> = ({
                     )}
                   </TableCell>
                   <TableCell>
-                    <LockupPicker
-                      onSelection={setSelection}
-                      contract={selection || contract}
-                    />
+                    {!readOnly ? (
+                      <LockupPicker
+                        onSelection={setSelection}
+                        contract={selection || contract}
+                      />
+                    ) : (
+                      humanizeDuration(
+                        Number(contract.global_period) *
+                          Number(contract.global_lockup_delay) *
+                          Number(contract.global_period_seconds) *
+                          1000,
+                        { units: ["y"], round: true }
+                      )
+                    )}
                   </TableCell>
                   <TableCell>
                     {humanizeDuration(

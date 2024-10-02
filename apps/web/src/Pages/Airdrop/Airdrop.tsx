@@ -3,7 +3,12 @@ import "./Airdrop.scss";
 import { ReactElement, useEffect, useState } from "react";
 import { useWallet } from "@txnlab/use-wallet-react";
 import { LoadingTile } from "@repo/ui";
-import { AccountData, CoreStaker } from "@repo/voix";
+import {
+  AccountData,
+  AIRDROP_CTC_INFO,
+  AIRDROP_FUNDER,
+  CoreStaker,
+} from "@repo/voix";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../Redux/store";
 import {
@@ -20,8 +25,6 @@ import { microalgosToAlgos } from "algosdk";
 import { NumericFormat } from "react-number-format";
 import Table from "./Table/Table";
 import axios from "axios";
-
-//import JsonViewer from "../../Components/JsonViewer/JsonViewer";
 
 import Lockup from "./Lockup/Lockup";
 import {
@@ -88,7 +91,6 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
   );
 };
 
-
 interface DeadlineProgressProps {
   deadlineTimestamp: number; // Timestamp in milliseconds
 }
@@ -130,6 +132,8 @@ const DeadlineProgress: React.FC<DeadlineProgressProps> = ({
 };
 
 function Airdrop(): ReactElement {
+  const readOnly = true;
+
   const { loading } = useSelector((state: RootState) => state.node);
   const { activeAccount } = useWallet();
 
@@ -139,8 +143,8 @@ function Airdrop(): ReactElement {
   const dispatch = useAppDispatch();
 
   // MAINNET
-  const funder = "62TIVJSZOS4DRSSYYDDZELQAGFYQC5JWKCHRBPPYKTZN2OOOXTGLB5ZJ4E";
-  const parent_id = 5211;
+  const parent_id = AIRDROP_CTC_INFO;
+  const funder = AIRDROP_FUNDER;
 
   const [airdropContracts, setAirdropContracts] = useState<AccountData[]>([]);
   const [airdrop2Contracts, setAirdrop2Contracts] = useState<AccountData[]>([]);
@@ -226,38 +230,6 @@ function Airdrop(): ReactElement {
           }}
         >
           <div className="px-2 sm:px-0">Lockup Config</div>
-          {/*<Tabs
-            value={tabIndex}
-            onChange={handleTabChange}
-            aria-label="Airdrop tabs"
-          >
-            {airdropContracts.map((contract, index) => {
-              return (
-                <Tab
-                  key={contract.contractId}
-                  label="Phase I"
-                  {...a11yProps(index)}
-                  style={{ minHeight: "unset", padding: "6px 16px" }}
-                  onClick={() => {
-                    dispatch(initAccountData(contract));
-                  }}
-                />
-              );
-            })}
-            {airdrop2Contracts.map((contract, index) => {
-              return (
-                <Tab
-                  key={contract.contractId}
-                  label="Phase II"
-                  {...a11yProps(index)}
-                  style={{ minHeight: "unset", padding: "6px 16px" }}
-                  onClick={() => {
-                    dispatch(initAccountData(contract));
-                  }}
-                />
-              );
-            })}
-          </Tabs>*/}
         </div>
         <div className="overview-body px-2 sm:px-0">
           {!isDataLoading &&
@@ -294,6 +266,7 @@ function Airdrop(): ReactElement {
                     funder={funder}
                     parent_id={parent_id}
                     rate={step_rate}
+                    readOnly={readOnly}
                   ></Table>
                 </Box>
               ) : null}
@@ -322,7 +295,7 @@ function Airdrop(): ReactElement {
                       airdrop2Contracts[0].global_deadline * 1000
                     }
                   />
-                  
+
                   <Table
                     contracts={airdrop2Contracts.map((contract) => ({
                       ...contract,
@@ -331,6 +304,7 @@ function Airdrop(): ReactElement {
                     funder={funder}
                     parent_id={parent_id}
                     rate={step_rate}
+                    readOnly={readOnly}
                   ></Table>
                 </Box>
               ) : null}
