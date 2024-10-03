@@ -139,6 +139,10 @@ function WithdrawAll({ show, onClose }: LockupProps): ReactElement {
       const zipped = zip(apids, bals, minbals)
         .map(([apid, bal, mb]) => [apid, Math.abs(bal - mb)])
         .filter(([_, mb]) => mb > 0);
+      if (zipped.length === 0) {
+        setZipped([]);
+        return;
+      }
       const ci = new CONTRACT(
         zipped[0][0],
         algodClient,
@@ -184,7 +188,8 @@ function WithdrawAll({ show, onClose }: LockupProps): ReactElement {
   }, [activeAccount, availableContracts, acknowledge]);
 
   const withdrawableBalance = useMemo(() => {
-    if (!zipped || zipped.length === 0) return -1;
+    if (!zipped) return -1;
+    if (zipped.length === 0) return 0;
     return zipped.reduce((acc, [_, mb]) => acc + mb, 0);
   }, [zipped]);
 
