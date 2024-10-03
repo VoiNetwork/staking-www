@@ -51,6 +51,7 @@ import axios from "axios";
 import moment from "moment";
 import { useParams } from "react-router-dom";
 import DeadlineCountdown from "@/Components/DeadlineCountdown/DeadlineCountdown";
+import WithdrawAll from "./WithdrawAll/WithdrawAll";
 
 function Overview(): ReactElement {
   const params = useParams<{ contractId: string }>();
@@ -303,6 +304,9 @@ function Overview(): ReactElement {
     useState<boolean>(false);
 
   const [isWithdrawModalVisible, setWithdrawModalVisibility] =
+    useState<boolean>(false);
+
+  const [isWithdrawAllModalVisible, setWithdrawAllModalVisibility] =
     useState<boolean>(false);
 
   const [isRegisterVisible, setRegisterVisibility] = useState<boolean>(false);
@@ -625,6 +629,14 @@ function Overview(): ReactElement {
                     <Button
                       className="button"
                       onClick={() => {
+                        setWithdrawAllModalVisibility(true);
+                      }}
+                    >
+                      Withdraw All
+                    </Button>
+                    <Button
+                      className="button"
+                      onClick={() => {
                         setRegisterVisibility(true);
                       }}
                     >
@@ -642,6 +654,15 @@ function Overview(): ReactElement {
                   onClose={() => handleModalClose(setWithdrawModalVisibility)}
                   onSuccess={() => handleModalClose(setWithdrawModalVisibility)}
                 ></Withdraw>
+                <WithdrawAll
+                  show={isWithdrawAllModalVisible}
+                  onClose={() =>
+                    handleModalClose(setWithdrawAllModalVisibility)
+                  }
+                  onSuccess={() =>
+                    handleModalClose(setWithdrawAllModalVisibility)
+                  }
+                ></WithdrawAll>
                 {activeAccount ? (
                   <Register
                     show={isRegisterVisible}

@@ -186,7 +186,7 @@ export class CoreStaker {
         sk: new Uint8Array(0),
       }
     );
-    const stakingAmount = params.amount
+    const stakingAmount = params.amount;
     const paymentAmount =
       stakingAmount + 1234500 + 1e5 + Number(params.extraPayment || 0);
     const owner = params.owner;
@@ -286,6 +286,20 @@ export class CoreStaker {
     );
 
     return result.transaction;
+  }
+
+  async getMinBalanceByOwner(algod: Algodv2, owner: string): Promise<number> {
+    const contractId = this.contractId();
+    const ci = new CONTRACT(contractId, algod, undefined, abi, {
+      addr: owner,
+      sk: new Uint8Array(0),
+    });
+    const withdrawR = await ci.withdraw(0);
+    if (withdrawR.success) {
+      return Number(withdrawR.returnValue);
+    } else {
+      return 0;
+    }
   }
 
   async getMinBalance(
