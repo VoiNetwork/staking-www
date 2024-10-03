@@ -39,7 +39,7 @@ export const dashboardTabs = [
   */
   {
     label: "Staking Forecast",
-    value: "staking-forcast",
+    value: "staking-forecast",
     icon: <CalculateIcon></CalculateIcon>,
   },
   {
