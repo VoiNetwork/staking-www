@@ -185,11 +185,11 @@ function AppRouter(): ReactElement {
                             />
                           </Routes>
                           <Typography
-                            color="red"
+                            style={{ color: 'rgba(112, 42, 226, 0.8)', fontWeight: 'bold' }}
                             variant="h6"
                             className="text-center"
                           >
-                            Connect wallet or using forecasting tool below!
+                            Connect your wallet or use the forecasting tool below!
                           </Typography>
                           <StakingForecast></StakingForecast>
                         </>
