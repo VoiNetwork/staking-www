@@ -257,7 +257,15 @@ function Overview(): ReactElement {
             round: true,
           });
           setNextExpire(nextExpireDuration);
+        })
+        .catch((error) => {
+          console.error('Error fetching average block time:', error);
+          // Optionally, set a default value or state to inform the user
         });
+    })
+    .catch((error) => {
+      console.error('Error fetching node status:', error);
+      // Optionally, set a default value or state to inform the user
     });
   }, [availableContracts]);
 
