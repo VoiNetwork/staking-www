@@ -243,7 +243,7 @@ function StakingForecast(): ReactElement {
                                           </a>{" "}
                                           or{" "}
                                           <a
-                                            href="ttps://www.coinstore.com/spot/VOIUSDT"
+                                            href="https://www.coinstore.com/spot/VOIUSDT"
                                             target="_blank"
                                           >
                                             Coinstore
