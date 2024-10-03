@@ -137,7 +137,7 @@ function AppRouter(): ReactElement {
                           element={<Airdrop></Airdrop>}
                         ></Route>
                         <Route
-                          path="/staking-forcast"
+                          path="/staking-forecast"
                           element={<StakingForecast></StakingForecast>}
                         ></Route>
                         <Route
