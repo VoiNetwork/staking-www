@@ -185,7 +185,7 @@ function Register({
               <div className="register-container">
                 <ShellCommand
                   description="Run the Voi Swarm installation script again:"
-                  command={`/bin/bash -c “$(curl -fsSL https://get.voi.network/swarm)"`}
+                  command={`/bin/bash -c "$(curl -fsSL https://get.voi.network/swarm)"`}
                 />
                 <Typography
                   variant="body2"
