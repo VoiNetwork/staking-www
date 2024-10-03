@@ -169,7 +169,7 @@ function AppRouter(): ReactElement {
                           <Route
                             path="*"
                             element={
-                              <Navigate to="/staking-forecast" replace />
+                              <Navigate to="/overview" replace />
                             }
                           />
                         </Routes>
