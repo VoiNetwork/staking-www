@@ -11,6 +11,7 @@ import {
   MenuItem,
   Select,
   Skeleton,
+  Typography,
 } from "@mui/material";
 import { Close, Label } from "@mui/icons-material";
 import { ModalGrowTransition, ShadedInput } from "@repo/theme";
@@ -61,6 +62,8 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
   const { account, staking, contract } = useSelector(
     (state: RootState) => state.user
   );
+
+  const [acknowledge, setAcknowledge] = useState<boolean>(false);
 
   const [txnId, setTxnId] = useState<string>("");
   const [txnMsg, setTxnMsg] = useState<string>("");
@@ -184,7 +187,7 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
           }}
         >
           <DialogTitle>
-            <div>Withdraw</div>
+            {!acknowledge ? <div>Acknowledgement</div> : <div>Withdraw</div>}
             <div>
               <Close onClick={handleClose} className="close-modal" />
             </div>
@@ -192,7 +195,44 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
           <DialogContent>
             <div className="withdraw-wrapper">
               <div className="withdraw-container">
-                {!isDataLoading &&
+                {!acknowledge && (
+                  <div className="acknowledge">
+                    <div className="acknowledge-body">
+                      <div className="acknowledge-text">
+                        <Typography
+                          variant={"body2"}
+                          sx={{
+                            textAlign: "left",
+                            fontSize: "0.9rem",
+                            background: "gainsboro",
+                            maxWidth: 400,
+                            padding: "10px",
+                            borderRadius: "10px",
+                          }}
+                        >
+                          The withdrawn amount will reduce the contract
+                          account's balance, affecting the chance of proposing
+                          blocks. The remaining balance can be staked by keeping
+                          the contract online.
+                        </Typography>
+                      </div>
+                      <div className="acknowledge-actions">
+                        <Button
+                          variant={"contained"}
+                          color={"primary"}
+                          size={"large"}
+                          onClick={() => {
+                            setAcknowledge(true);
+                          }}
+                        >
+                          I Understand
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {acknowledge &&
+                  !isDataLoading &&
                   activeAccount &&
                   accountData &&
                   stakingAccount &&
@@ -351,15 +391,7 @@ function Lockup({ show, onClose }: LockupProps): ReactElement {
                           </Grid>
                           <Grid item xs={12}>
                             <Button
-                              disabled={
-                                (isNumber(amount) && Number(amount) <= 0) ||
-                                availableBalance - 5000 <= 0 ||
-                                (availableBalance < 5000
-                                  ? -1
-                                  : microalgosToAlgos(availableBalance - 5000) -
-                                    Number(amount)) <= 0 ||
-                                !isNumber(amount)
-                              }
+                              disabled={errorMessage !== ""}
                               fullWidth
                               variant={"contained"}
                               color={"primary"}

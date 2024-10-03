@@ -1,0 +1,135 @@
+@import "@repo/styles";
+
+.staking-forecast-wrapper {
+  $sm: 640px;
+  $md: 768px;
+  $lg: 1024px;
+  $xl: 1280px;
+  $xxl: 1536px;
+  $side-width: 250px;
+  $padding: 0.5rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding: 20px;
+  /*
+  background-color: #1b2a3d;
+  */
+  color: #ffffff;
+  min-height: 100vh;
+}
+
+.staking-forecast-container {
+  width: 100%;
+  max-width: 800px;
+  /*
+  background-color: #2b3a4d;
+  */
+  background-color: darkgoldenrod;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.staking-forecast-header {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #ffffff;
+}
+
+.staking-forecast-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.staking-forecast-body .form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  font-size: 16px;
+  margin-bottom: 10px;
+  display: block;
+  color: #b0bec5;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #90a4ae;
+  background-color: #2e3b4d;
+  color: #ffffff;
+}
+
+.staking-forecast-body .MuiFormControl-root {
+  margin-bottom: 20px;
+}
+
+.staking-forecast-body .MuiFormControl-root label {
+  color: #ffffff;
+}
+
+.staking-forecast-body .MuiButton-root {
+  background-color: #3b82f6;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  width: 100%;
+  text-transform: none;
+}
+
+.staking-forecast-body .MuiButton-root:hover {
+  background-color: #2563eb;
+}
+
+.staking-forecast-body .results {
+  margin-top: 20px;
+  background-color: #1f2937;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.results .result-item {
+  margin-bottom: 10px;
+}
+
+.result-item span {
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.info-msg {
+  color: #e57373;
+  margin: 10px 0;
+}
+
+.forecast-button {
+  margin-top: 15px;
+  text-align: center;
+  background-color: transparent;
+  border: 2px solid #fff;
+  border-radius: 5px;
+  padding: 10px;
+}
+.forecast-button:hover {
+  background-color: "#fff";
+  color: "#000";
+}
+
+@keyframes blinking {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.1;
+  }
+  100% {
+    opacity: 1;
+  }
+}

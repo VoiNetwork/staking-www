@@ -395,7 +395,9 @@ function Lockup({
                               <NumericFormat
                                 value={Math.max(
                                   0,
-                                  microalgosToAlgos(availableBalance - txnCost)
+                                  microalgosToAlgos(
+                                    availableBalance - txnCost - 1e6
+                                  )
                                 )}
                                 suffix=" VOI available"
                                 displayType={"text"}
@@ -414,7 +416,10 @@ function Lockup({
                               onClick={() => {
                                 setAmount(
                                   microalgosToAlgos(
-                                    availableBalance - txnCost
+                                    Math.max(
+                                      availableBalance - txnCost - 1e6,
+                                      0
+                                    )
                                   ).toString()
                                 );
                               }}

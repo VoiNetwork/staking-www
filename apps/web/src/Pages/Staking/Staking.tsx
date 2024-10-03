@@ -15,6 +15,7 @@ import moment from "moment";
 import { Button, Stack, Typography } from "@mui/material";
 import BlinkingText from "../../Components/BlinkingText/BlinkingText";
 import { STAKING_CTC_INFO, STAKING_FUNDER } from "@repo/voix";
+import Banner from "@/Components/Banner/Banner";
 
 function Staking(): ReactElement {
   const { loading } = useSelector((state: RootState) => state.node);
@@ -58,6 +59,7 @@ function Staking(): ReactElement {
 
     return weeksPassed;
   }
+
   const startTime = new Date("2024-09-30T00:00:00Z"); // start of week 1
 
   const weeksPassed = getWeeksFromTime(startTime);
@@ -100,6 +102,7 @@ function Staking(): ReactElement {
 
   return (
     <div className="overview-wrapper">
+      <Banner />
       <div className="overview-container">
         <div className="overview-header">
           <div style={{ marginLeft: "10px" }}>Staking</div>

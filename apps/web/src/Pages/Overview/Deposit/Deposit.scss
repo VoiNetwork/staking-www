@@ -44,3 +44,51 @@
     }
   }
 }
+
+.acknowledge {
+  /*
+  padding: 20px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  */
+  max-width: 600px;
+  margin: 0 auto;
+
+  .acknowledge-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    .acknowledge-text {
+      margin-bottom: 20px;
+      font-size: 16px;
+      color: #333;
+
+      div {
+        padding: 10px;
+        background-color: #fff;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+    }
+
+    .acknowledge-actions {
+      margin-top: 10px;
+
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        text-transform: uppercase;
+        background-color: #007bff;
+        color: #fff;
+
+        &:hover {
+          background-color: #0056b3;
+        }
+      }
+    }
+  }
+}

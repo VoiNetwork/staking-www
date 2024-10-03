@@ -25,6 +25,7 @@ import { Box } from "@mui/material";
 import logo from "../../assets/images/full-logo.png";
 import MobileMenu from "../../Components/MobilePanel";
 import "../App.scss";
+import StakingForecast from "@/Pages/StakingForecast/StakingForecast";
 
 function AppRouter(): ReactElement {
   const { selectedNode } = useSelector((state: RootState) => state.nodes);
@@ -135,12 +136,14 @@ function AppRouter(): ReactElement {
                           path="/airdrop"
                           element={<Airdrop></Airdrop>}
                         ></Route>
-                        {
-                          <Route
-                            path="/staking"
-                            element={<Staking></Staking>}
-                          ></Route>
-                        }
+                        <Route
+                          path="/staking-forcast"
+                          element={<StakingForecast></StakingForecast>}
+                        ></Route>
+                        <Route
+                          path="/staking"
+                          element={<Staking></Staking>}
+                        ></Route>
                         {/*<Route
                           path="/setting"
                           element={<Setting></Setting>}

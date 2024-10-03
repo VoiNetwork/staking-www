@@ -24,9 +24,9 @@ export type AccountData = {
   global_distribution_seconds: number;
   part_vote_k: string | null;
   part_sel_k: string | null;
-  part_vote_fst: string | null;
-  part_vote_lst: string | null;
-  part_vote_kd: string | null;
+  part_vote_fst: number | null;
+  part_vote_lst: number | null;
+  part_vote_kd: number | null;
   part_sp_key: string | null;
   deleted: number;
 };
@@ -56,4 +56,4 @@ export type CreateParams = {
   funder: string;
   delegate: string;
   period: number;
-}
+};

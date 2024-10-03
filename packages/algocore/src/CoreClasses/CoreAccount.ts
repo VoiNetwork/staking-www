@@ -59,9 +59,16 @@ export class CoreAccount {
     return -1;
   }
 
-  partKeyExpiresIn(currentRound: number, blockTimeMs: number): string {
+  partKeyExpiresInDiff(currentRound: number, blockTimeMs: number): number {
     const remainingRounds = this.partKeyExpiresInBlocks(currentRound);
     const diff = Math.floor(remainingRounds * blockTimeMs);
-    return humanizeDuration(diff, { largest: 2, round: true });
+    return diff;
+  }
+
+  partKeyExpiresIn(currentRound: number, blockTimeMs: number): string {
+    return humanizeDuration(
+      this.partKeyExpiresInDiff(currentRound, blockTimeMs),
+      { largest: 2, round: true }
+    );
   }
 }

@@ -1,6 +1,6 @@
 import React from "react";
 import "./LeftPanel.scss";
-import { Tab, Tabs } from "@mui/material";
+import { Box, Divider, Tab, Tabs } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import { ReactElement, useEffect } from "react";
 import {
@@ -21,6 +21,7 @@ import {
   dashboardTabs,
   settingRoutes,
 } from "../../constants/routes";
+import LinkIcon from "@mui/icons-material/Link";
 
 function LeftPanel(): ReactElement {
   const location = useLocation();
@@ -31,10 +32,6 @@ function LeftPanel(): ReactElement {
   route = route.substring(1);
   route = route.split("/");
   route = route[0];
-
-  
-
-  
 
   const routes: string[] = [...dashboardRoutes, ...settingRoutes];
 
@@ -61,7 +58,6 @@ function LeftPanel(): ReactElement {
   //   },
   // ];
 
-  
   return (
     <div className="left-panel-wrapper ">
       <div className="left-panel-container">

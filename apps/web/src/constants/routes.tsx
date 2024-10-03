@@ -1,6 +1,7 @@
 import React from "react";
 import { AdjustOutlined, HomeOutlined, Payments } from "@mui/icons-material";
 import LockClockIcon from "@mui/icons-material/LockClock";
+import CalculateIcon from "@mui/icons-material/Calculate";
 
 export const airdropRoutes: string[] = ["airdrop"];
 
@@ -36,6 +37,11 @@ export const dashboardTabs = [
     icon: <AdjustOutlined></AdjustOutlined>,
   },
   */
+  {
+    label: "Staking Forecast",
+    value: "staking-forcast",
+    icon: <CalculateIcon></CalculateIcon>,
+  },
   {
     label: "Staking Program",
     value: "staking",

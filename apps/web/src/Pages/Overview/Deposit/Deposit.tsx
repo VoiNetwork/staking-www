@@ -10,6 +10,7 @@ import {
   Grid,
   MenuItem,
   Select,
+  Typography,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { ModalGrowTransition, ShadedInput } from "@repo/theme";
@@ -47,6 +48,8 @@ function Lockup({ show, onClose, onSuccess }: LockupProps): ReactElement {
     setAvailableBalance(-1);
     setMinBalance(-1);
   }
+
+  const [acknowledge, setAcknowledge] = useState<boolean>(false);
 
   const { transactionSigner, activeAccount } = useWallet();
 
@@ -146,10 +149,10 @@ function Lockup({ show, onClose, onSuccess }: LockupProps): ReactElement {
     if (Number(amount) <= 0) {
       return "Amount should be greater than 0";
     }
-    if (availableBalance < 5000) {
+    if (availableBalance < 1e6) {
       return "Insufficient balance";
     }
-    if (availableBalance - 5000 < algosToMicroalgos(Number(amount))) {
+    if (availableBalance - 1e6 < algosToMicroalgos(Number(amount))) {
       return "Insufficient balance";
     }
     return "";
@@ -171,7 +174,7 @@ function Lockup({ show, onClose, onSuccess }: LockupProps): ReactElement {
           }}
         >
           <DialogTitle>
-            <div>Deposit</div>
+            {acknowledge ? <div>Deposit</div> : <div>Acknowledgment</div>}
             <div>
               <Close onClick={handleClose} className="close-modal" />
             </div>
@@ -179,7 +182,45 @@ function Lockup({ show, onClose, onSuccess }: LockupProps): ReactElement {
           <DialogContent>
             <div className="deposit-wrapper">
               <div className="deposit-container">
-                {!isDataLoading &&
+                {!acknowledge && (
+                  <div className="acknowledge">
+                    <div className="acknowledge-body">
+                      <div className="acknowledge-text">
+                        <Typography
+                          variant={"body2"}
+                          sx={{
+                            textAlign: "left",
+                            fontSize: "0.9rem",
+                            background: "gainsboro",
+                            maxWidth: 400,
+                            padding: "10px",
+                            borderRadius: "10px",
+                          }}
+                        >
+                          I acknowledge that the deposit will not impact staking
+                          rewards or airdrop amounts. The deposited amount is
+                          withdrawable anytime, during or after the staking
+                          period, and will be reflected in both the balance and
+                          available balance.
+                        </Typography>
+                      </div>
+                      <div className="acknowledge-actions">
+                        <Button
+                          variant={"contained"}
+                          color={"primary"}
+                          size={"large"}
+                          onClick={() => {
+                            setAcknowledge(true);
+                          }}
+                        >
+                          I Understand
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {acknowledge &&
+                  !isDataLoading &&
                   activeAccount &&
                   accountData &&
                   stakingAccount &&
@@ -210,9 +251,11 @@ function Lockup({ show, onClose, onSuccess }: LockupProps): ReactElement {
                           <div className="value">
                             <NumericFormat
                               value={
-                                availableBalance < 5000
+                                Math.max(availableBalance - 1e6, 0) <= 0
                                   ? "-"
-                                  : microalgosToAlgos(availableBalance - 5000)
+                                  : microalgosToAlgos(
+                                      Math.max(availableBalance - 1e6, 0)
+                                    )
                               }
                               suffix=" VOI"
                               displayType={"text"}
@@ -234,12 +277,14 @@ function Lockup({ show, onClose, onSuccess }: LockupProps): ReactElement {
                               <FormLabel className="classic-label flex">
                                 <div>Amount</div>
                                 <Button
-                                  disabled={availableBalance - 5000 <= 0}
+                                  disabled={
+                                    Math.max(availableBalance - 1e6, 0) <= 0
+                                  }
                                   variant="outlined"
                                   onClick={() => {
                                     setAmount(
                                       microalgosToAlgos(
-                                        availableBalance - 5000
+                                        Math.max(availableBalance - 1e6, 0)
                                       ).toString()
                                     );
                                   }}
@@ -248,16 +293,18 @@ function Lockup({ show, onClose, onSuccess }: LockupProps): ReactElement {
                                 </Button>
                               </FormLabel>
                               <ShadedInput
-                                disabled={availableBalance - 5000 <= 0}
+                                disabled={
+                                  Math.max(availableBalance - 1e6, 0) <= 0
+                                }
                                 placeholder={
-                                  availableBalance - 5000 <= 0
+                                  Math.max(availableBalance - 1e6, 0) <= 0
                                     ? "Insufficient balance"
                                     : "Enter amount"
                                 }
                                 value={amount}
                                 onChange={(ev) => {
-                                  console.log(availableBalance - 5000);
-                                  if (availableBalance - 5000 <= 0) return;
+                                  if (Math.max(availableBalance - 1e6, 0) <= 0)
+                                    return;
                                   setAmount(ev.target.value);
                                 }}
                                 fullWidth
@@ -315,11 +362,11 @@ function Lockup({ show, onClose, onSuccess }: LockupProps): ReactElement {
                                 <div className="value">
                                   <NumericFormat
                                     value={
-                                      availableBalance < 5000 ||
+                                      availableBalance < 1e6 ||
                                       !isNumber(amount)
                                         ? "-"
                                         : microalgosToAlgos(
-                                            availableBalance - 5000
+                                            availableBalance - 1e6
                                           ) - Number(amount)
                                     }
                                     suffix=" VOI"
@@ -334,12 +381,8 @@ function Lockup({ show, onClose, onSuccess }: LockupProps): ReactElement {
                           <Grid item xs={12}>
                             <Button
                               disabled={
-                                availableBalance - 5000 <= 0 ||
-                                (availableBalance < 5000
-                                  ? -1
-                                  : microalgosToAlgos(availableBalance - 5000) -
-                                    Number(amount)) <= 0 ||
-                                !isNumber(amount)
+                                !isNumber(amount) &&
+                                Math.max(availableBalance - 1e6, 0) <= 0
                               }
                               fullWidth
                               variant={"contained"}
