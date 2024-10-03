@@ -171,7 +171,7 @@ function StakingForecast(): ReactElement {
               such as{" "}
               <a
                 style={{
-                  color: "lightgoldenrodyellow",
+                  color: "lightblue",
                   textDecoration: "none",
                   fontWeight: 900,
                 }}
@@ -183,7 +183,7 @@ function StakingForecast(): ReactElement {
               or{" "}
               <a
                 style={{
-                  color: "lightgoldenrodyellow",
+                  color: "lightblue",
                   textDecoration: "none",
                   fontWeight: 900,
                 }}
@@ -195,7 +195,7 @@ function StakingForecast(): ReactElement {
               . If you are looking to bridge from another network read{" "}
               <a
                 style={{
-                  color: "lightgoldenrodyellow",
+                  color: "lightblue",
                   textDecoration: "none",
                   fontWeight: 900,
                 }}
@@ -227,7 +227,7 @@ function StakingForecast(): ReactElement {
                                 Amount to Stake
                                 <span
                                   style={{
-                                    color: "lightgoldenrodyellow",
+                                    color: "lightblue",
                                     marginLeft: "10px",
                                     fontSize: "12px",
                                     cursor: "pointer",
