@@ -11,7 +11,7 @@ const Banner: React.FC<BannerProps> = (props) => {
         background: "url(/happy.png)",
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
-        bgcolor: "silver",
+        bgcolor: "rgba(0, 0, 0, 0.8)",
         color: "#fff",
         padding: "16px",
         textAlign: "center",

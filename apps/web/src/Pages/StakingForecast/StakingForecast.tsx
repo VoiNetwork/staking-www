@@ -157,7 +157,7 @@ function StakingForecast(): ReactElement {
               such as{" "}
               <a
                 style={{
-                  color: "lightgoldenrodyellow",
+                  color: "lightblue",
                   textDecoration: "none",
                   fontWeight: 900,
                 }}
@@ -169,7 +169,7 @@ function StakingForecast(): ReactElement {
               or{" "}
               <a
                 style={{
-                  color: "lightgoldenrodyellow",
+                  color: "lightblue",
                   textDecoration: "none",
                   fontWeight: 900,
                 }}
@@ -181,7 +181,7 @@ function StakingForecast(): ReactElement {
               . If you are looking to bridge from another network read{" "}
               <a
                 style={{
-                  color: "lightgoldenrodyellow",
+                  color: "lightblue",
                   textDecoration: "none",
                   fontWeight: 900,
                 }}
@@ -193,23 +193,140 @@ function StakingForecast(): ReactElement {
               .
             </Typography>
             <div className="staking-forecast-body">
-              <div>
-                <div className="props">
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-                      <Divider></Divider>
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-                      <FormControl fullWidth variant="outlined">
-                        <FormLabel className="classic-label flex">
-                          <div>
-                            Amount to Stake
-                            <span
-                              style={{
-                                color: "lightgoldenrodyellow",
-                                marginLeft: "10px",
-                                fontSize: "12px",
-                                cursor: "pointer",
+                  <div>
+                    <div className="props">
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                          <Divider></Divider>
+                        </Grid>
+                        <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+                          <FormControl fullWidth variant="outlined">
+                            <FormLabel className="classic-label flex">
+                              <div>
+                                Amount to Stake
+                                <span
+                                  style={{
+                                    color: "lightblue",
+                                    marginLeft: "10px",
+                                    fontSize: "12px",
+                                    cursor: "pointer",
+                                  }}
+                                  onClick={() => {
+                                    confirmation({
+                                      ...confirmationProps,
+                                      title: (
+                                        <div style={{ textAlign: "left" }}>
+                                          Need more VOI?
+                                        </div>
+                                      ),
+                                      description: (
+                                        <div
+                                          style={{
+                                            textAlign: "left",
+                                          }}
+                                        >
+                                          <Typography variant="body2">
+                                            <span style={{ fontWeight: 900 }}>
+                                              Option 1: Buy VOI on Centralized
+                                              Exchange
+                                            </span>
+                                            <br />
+                                            <p>
+                                              Go to an exchange. Currently, you
+                                              must be located outside of the
+                                              United States to use{" "}
+                                              <a
+                                                href="https://www.mexc.com/exchange/VOI_USDT"
+                                                target="_blank"
+                                              >
+                                                MEXC
+                                              </a>{" "}
+                                              or{" "}
+                                              <a
+                                                href="ttps://www.coinstore.com/spot/VOIUSDT"
+                                                target="_blank"
+                                              >
+                                                Coinstore
+                                              </a>
+                                              .
+                                            </p>
+                                            <br />
+                                            <span style={{ fontWeight: 900 }}>
+                                              Option 2: Bridge with{" "}
+                                              <a
+                                                href="https://app.aramid.finance/bridge/Base/Voi/USDC/Aramid%20USDC"
+                                                target="_blank"
+                                              >
+                                                Aramid
+                                              </a>
+                                            </span>
+                                            <br />
+                                            <p>
+                                              Bridge USDC from Base, Arbitrum or
+                                              Algorand.
+                                            </p>
+                                            <br />
+                                            <span style={{ fontWeight: 900 }}>
+                                              Option 3: Swap
+                                            </span>
+                                            <br />
+                                            <p>
+                                              Swap USDC or other token for VOI
+                                              on{" "}
+                                              <a
+                                                href="https://voi.humble.sh"
+                                                target="_blank"
+                                              >
+                                                HumbPact Swap
+                                              </a>
+                                              .
+                                            </p>
+                                          </Typography>
+                                        </div>
+                                      ),
+                                      confirmationText: "Close",
+                                      hideCancelButton: true,
+                                    });
+                                  }}
+                                >
+                                  Need more VOI?
+                                </span>
+                              </div>
+                            </FormLabel>
+                            <ShadedInput
+                              value={amount}
+                              onChange={(ev) => {
+                                setAmount(parseFloat(ev.target.value) || 0);
+                              }}
+                              type="number"
+                              fullWidth
+                              endAdornment={
+                                <InputAdornment position="end">
+                                  VOI
+                                </InputAdornment>
+                              }
+                            />
+                          </FormControl>
+                        </Grid>
+
+                        <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+                          <FormControl fullWidth variant="outlined">
+                            <FormLabel className="classic-label flex">
+                              <div>Lockup Period (Months)</div>
+                            </FormLabel>
+                            <ShadedInput
+                              value={lockupPeriod}
+                              onChange={(ev) => {
+                                if (ev.target.value === "") {
+                                  setLockupPeriod("");
+                                } else if (
+                                  parseInt(ev.target.value) >= 0 &&
+                                  parseInt(ev.target.value) <= 18
+                                ) {
+                                  setLockupPeriod(
+                                    `${parseInt(ev.target.value) || 0}`
+                                  );
+                                }
                               }}
                               onClick={() => {
                                 confirmation({
