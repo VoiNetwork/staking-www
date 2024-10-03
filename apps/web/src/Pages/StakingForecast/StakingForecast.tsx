@@ -164,7 +164,7 @@ function StakingForecast(): ReactElement {
           <Stack direction="column" spacing={2}>
             <Typography variant="body2" className="staking-forecast-subheader">
               The staking forecast tool allows you to easily forecast your
-              staking rewards that best suit your needs.
+              staking rewards that best suits your situation.
             </Typography>
             <Typography variant="body2" className="staking-forecast-subheader">
               Looking to acquire more Voi to stake? Use a centralized exchange
@@ -175,7 +175,7 @@ function StakingForecast(): ReactElement {
                   textDecoration: "none",
                   fontWeight: 900,
                 }}
-                href="https://www.mexc.com/exchange/VOI_USDT?_from=header"
+                href="https://www.mexc.com/exchange/VOI_USDT"
                 target="_blank"
               >
                 MEXC
