@@ -1,7 +1,9 @@
 import React, { ReactElement, useEffect, useMemo, useState } from "react";
 import "./WithdrawAll.scss";
 import {
+  Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -42,6 +44,34 @@ function zip<T>(...arrays: T[][]): T[][] {
   );
 }
 
+interface BigNumberDisplayProps {
+  withdrawableAmount: number | string; // Can be a number or string
+  tokenSymbol?: string; // Optional, defaults to "VOI"
+}
+
+const BigNumberDisplay: React.FC<BigNumberDisplayProps> = ({
+  withdrawableAmount,
+  tokenSymbol = "VOI",
+}) => {
+  return (
+    <Box display="flex" flexDirection="column" alignItems="center">
+      {/* Display the big number */}
+      <Typography variant="h4" component="div" gutterBottom>
+        {withdrawableAmount}
+      </Typography>
+      {/* Display "1 VOI" or other token info */}
+      <Typography variant="body1" color="textSecondary">
+        <NumericFormat
+          value={withdrawableAmount}
+          suffix=" VOI"
+          displayType={"text"}
+          thousandSeparator={true}
+        ></NumericFormat>
+      </Typography>
+    </Box>
+  );
+};
+
 interface LockupProps {
   show: boolean;
   onClose: () => void;
@@ -58,11 +88,9 @@ function WithdrawAll({ show, onClose }: LockupProps): ReactElement {
     setAmount("");
     setTxnId("");
     setTxnMsg("");
-    setAvailableBalance(-1);
-    setMinBalance(-1);
   }
 
-  const { transactionSigner, activeAccount } = useWallet();
+  const { transactionSigner, activeAccount, signTransactions } = useWallet();
 
   const { showException, showSnack } = useSnackbar();
   const { showLoader, hideLoader } = useLoader();
@@ -77,6 +105,8 @@ function WithdrawAll({ show, onClose }: LockupProps): ReactElement {
 
   const [acknowledge, setAcknowledge] = useState<boolean>(false);
 
+  const [txnR, setTxnR] = useState<any>(null);
+  const [zipped, setZipped] = useState<any>(null);
   useEffect(() => {
     if (
       !activeAccount ||
@@ -85,7 +115,6 @@ function WithdrawAll({ show, onClose }: LockupProps): ReactElement {
       !acknowledge
     )
       return;
-    // get withdrawable balance
     const algodClient = voiStakingUtils.network.getAlgodClient();
     const indexerClient = voiStakingUtils.network.getIndexerClient();
     const apps: CoreStaker[] = availableContracts.map((contract) => {
@@ -106,12 +135,10 @@ function WithdrawAll({ show, onClose }: LockupProps): ReactElement {
         const bal = acc.availableBalance();
         bals.push(bal);
       }
-
       // zip available contracts with min balances
       const zipped = zip(apids, bals, minbals)
         .map(([apid, bal, mb]) => [apid, Math.abs(bal - mb)])
         .filter(([_, mb]) => mb > 0);
-      console.log({ zipped });
       const ci = new CONTRACT(
         zipped[0][0],
         algodClient,
@@ -122,7 +149,6 @@ function WithdrawAll({ show, onClose }: LockupProps): ReactElement {
           sk: new Uint8Array(0),
         }
       );
-      console.log(ci);
       const buildN = [];
       for await (const [apid, mb] of zipped) {
         console.log(apid, mb);
@@ -146,17 +172,23 @@ function WithdrawAll({ show, onClose }: LockupProps): ReactElement {
         const txnO = (await cia.withdraw(mb)).obj;
         buildN.push(txnO);
       }
-      console.log({ buildN });
+      ci.setFee(2000);
       ci.setExtraTxns(buildN);
       ci.setEnableGroupResourceSharing(true);
       const customR = await ci.custom();
-      console.log(customR);
-      if (!customR.simulate) {
-        showSnack("Withdrawal failed", "error");
-      } else {
+      if (customR.success) {
+        setTxnR(customR);
+        setZipped(zipped);
       }
     })();
   }, [activeAccount, availableContracts, acknowledge]);
+
+  const withdrawableBalance = useMemo(() => {
+    if (!zipped || zipped.length === 0) return -1;
+    return zipped.reduce((acc, [_, mb]) => acc + mb, 0);
+  }, [zipped]);
+
+  console.log({ txnR, zipped });
 
   const [txnId, setTxnId] = useState<string>("");
   const [txnMsg, setTxnMsg] = useState<string>("");
@@ -170,351 +202,161 @@ function WithdrawAll({ show, onClose }: LockupProps): ReactElement {
   const isDataLoading =
     loading || account.loading || staking.loading || contract.loading;
 
-  async function withdraw(data: AccountData) {
-    if (!activeAccount) {
-      showSnack("Please connect your wallet", "error");
-      return;
-    }
+  async function withdraw() {
+    if (!txnR.success) return;
 
-    if (!amount || !isNumber(amount)) {
-      showSnack("Invalid amount", "error");
-      return;
-    }
+    const algodClient = voiStakingUtils.network.getAlgodClient();
 
-    try {
-      showLoader("Withdrawal in progress");
-      const transaction = await new CoreStaker(data).withdraw(
-        voiStakingUtils.network.getAlgodClient(),
-        AlgoAmount.Algos(Number(amount)).microAlgos,
-        {
-          addr: activeAccount.address,
-          signer: transactionSigner,
-        }
-      );
-      const txnId = transaction.txID();
-      await waitForConfirmation(
-        txnId,
-        20,
-        voiStakingUtils.network.getAlgodClient()
-      );
+    const stxns = await signTransactions(
+      txnR.txns.map((txn: string) => new Uint8Array(Buffer.from(txn, "base64")))
+    );
 
-      setTxnId(txnId);
-      setTxnMsg("You have withdrawn successfully.");
-      resetState();
-    } catch (e) {
-      showException(e);
-    } finally {
-      hideLoader();
-    }
+    algodClient.sendRawTransaction(stxns as Uint8Array[]).do();
+
+    onClose();
+
+    console.log({ txnR, zipped });
+
+    // if (!activeAccount) {
+    //   showSnack("Please connect your wallet", "error");
+    //   return;
+    // }
+
+    // if (!amount || !isNumber(amount)) {
+    //   showSnack("Invalid amount", "error");
+    //   return;
+    // }
+
+    // try {
+    //   showLoader("Withdrawal in progress");
+    //   const transaction = await new CoreStaker(data).withdraw(
+    //     voiStakingUtils.network.getAlgodClient(),
+    //     AlgoAmount.Algos(Number(amount)).microAlgos,
+    //     {
+    //       addr: activeAccount.address,
+    //       signer: transactionSigner,
+    //     }
+    //   );
+    //   const txnId = transaction.txID();
+    //   await waitForConfirmation(
+    //     txnId,
+    //     20,
+    //     voiStakingUtils.network.getAlgodClient()
+    //   );
+
+    //   setTxnId(txnId);
+    //   setTxnMsg("You have withdrawn successfully.");
+    //   resetState();
+    // } catch (e) {
+    //   showException(e);
+    // } finally {
+    //   hideLoader();
+    // }
   }
 
-  const [minBalance, setMinBalance] = useState<number>(-1);
-  useEffect(() => {
-    if (!activeAccount || !contractState || !accountData) return;
-    const algod = new NodeClient(voiStakingUtils.network);
-    new CoreStaker(accountData)
-      .getMinBalance(algod.algod, contractState)
-      .then(setMinBalance)
-      .catch((error) => {
-        showException(error);
-      });
-  }, [activeAccount, accountData, contractState]);
-
-  const [availableBalance, setAvailableBalance] = useState<number>(-1);
-  useEffect(() => {
-    if (!activeAccount) return;
-    const algodClient = voiStakingUtils.network.getAlgodClient();
-    algodClient
-      .accountInformation(activeAccount.address)
-      .do()
-      .then((account) => {
-        setAvailableBalance(
-          new CoreAccount(account as AccountResult).availableBalance()
-        );
-      });
-  }, [activeAccount]);
-
-  const withdrawableBalance = useMemo(() => {
-    if (minBalance < 0 || !stakingAccount) return -1;
-    const balance =
-      new CoreAccount(stakingAccount).availableBalance() - minBalance;
-    const adjustedBalance = balance < 0 ? 0 : balance;
-    return microalgosToAlgos(adjustedBalance);
-  }, [minBalance, stakingAccount]);
-
-  const errorMessage = (() => {
-    if (amount === "") {
-      return "";
-    }
-    if (availableBalance - 5000 <= 0) {
-      return "Insufficient balance";
-    }
-    if (!isNumber(amount)) {
-      return "Invalid amount";
-    }
-    if (Number(amount) <= 0) {
-      return "Amount should be greater than 0";
-    }
-    if (withdrawableBalance < 0) {
-      return "Withdrawable balance not available";
-    }
-    if (withdrawableBalance < Number(amount)) {
-      return "Insufficient withdrawable balance";
-    }
-    return "";
-  })();
+  const errorMessage = "";
 
   return (
     <div>
-      {show ? (
+      {show && (
         <Dialog
           onClose={handleClose}
           fullWidth
           open={show}
           TransitionComponent={ModalGrowTransition}
           transitionDuration={400}
-          className="classic-modal round"
           maxWidth={"xs"}
+          className="classic-modal round"
           sx={{
-            ".MuiPaper-root": {},
+            ".MuiPaper-root": {
+              minHeight: "400px",
+              display: "flex",
+              flexDirection: "column",
+            },
           }}
         >
           <DialogTitle>
-            {!acknowledge ? <div>Acknowledgement</div> : <div>Withdraw</div>}
-            <div>
-              <Close onClick={handleClose} className="close-modal" />
-            </div>
+            {!acknowledge ? "Acknowledgement" : "Withdraw"}
+            <Close onClick={handleClose} className="close-modal" />
           </DialogTitle>
-          <DialogContent>
-            <div className="withdraw-wrapper">
-              <div className="withdraw-container">
-                {!acknowledge && (
-                  <div className="acknowledge">
-                    <div className="acknowledge-body">
-                      <div className="acknowledge-text">
-                        <Typography
-                          variant={"body2"}
-                          sx={{
-                            textAlign: "left",
-                            fontSize: "0.9rem",
-                            background: "gainsboro",
-                            maxWidth: 400,
-                            padding: "10px",
-                            borderRadius: "10px",
-                          }}
-                        >
-                          The withdrawn amount will reduce the contract
-                          account's balance, affecting the chance of proposing
-                          blocks. The remaining balance can be staked by keeping
-                          the contract online.
-                        </Typography>
-                      </div>
-                      <div className="acknowledge-actions">
-                        <Button
-                          variant={"contained"}
-                          color={"primary"}
-                          size={"large"}
-                          onClick={() => {
-                            setAcknowledge(true);
-                          }}
-                        >
-                          I Understand
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {acknowledge &&
-                  !isDataLoading &&
-                  activeAccount &&
-                  accountData &&
-                  stakingAccount &&
-                  contractState && (
-                    <div className="withdraw-body">
-                      <div className="props">
-                        <div className="prop">
-                          <div className="key">Total Balance</div>
-                          <div className="value">
-                            <NumericFormat
-                              value={
-                                minBalance < 0
-                                  ? "-"
-                                  : microalgosToAlgos(
-                                      new CoreAccount(
-                                        stakingAccount
-                                      ).availableBalance() - minBalance
-                                    )
-                              }
-                              suffix=" VOI"
-                              displayType={"text"}
-                              thousandSeparator={true}
-                            ></NumericFormat>
-                          </div>
-                        </div>
-                        <div className="prop">
-                          <div className="key">Withdrawable Balance</div>
-                          <div className="value">
-                            {withdrawableBalance < 0 ? (
-                              "-"
-                            ) : (
-                              <NumericFormat
-                                value={
-                                  withdrawableBalance >= 0
-                                    ? withdrawableBalance
-                                    : 0
-                                }
-                                suffix=" VOI"
-                                displayType={"text"}
-                                thousandSeparator={true}
-                              ></NumericFormat>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="withdraw-widget">
-                        <Grid container spacing={0}>
-                          <Grid item xs={12}>
-                            <FormControl
-                              style={{
-                                minHeight: 100,
-                              }}
-                              fullWidth
-                              variant="outlined"
-                            >
-                              <FormLabel className="classic-label flex">
-                                <div>Amount</div>
-                                <Button
-                                  disabled={availableBalance - 5000 <= 0}
-                                  variant="outlined"
-                                  onClick={() => {
-                                    if (withdrawableBalance > 0) {
-                                      setAmount(withdrawableBalance.toString());
-                                    } else {
-                                      showSnack(
-                                        "Withdrawable balance not available",
-                                        "error"
-                                      );
-                                    }
-                                  }}
-                                >
-                                  Max
-                                </Button>
-                              </FormLabel>
-                              <ShadedInput
-                                disabled={availableBalance - 5000 <= 0}
-                                placeholder={
-                                  availableBalance - 5000 <= 0
-                                    ? "Insufficient balance"
-                                    : "Enter amount"
-                                }
-                                value={amount}
-                                onChange={(ev) => {
-                                  if (availableBalance - 5000 <= 0) return;
-                                  setAmount(ev.target.value);
-                                }}
-                                fullWidth
-                                endAdornment={<div>VOI</div>}
-                              />
-                              {errorMessage ? (
-                                <label
-                                  style={{
-                                    color: "red",
-                                    fontSize: "12px",
-                                    marginTop: "5px",
-                                  }}
-                                  className="error"
-                                >
-                                  {errorMessage}
-                                </label>
-                              ) : null}
-                            </FormControl>
-                          </Grid>
-                          <Grid item xs={12}>
-                            <div
-                              className="props"
-                              style={{
-                                border: "1px solid #e0e0e0",
-                                backgroundColor: "#f9f9f9",
-                                borderRadius: 10,
-                                padding: 10,
-                              }}
-                            >
-                              <div className="prop">
-                                <div className="key">
-                                  Final Contract Balance
-                                </div>
-                                <div className="value">
-                                  <NumericFormat
-                                    value={
-                                      !isNumber(amount)
-                                        ? "-"
-                                        : microalgosToAlgos(
-                                            new CoreAccount(
-                                              stakingAccount
-                                            ).availableBalance() - minBalance
-                                          ) - Number(amount)
-                                    }
-                                    suffix=" VOI"
-                                    displayType={"text"}
-                                    thousandSeparator={true}
-                                    decimalScale={6}
-                                  ></NumericFormat>
-                                </div>
-                              </div>
-                              <div className="prop">
-                                <div className="key">Final Account Balance</div>
-                                <div className="value">
-                                  <NumericFormat
-                                    value={
-                                      availableBalance < 5000 ||
-                                      !isNumber(amount)
-                                        ? "-"
-                                        : microalgosToAlgos(
-                                            availableBalance - 5000
-                                          ) + Number(amount)
-                                    }
-                                    suffix=" VOI"
-                                    displayType={"text"}
-                                    thousandSeparator={true}
-                                    decimalScale={6}
-                                  ></NumericFormat>
-                                </div>
-                              </div>
-                            </div>
-                          </Grid>
-                          <Grid item xs={12}>
-                            <Button
-                              disabled={errorMessage !== ""}
-                              fullWidth
-                              variant={"contained"}
-                              color={"primary"}
-                              size={"large"}
-                              onClick={() => {
-                                withdraw(accountData);
-                              }}
-                            >
-                              Withdraw
-                            </Button>
-                          </Grid>
-                        </Grid>
-                      </div>
-                    </div>
-                  )}
 
-                <TransactionDetails
-                  id={txnId}
-                  show={Boolean(txnId)}
-                  onClose={() => {
-                    setTxnId("");
+          <DialogContent sx={{ flexGrow: 1 }}>
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              justifyContent="center"
+            >
+              {!acknowledge ? (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    textAlign: "left",
+                    fontSize: "0.9rem",
+                    background: "gainsboro",
+                    maxWidth: 400,
+                    padding: "10px",
+                    borderRadius: "10px",
+                    height: "225px",
                   }}
-                  msg={txnMsg}
-                ></TransactionDetails>
-              </div>
-            </div>
+                >
+                  Withdraw All will reduce the balance of all your contract
+                  accounts, potentially affecting their block proposal ability.
+                  The displayed amount is the total withdrawable balance from
+                  all your contracts. Confirm that you understand the potential
+                  effects.
+                </Typography>
+              ) : (
+                <Box
+                  sx={{
+                    position: "relative",
+                    top: 100,
+                  }}
+                >
+                  {withdrawableBalance < 0 ? (
+                    <CircularProgress size={72} />
+                  ) : (
+                    <BigNumberDisplay
+                      withdrawableAmount={
+                        withdrawableBalance >= 0
+                          ? microalgosToAlgos(withdrawableBalance)
+                          : 0
+                      }
+                    />
+                  )}
+                </Box>
+              )}
+            </Box>
           </DialogContent>
+
+          <Box sx={{ p: 2 }}>
+            <Button
+              disabled={!!acknowledge && withdrawableBalance <= 0}
+              fullWidth
+              variant="contained"
+              color="primary"
+              size="large"
+              onClick={() => {
+                if (!acknowledge) {
+                  setAcknowledge(true);
+                } else {
+                  withdraw();
+                }
+              }}
+            >
+              {acknowledge ? "Withdraw" : "I Understand"}
+            </Button>
+          </Box>
+
+          {txnId && (
+            <TransactionDetails
+              id={txnId}
+              show={Boolean(txnId)}
+              onClose={() => setTxnId("")}
+              msg={txnMsg}
+            />
+          )}
         </Dialog>
-      ) : (
-        ""
       )}
     </div>
   );
