@@ -46,7 +46,10 @@ function Register({
   const { showLoader, hideLoader } = useLoader();
 
   //const [participationId, setParticipationId] = useState<string>("");
-  const [parentAddress, setParentAddress] = useState<string>("");
+
+  const [parentAddress, setParentAddress] = useState<string>(
+    accountData.contractAddress
+  );
 
   const [selectionKey, setSelectionKey] = useState<string>("");
   const [stateProofKey, setStateProofKey] = useState<string>("");
