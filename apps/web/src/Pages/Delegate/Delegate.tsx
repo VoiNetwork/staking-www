@@ -15,7 +15,6 @@ import { isValidAddress, microalgosToAlgos } from "algosdk";
 import { CoreAccount, NodeClient, ZERO_ADDRESS_STRING } from "@repo/algocore";
 import { NumericFormat } from "react-number-format";
 import { useConfirm } from "material-ui-confirm";
-import { Contract } from "ulujs/types/arc200";
 import ContractPicker from "@/Components/pickers/ContractPicker/ContractPicker";
 
 function Delegate(): ReactElement {
