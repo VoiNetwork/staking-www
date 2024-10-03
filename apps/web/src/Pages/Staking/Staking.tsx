@@ -12,12 +12,15 @@ import {
   loadAvailableBalance,
 } from "../../Redux/staking/userReducer";
 import moment from "moment";
-import { Button, Stack, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import BlinkingText from "../../Components/BlinkingText/BlinkingText";
 import { STAKING_CTC_INFO, STAKING_FUNDER } from "@repo/voix";
 import Banner from "@/Components/Banner/Banner";
+import DeadlineCountdown from "@/Components/DeadlineCountdown/DeadlineCountdown";
 
 function Staking(): ReactElement {
+  const week1Deadline = new Date("2024-10-07T00:00:00"); // Replace with your Week 1 deadline date
+
   const { loading } = useSelector((state: RootState) => state.node);
   const { activeAccount } = useWallet();
 
@@ -102,7 +105,10 @@ function Staking(): ReactElement {
 
   return (
     <div className="overview-wrapper">
-      <Banner />
+      <DeadlineCountdown deadline={week1Deadline} />
+      <Box sx={{ mt: 5 }}>
+        <Banner />
+      </Box>
       <div className="overview-container">
         <div className="overview-header">
           <div style={{ marginLeft: "10px" }}>Staking</div>

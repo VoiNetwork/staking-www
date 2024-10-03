@@ -1,5 +1,5 @@
 import "./Deposit.scss";
-import { ReactElement, useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../Redux/store";
 import { useWallet } from "@txnlab/use-wallet-react";

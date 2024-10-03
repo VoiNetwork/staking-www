@@ -50,9 +50,12 @@ import Banner from "@/Components/Banner/Banner";
 import axios from "axios";
 import moment from "moment";
 import { useParams } from "react-router-dom";
+import DeadlineCountdown from "@/Components/DeadlineCountdown/DeadlineCountdown";
 
 function Overview(): ReactElement {
   const params = useParams<{ contractId: string }>();
+
+  const week1Deadline = new Date("2024-10-07T00:00:00"); // Replace with your Week 1 deadline date
 
   const { loading } = useSelector((state: RootState) => state.node);
   const { activeAccount } = useWallet();
@@ -379,7 +382,10 @@ function Overview(): ReactElement {
   return (
     <div className="overview-wrapper-component">
       <div className="overview-container">
-        <Banner />
+        <DeadlineCountdown deadline={week1Deadline} />
+        <Box sx={{ mt: 5 }}>
+          <Banner />
+        </Box>
         <div
           className="overview-header"
           style={{
