@@ -21,13 +21,17 @@ import Setting from "../../Pages/Setting/Setting";
 import voiStakingUtils from "../../utils/voiStakingUtils";
 import { CoreAccount } from "@repo/algocore";
 import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
-import { Box } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import logo from "../../assets/images/full-logo.png";
 import MobileMenu from "../../Components/MobilePanel";
 import "../App.scss";
 import StakingForecast from "@/Pages/StakingForecast/StakingForecast";
+import Banner from "@/Components/Banner/Banner";
+import DeadlineCountdown from "@/Components/DeadlineCountdown/DeadlineCountdown";
 
 function AppRouter(): ReactElement {
+  const week1Deadline = new Date("2024-10-07T00:00:00"); // Replace with your Week 1 deadline date
+
   const { selectedNode } = useSelector((state: RootState) => state.nodes);
   const { activeAccount } = useWallet();
 
@@ -107,64 +111,76 @@ function AppRouter(): ReactElement {
                 </div>
                 {selectedNode && (
                   <div className="content-body">
-                    {activeAccount && (
-                      <Routes>
-                        <Route
-                          path="/overview"
-                          element={<Overview></Overview>}
-                        ></Route>
-                        <Route
-                          path="/overview/:contractId"
-                          element={<Overview></Overview>}
-                        ></Route>
-                        <Route path="/stake" element={<Stake></Stake>}></Route>
-                        <Route
-                          path="/deposit"
-                          element={<Deposit></Deposit>}
-                        ></Route>
-                        <Route
-                          path="/withdraw"
-                          element={<Withdraw></Withdraw>}
-                        ></Route>
-                        {/*
+                    <Stack spacing={3} direction="column" className="mb-4">
+                      <DeadlineCountdown deadline={week1Deadline} />
+                      <Banner></Banner>
+                      {activeAccount && (
+                        <Routes>
+                          <Route
+                            path="/overview"
+                            element={<Overview></Overview>}
+                          ></Route>
+                          <Route
+                            path="/overview/:contractId"
+                            element={<Overview></Overview>}
+                          ></Route>
+                          <Route
+                            path="/stake"
+                            element={<Stake></Stake>}
+                          ></Route>
+                          <Route
+                            path="/deposit"
+                            element={<Deposit></Deposit>}
+                          ></Route>
+                          <Route
+                            path="/withdraw"
+                            element={<Withdraw></Withdraw>}
+                          ></Route>
+                          {/*
                         <Route
                           path="/transfer"
                           element={<Transfer></Transfer>}
                     ></Route>
                     */}
-                        <Route
-                          path="/delegate"
-                          element={<Delegate></Delegate>}
-                        ></Route>
-                        <Route
-                          path="/airdrop"
-                          element={<Airdrop></Airdrop>}
-                        ></Route>
-                        <Route
-                          path="/staking-forecast"
-                          element={<StakingForecast></StakingForecast>}
-                        ></Route>
-                        <Route
-                          path="/staking"
-                          element={<Staking></Staking>}
-                        ></Route>
-                        {/*<Route
+                          <Route
+                            path="/delegate"
+                            element={<Delegate></Delegate>}
+                          ></Route>
+                          <Route
+                            path="/airdrop"
+                            element={<Airdrop></Airdrop>}
+                          ></Route>
+                          <Route
+                            path="/staking-forecast"
+                            element={<StakingForecast></StakingForecast>}
+                          ></Route>
+                          <Route
+                            path="/staking"
+                            element={<Staking></Staking>}
+                          ></Route>
+                          {/*<Route
                           path="/setting"
                           element={<Setting></Setting>}
                         ></Route>*/}
-                        <Route
-                          path="/account"
-                          element={<Participate></Participate>}
-                        ></Route>
-                        <Route
-                          path="*"
-                          element={<Navigate to="/overview" replace />}
-                        />
-                      </Routes>
-                    )}
-                    {!activeAccount && (
-                      <div className="info-msg">Please connect your wallet</div>
-                    )}
+                          <Route
+                            path="/account"
+                            element={<Participate></Participate>}
+                          ></Route>
+                          <Route
+                            path="*"
+                            element={<Navigate to="/overview" replace />}
+                          />
+                        </Routes>
+                      )}
+                      {!activeAccount && (
+                        <>
+                          {/*<div className="info-msg">
+                            Please connect your wallet
+                          </div>*/}
+                          <StakingForecast />
+                        </>
+                      )}
+                    </Stack>
                   </div>
                 )}
                 <footer
