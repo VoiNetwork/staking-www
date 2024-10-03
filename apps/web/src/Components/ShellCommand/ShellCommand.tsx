@@ -11,6 +11,8 @@ interface ShellCommandProps {
   description: string;
 }
 
+const COPY_FEEDBACK_DURATION = 3000;
+
 const ShellCommand: React.FC<ShellCommandProps> = ({ command, description }) => {
     const [copied, setCopied] = useState(false);
 
@@ -18,7 +20,7 @@ const ShellCommand: React.FC<ShellCommandProps> = ({ command, description }) => 
         navigator.clipboard.writeText(command)
             .then(() => {
                 setCopied(true);
-                setTimeout(() => setCopied(false), 3000);
+                setTimeout(() => setCopied(false), COPY_FEEDBACK_DURATION);
             })
             .catch(err => {
                 console.error('Failed to copy text: ', err);
@@ -39,6 +41,7 @@ const ShellCommand: React.FC<ShellCommandProps> = ({ command, description }) => 
         startIcon={<CopyAll />}
         onClick={handleCopy}
         sx={{ marginTop: '10px' }}
+        aria-label="Copy command to clipboard"
         >
         {copied ? 'Copied!' : 'Copy'}
       </Button>
