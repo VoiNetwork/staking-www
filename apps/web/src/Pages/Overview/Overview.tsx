@@ -38,6 +38,7 @@ import Withdraw from "./Withdraw/Withdraw";
 import {
   initAccountData,
   loadAccountData,
+  loadContractState,
 } from "../../Redux/staking/userReducer";
 import ContractPicker from "../../Components/pickers/ContractPicker/ContractPicker";
 import humanizeDuration from "humanize-duration";
@@ -48,8 +49,11 @@ import Register from "./Register/Register";
 import Banner from "@/Components/Banner/Banner";
 import axios from "axios";
 import moment from "moment";
+import { useParams } from "react-router-dom";
 
 function Overview(): ReactElement {
+  const params = useParams<{ contractId: string }>();
+
   const { loading } = useSelector((state: RootState) => state.node);
   const { activeAccount } = useWallet();
 
@@ -234,39 +238,41 @@ function Overview(): ReactElement {
   const [nextExpire, setNextExpire] = useState<string>("--");
   useEffect(() => {
     if (!availableContracts) return;
-    new NodeClient(voiStakingUtils.network).status().then((status) => {
-      const currentRound = status["last-round"];
-      new BlockClient(voiStakingUtils.network)
-        .getAverageBlockTimeInMS()
-        .then((blockTimeMs) => {
-          const nextExpire = availableContracts
-            .filter(
-              (el) => !!el.part_vote_lst && el.part_vote_lst > currentRound
-            )
-            .reduce((acc, contract) => {
-              return Math.min(
-                acc,
-                contract.part_vote_lst || Number.MAX_SAFE_INTEGER
-              );
-            }, Number.MAX_SAFE_INTEGER);
-          if (nextExpire === Number.MAX_SAFE_INTEGER) return;
-          const diff = nextExpire - currentRound;
-          const diffMs = diff * blockTimeMs;
-          const nextExpireDuration = humanizeDuration(diffMs, {
-            largest: 2,
-            round: true,
+    new NodeClient(voiStakingUtils.network)
+      .status()
+      .then((status) => {
+        const currentRound = status["last-round"];
+        new BlockClient(voiStakingUtils.network)
+          .getAverageBlockTimeInMS()
+          .then((blockTimeMs) => {
+            const nextExpire = availableContracts
+              .filter(
+                (el) => !!el.part_vote_lst && el.part_vote_lst > currentRound
+              )
+              .reduce((acc, contract) => {
+                return Math.min(
+                  acc,
+                  contract.part_vote_lst || Number.MAX_SAFE_INTEGER
+                );
+              }, Number.MAX_SAFE_INTEGER);
+            if (nextExpire === Number.MAX_SAFE_INTEGER) return;
+            const diff = nextExpire - currentRound;
+            const diffMs = diff * blockTimeMs;
+            const nextExpireDuration = humanizeDuration(diffMs, {
+              largest: 2,
+              round: true,
+            });
+            setNextExpire(nextExpireDuration);
+          })
+          .catch((error) => {
+            console.error("Error fetching average block time:", error);
+            // Optionally, set a default value or state to inform the user
           });
-          setNextExpire(nextExpireDuration);
-        })
-        .catch((error) => {
-          console.error('Error fetching average block time:', error);
-          // Optionally, set a default value or state to inform the user
-        });
-    })
-    .catch((error) => {
-      console.error('Error fetching node status:', error);
-      // Optionally, set a default value or state to inform the user
-    });
+      })
+      .catch((error) => {
+        console.error("Error fetching node status:", error);
+        // Optionally, set a default value or state to inform the user
+      });
   }, [availableContracts]);
 
   const dispatch = useAppDispatch();
@@ -327,6 +333,11 @@ function Overview(): ReactElement {
     }
   }, [staking]);
 
+  useEffect(() => {
+    if (!accountData) return;
+    setTab(accountData.contractId);
+  }, [accountData]);
+
   const [minBalance, setMinBalance] = useState<number>(-1);
   useEffect(() => {
     if (!activeAccount || !contractState || !accountData) return;
@@ -344,7 +355,8 @@ function Overview(): ReactElement {
     return microalgosToAlgos(adjustedBalance);
   }, [minBalance, stakingAccount]);
 
-  const [tab, setTab] = useState(0);
+  const [tab, setTab] = useState(accountData?.contractId || 0);
+
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTab(newValue);
   };
@@ -502,6 +514,7 @@ function Overview(): ReactElement {
             {airdropContracts.map((contract, index) => {
               return (
                 <Tab
+                  value={contract.contractId}
                   className="tab"
                   key={contract.contractId}
                   label="Phase I"
@@ -517,6 +530,7 @@ function Overview(): ReactElement {
             {airdrop2Contracts.map((contract, index) => {
               return (
                 <Tab
+                  value={contract.contractId}
                   className="tab"
                   key={contract.contractId}
                   label="Phase II"
@@ -531,6 +545,7 @@ function Overview(): ReactElement {
             {stakingContracts.map((contract, index) => {
               return (
                 <Tab
+                  value={contract.contractId}
                   className="tab"
                   key={contract.contractId}
                   label={`Staking ${index + 1}`}
@@ -545,6 +560,7 @@ function Overview(): ReactElement {
             {otherContracts.map((contract, index) => {
               return (
                 <Tab
+                  value={contract.contractId}
                   key={contract.contractId}
                   label={contract.contractId}
                   {...a11yProps(index)}

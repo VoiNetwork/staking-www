@@ -113,6 +113,10 @@ function AppRouter(): ReactElement {
                           path="/overview"
                           element={<Overview></Overview>}
                         ></Route>
+                        <Route
+                          path="/overview/:contractId"
+                          element={<Overview></Overview>}
+                        ></Route>
                         <Route path="/stake" element={<Stake></Stake>}></Route>
                         <Route
                           path="/deposit"
