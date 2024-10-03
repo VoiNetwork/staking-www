@@ -502,7 +502,7 @@ function StakingForecast(): ReactElement {
                             amount + forecastedReward
                           ).toFixed(
                             3
-                          )} VOI. This will locked for ${humanizeDuration(
+                          )} VOI. This will be locked for ${humanizeDuration(
                             parseInt(lockupPeriod) * SECOND_IN_MONTH * 1000,
                             {
                               units: ["y", "mo"],
