@@ -21,7 +21,7 @@ import Setting from "../../Pages/Setting/Setting";
 import voiStakingUtils from "../../utils/voiStakingUtils";
 import { CoreAccount } from "@repo/algocore";
 import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
-import { Box, Stack } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import logo from "../../assets/images/full-logo.png";
 import MobileMenu from "../../Components/MobilePanel";
 import "../App.scss";
@@ -168,16 +168,30 @@ function AppRouter(): ReactElement {
                           ></Route>
                           <Route
                             path="*"
-                            element={<Navigate to="/overview" replace />}
+                            element={
+                              <Navigate to="/staking-forecast" replace />
+                            }
                           />
                         </Routes>
                       )}
                       {!activeAccount && (
                         <>
-                          {/*<div className="info-msg">
-                            Please connect your wallet
-                          </div>*/}
-                          <StakingForecast />
+                          <Routes>
+                            <Route
+                              path="*"
+                              element={
+                                <Navigate to="/staking-forecast" replace />
+                              }
+                            />
+                          </Routes>
+                          <Typography
+                            color="red"
+                            variant="h6"
+                            className="text-center"
+                          >
+                            Connect wallet or using forecasting tool below!
+                          </Typography>
+                          <StakingForecast></StakingForecast>
                         </>
                       )}
                     </Stack>
