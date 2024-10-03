@@ -184,20 +184,14 @@ function Overview(): ReactElement {
       );
     };
     const rate = (period: number) => {
-      switch (period) {
-        case 1:
-          return 10;
-        case 2:
-          return 12;
-        case 3:
-          return 15;
-        case 4:
-          return 18;
-        case 5:
-          return 20;
-        default:
-          return 0;
-      }
+      const rates: { [key: number]: number } = {
+        1: 10,
+        2: 12,
+        3: 15,
+        4: 18,
+        5: 20,
+      };
+      return rates[period] || 0;
     };
     let estimate = 0;
     if (airdrop2Contracts.length > 0) {
