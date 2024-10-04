@@ -91,7 +91,11 @@ function ConnectWallet({
                               {!wallet.isConnected ? (
                                 <Button
                                   sx={{ width: "100px" }}
-                                  onClick={wallet.connect}
+                                  onClick={() => {
+                                    wallet.connect().then(() => {
+                                      onClose && onClose();
+                                    });
+                                  }}
                                   variant={"outlined"}
                                   color="primary"
                                   size={"small"}

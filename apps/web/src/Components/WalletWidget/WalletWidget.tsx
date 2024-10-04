@@ -8,22 +8,24 @@ import ConnectWallet from "./ConnectWallet/ConnectWallet";
 import { BlockPackExplorer, CoreNode } from "@repo/algocore";
 import { RootState } from "../../Redux/store";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 function WalletWidget(): ReactElement {
+  const navigate = useNavigate();
   const [menuAnchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const { activeAccount, activeWallet } = useWallet();
   const [isConnectWalletVisible, setConnectWalletVisibility] =
     useState<boolean>(false);
 
   const { genesis, health, versionsCheck, status, ready } = useSelector(
-    (state: RootState) => state.node,
+    (state: RootState) => state.node
   );
   const coreNodeInstance = new CoreNode(
     status,
     versionsCheck,
     genesis,
     health,
-    ready,
+    ready
   );
 
   function closeMenu() {
@@ -84,7 +86,7 @@ function WalletWidget(): ReactElement {
                     ev.preventDefault();
                     closeMenu();
                     new BlockPackExplorer(coreNodeInstance).openAddress(
-                      activeAccount.address,
+                      activeAccount.address
                     );
                   }}
                 >
@@ -150,6 +152,7 @@ function WalletWidget(): ReactElement {
           show={isConnectWalletVisible}
           onClose={() => {
             setConnectWalletVisibility(false);
+            navigate("/overview");
           }}
         ></ConnectWallet>
       </div>
