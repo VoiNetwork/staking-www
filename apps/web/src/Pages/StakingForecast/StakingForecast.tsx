@@ -275,7 +275,7 @@ function StakingForecast(): ReactElement {
                                             href="https://voi.humble.sh"
                                             target="_blank"
                                           >
-                                            HumbPact Swap
+                                            Humble Swap
                                           </a>
                                           .
                                         </p>
@@ -648,7 +648,7 @@ function StakingForecast(): ReactElement {
                             href="https://voi.humble.sh"
                             target="_blank"
                           >
-                            HumbPact Swap
+                            Humble Swap
                           </a>
                           .
                         </p>
