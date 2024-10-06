@@ -1,7 +1,7 @@
 import "./Overview.scss";
 import React, { ReactElement, useEffect, useMemo, useState } from "react";
 import { useWallet } from "@txnlab/use-wallet-react";
-import { LoadingTile } from "@repo/ui";
+import { LoadingTile, useLoader, useSnackbar } from "@repo/ui";
 import {
   AccountData,
   AIRDROP_CTC_INFO,
@@ -26,11 +26,12 @@ import {
   Button,
   ButtonGroup,
   Grid,
+  Stack,
   Tab,
   Tabs,
   Typography,
 } from "@mui/material";
-import { microalgosToAlgos } from "algosdk";
+import algosdk, { microalgosToAlgos } from "algosdk";
 import { NumericFormat } from "react-number-format";
 import JsonViewer from "../../Components/JsonViewer/JsonViewer";
 import Deposit from "./Deposit/Deposit";
@@ -49,12 +50,16 @@ import Register from "./Register/Register";
 import axios from "axios";
 import moment from "moment";
 import { useParams } from "react-router-dom";
+import { useConfirm } from "material-ui-confirm";
+import { confirmationProps } from "@repo/theme";
+import { waitForConfirmation } from "@algorandfoundation/algokit-utils";
+import party from "party-js";
 
 function Overview(): ReactElement {
   const params = useParams<{ contractId: string }>();
 
   const { loading } = useSelector((state: RootState) => state.node);
-  const { activeAccount } = useWallet();
+  const { activeAccount, transactionSigner } = useWallet();
 
   const { account, staking, contract } = useSelector(
     (state: RootState) => state.user
@@ -374,6 +379,47 @@ function Overview(): ReactElement {
     setModalVisibility(false);
     dispatch(loadAccountData(activeAccount.address));
   };
+
+  const confirmation = useConfirm();
+
+  const { showLoader, hideLoader } = useLoader();
+  const { showException, showSnack } = useSnackbar();
+
+  async function deRegister() {
+    if (!activeAccount || !accountData) return;
+    try {
+      showLoader("Degistering your participation key");
+      const txnId = await new CoreStaker(accountData).stake(
+        voiStakingUtils.network.getAlgodClient(),
+        {
+          selK: new Uint8Array(32),
+          spKey: new Uint8Array(64),
+          voteK: new Uint8Array(32),
+          voteKd: 0,
+          voteFst: 0,
+          voteLst: 0,
+        },
+        {
+          addr: activeAccount.address,
+          signer: transactionSigner,
+        }
+      );
+      await waitForConfirmation(
+        txnId,
+        20,
+        voiStakingUtils.network.getAlgodClient()
+      );
+      dispatch(loadAccountData(activeAccount.address));
+      party.confetti(document.body, {
+        count: party.variation.range(200, 300),
+        size: party.variation.range(1, 1.4),
+      });
+    } catch (e) {
+      showException(e);
+    } finally {
+      hideLoader();
+    }
+  }
 
   return (
     <div className="overview-wrapper-component">
@@ -729,9 +775,31 @@ function Overview(): ReactElement {
                         />
                       </div>
                       <div className="content">
-                        {new CoreAccount(stakingAccount).isOnline()
-                          ? "Online"
-                          : "Offline"}
+                        {new CoreAccount(stakingAccount).isOnline() ? (
+                          <Stack
+                            direction="row"
+                            spacing={1}
+                            sx={{ alignItems: "center" }}
+                          >
+                            <span>Online</span>
+                            <Button
+                              variant="text"
+                              color="primary"
+                              onClick={() => {
+                                confirmation({
+                                  ...confirmationProps,
+                                  description: `You are trying to go offline with staking account ${stakingAccount.address}.Once you go offline, you will not be able to earn rewards producing blocks.`,
+                                })
+                                  .then(deRegister)
+                                  .catch(() => {});
+                              }}
+                            >
+                              Go Offline
+                            </Button>
+                          </Stack>
+                        ) : (
+                          "Offline"
+                        )}
                       </div>
                     </div>
                   </Grid>
