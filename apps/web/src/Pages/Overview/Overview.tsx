@@ -388,7 +388,7 @@ function Overview(): ReactElement {
   async function deRegister() {
     if (!activeAccount || !accountData) return;
     try {
-      showLoader("Degistering your participation key");
+      showLoader("Deregistering your participation key");
       const txnId = await new CoreStaker(accountData).stake(
         voiStakingUtils.network.getAlgodClient(),
         {
