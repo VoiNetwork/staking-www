@@ -788,7 +788,7 @@ function Overview(): ReactElement {
                               onClick={() => {
                                 confirmation({
                                   ...confirmationProps,
-                                  description: `You are trying to go offline with staking account ${stakingAccount.address}.Once you go offline, you will not be able to earn rewards producing blocks.`,
+                                  description: `You are trying to go offline with staking account ${stakingAccount.address}. Once you go offline, you will not be able to earn rewards producing blocks.`,
                                 })
                                   .then(deRegister)
                                   .catch(() => {});
