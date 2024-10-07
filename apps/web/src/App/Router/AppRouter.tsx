@@ -30,7 +30,26 @@ import Banner from "@/Components/Banner/Banner";
 import DeadlineCountdown from "@/Components/DeadlineCountdown/DeadlineCountdown";
 
 function AppRouter(): ReactElement {
-  const week1Deadline = new Date("2024-10-07T00:00:00Z"); // Replace with your Week 1 deadline date
+  const week1Deadline = new Date("2024-10-07T00:00:00Z");
+  const week2Deadline = new Date("2024-10-14T00:00:00Z");
+  const week3Deadline = new Date("2024-10-21T00:00:00Z");
+  const week4Deadline = new Date("2024-10-28T00:00:00Z");
+  const now = new Date().getUTCDate();
+  let whichWeek = 0;
+  let whichDeadline = week1Deadline;
+  if (now < week1Deadline) {
+    whichWeek = 1;
+    whichDeadline = week1Deadline;
+  } else if (now < week2Deadline) {
+    whichWeek = 2;
+    whichDeadline = week2Deadline;
+  } else if (now < week3Deadline) {
+    whichWeek = 3;
+    whichDeadline = week3Deadline;
+  } else if (now < week4Deadline) {
+    whichWeek = 4;
+    whichDeadline = week4Deadline;
+  }
 
   const { selectedNode } = useSelector((state: RootState) => state.nodes);
   const { activeAccount } = useWallet();
@@ -112,7 +131,10 @@ function AppRouter(): ReactElement {
                 {selectedNode && (
                   <div className="content-body">
                     <Stack spacing={3} direction="column" className="mb-4">
-                      <DeadlineCountdown deadline={week1Deadline} />
+                      <DeadlineCountdown
+                        week={whichWeek}
+                        deadline={week2Deadline}
+                      />
                       <Banner></Banner>
                       {activeAccount && (
                         <Routes>
