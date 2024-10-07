@@ -30,7 +30,22 @@ import Banner from "@/Components/Banner/Banner";
 import DeadlineCountdown from "@/Components/DeadlineCountdown/DeadlineCountdown";
 
 function AppRouter(): ReactElement {
-  const week1Deadline = new Date("2024-10-07T00:00:00"); // Replace with your Week 1 deadline date
+  const deadlines = [
+    new Date("2024-10-07T00:00:00Z"),
+    new Date("2024-10-14T00:00:00Z"),
+    new Date("2024-10-21T00:00:00Z"),
+    new Date("2024-10-28T00:00:00Z"),
+  ];
+  const now = new Date().getTime();
+  let whichWeek = 0;
+  let whichDeadline = deadlines[deadlines.length - 1];
+  for (let i = 0; i < deadlines.length; i++) {
+    if (now < deadlines[i].getTime()) {
+      whichWeek = i + 1;
+      whichDeadline = deadlines[i];
+      break;
+    }
+  }
 
   const { selectedNode } = useSelector((state: RootState) => state.nodes);
   const { activeAccount } = useWallet();
@@ -112,7 +127,10 @@ function AppRouter(): ReactElement {
                 {selectedNode && (
                   <div className="content-body">
                     <Stack spacing={3} direction="column" className="mb-4">
-                      <DeadlineCountdown deadline={week1Deadline} />
+                      <DeadlineCountdown
+                        week={whichWeek}
+                        deadline={whichDeadline}
+                      />
                       <Banner></Banner>
                       {activeAccount && (
                         <Routes>
@@ -168,9 +186,7 @@ function AppRouter(): ReactElement {
                           ></Route>
                           <Route
                             path="*"
-                            element={
-                              <Navigate to="/staking-forecast" replace />
-                            }
+                            element={<Navigate to="/overview" replace />}
                           />
                         </Routes>
                       )}
@@ -185,11 +201,15 @@ function AppRouter(): ReactElement {
                             />
                           </Routes>
                           <Typography
-                            style={{ color: 'rgba(112, 42, 226, 0.8)', fontWeight: 'bold' }}
+                            style={{
+                              color: "rgba(112, 42, 226, 0.8)",
+                              fontWeight: "bold",
+                            }}
                             variant="h6"
                             className="text-center"
                           >
-                            Connect your wallet or use the forecasting tool below!
+                            Connect your wallet or use the forecasting tool
+                            below!
                           </Typography>
                           <StakingForecast></StakingForecast>
                         </>

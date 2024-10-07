@@ -1,5 +1,5 @@
 import "./Transfer.scss";
-import { ReactElement, useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../Redux/store";
 import { useWallet } from "@txnlab/use-wallet-react";
@@ -161,7 +161,6 @@ function Transfer(): ReactElement {
                         />
                       </FormControl>
                     </Grid>
-                    <Grid item xs={12} sm={12} md={12} lg={12} xl={12}></Grid>
                     <Grid item xs={12} sm={12} md={4} lg={3} xl={3}>
                       <Button
                         variant={"contained"}

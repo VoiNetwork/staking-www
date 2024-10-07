@@ -60,7 +60,7 @@ const Banner: React.FC<BannerProps> = (props) => {
           rel="noopener"
           sx={{ color: "#fff", textDecoration: "none" }}
         >
-          HumbPact
+          Humble Swap
         </Button>
         <Button
           component={Link}
