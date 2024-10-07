@@ -133,7 +133,7 @@ function AppRouter(): ReactElement {
                     <Stack spacing={3} direction="column" className="mb-4">
                       <DeadlineCountdown
                         week={whichWeek}
-                        deadline={week2Deadline}
+                        deadline={whichDeadline}
                       />
                       <Banner></Banner>
                       {activeAccount && (
