@@ -34,7 +34,7 @@ function AppRouter(): ReactElement {
   const week2Deadline = new Date("2024-10-14T00:00:00Z");
   const week3Deadline = new Date("2024-10-21T00:00:00Z");
   const week4Deadline = new Date("2024-10-28T00:00:00Z");
-  const now = new Date().getUTCDate();
+  const now = new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate()));
   let whichWeek = 0;
   let whichDeadline = week1Deadline;
   if (now < week1Deadline) {
