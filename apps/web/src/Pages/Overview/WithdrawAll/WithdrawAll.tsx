@@ -35,14 +35,7 @@ import algosdk, { algosToMicroalgos, microalgosToAlgos } from "algosdk";
 import Withdraw from "../../Withdraw/Withdraw";
 import { abi, CONTRACT } from "ulujs";
 import { AirdropClient, APP_SPEC } from "@repo/voix/src/clients/AirdropClient";
-
-// TODO export to utils
-function zip<T>(...arrays: T[][]): T[][] {
-  const maxLength = Math.min(...arrays.map((arr) => arr.length));
-  return Array.from({ length: maxLength }, (_, i) =>
-    arrays.map((arr) => arr[i])
-  );
-}
+import _ from 'lodash';
 
 interface BigNumberDisplayProps {
   withdrawableAmount: number | string; // Can be a number or string
@@ -136,7 +129,7 @@ function WithdrawAll({ show, onClose }: LockupProps): ReactElement {
         bals.push(bal);
       }
       // zip available contracts with min balances
-      const zipped = zip(apids, bals, minbals)
+      const zipped = _.zip(apids, bals, minbals)
         .map(([apid, bal, mb]) => [apid, Math.abs(bal - mb)])
         .filter(([_, mb]) => mb > 0);
       if (zipped.length === 0) {
