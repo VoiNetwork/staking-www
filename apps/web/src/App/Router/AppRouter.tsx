@@ -30,25 +30,21 @@ import Banner from "@/Components/Banner/Banner";
 import DeadlineCountdown from "@/Components/DeadlineCountdown/DeadlineCountdown";
 
 function AppRouter(): ReactElement {
-  const week1Deadline = new Date("2024-10-07T00:00:00Z");
-  const week2Deadline = new Date("2024-10-14T00:00:00Z");
-  const week3Deadline = new Date("2024-10-21T00:00:00Z");
-  const week4Deadline = new Date("2024-10-28T00:00:00Z");
-  const now = new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate()));
+  const deadlines = [
+    new Date("2024-10-07T00:00:00Z"),
+    new Date("2024-10-14T00:00:00Z"),
+    new Date("2024-10-21T00:00:00Z"),
+    new Date("2024-10-28T00:00:00Z"),
+  ];
+  const now = new Date().getTime();
   let whichWeek = 0;
-  let whichDeadline = week1Deadline;
-  if (now < week1Deadline) {
-    whichWeek = 1;
-    whichDeadline = week1Deadline;
-  } else if (now < week2Deadline) {
-    whichWeek = 2;
-    whichDeadline = week2Deadline;
-  } else if (now < week3Deadline) {
-    whichWeek = 3;
-    whichDeadline = week3Deadline;
-  } else if (now < week4Deadline) {
-    whichWeek = 4;
-    whichDeadline = week4Deadline;
+  let whichDeadline = deadlines[deadlines.length - 1];
+  for (let i = 0; i < deadlines.length; i++) {
+    if (now < deadlines[i].getTime()) {
+      whichWeek = i + 1;
+      whichDeadline = deadlines[i];
+      break;
+    }
   }
 
   const { selectedNode } = useSelector((state: RootState) => state.nodes);
