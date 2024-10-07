@@ -7,35 +7,24 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
-  FormControl,
-  FormLabel,
-  Grid,
-  MenuItem,
-  Select,
-  Skeleton,
   Typography,
 } from "@mui/material";
-import { Close, Label } from "@mui/icons-material";
-import { ModalGrowTransition, ShadedInput } from "@repo/theme";
-import { AccountData, CoreStaker, StakingContractState } from "@repo/voix";
+import { Close } from "@mui/icons-material";
+import { ModalGrowTransition } from "@repo/theme";
+import { CoreStaker } from "@repo/voix";
 import voiStakingUtils from "../../../utils/voiStakingUtils";
-import { waitForConfirmation } from "@algorandfoundation/algokit-utils";
 import { useWallet } from "@txnlab/use-wallet-react";
 import { useLoader, useSnackbar } from "@repo/ui";
 import { useSelector } from "react-redux";
-import { RootState, useAppDispatch } from "../../../Redux/store";
-import { isNumber } from "@repo/utils";
-import { AlgoAmount } from "@algorandfoundation/algokit-utils/types/amount";
-import { loadAccountData } from "../../../Redux/staking/userReducer";
-import { CoreAccount, NodeClient } from "@repo/algocore";
+import { RootState } from "../../../Redux/store";
+import { CoreAccount } from "@repo/algocore";
 import { AccountResult } from "@algorandfoundation/algokit-utils/types/indexer";
 import TransactionDetails from "../../../Components/TransactionDetails/TransactionDetails";
 import { NumericFormat } from "react-number-format";
-import algosdk, { algosToMicroalgos, microalgosToAlgos } from "algosdk";
-import Withdraw from "../../Withdraw/Withdraw";
+import algosdk, { microalgosToAlgos } from "algosdk";
 import { abi, CONTRACT } from "ulujs";
-import { AirdropClient, APP_SPEC } from "@repo/voix/src/clients/AirdropClient";
-import _ from 'lodash';
+import { APP_SPEC } from "@repo/voix/src/clients/AirdropClient";
+import _ from "lodash";
 
 interface BigNumberDisplayProps {
   withdrawableAmount: number | string; // Can be a number or string
@@ -56,7 +45,7 @@ const BigNumberDisplay: React.FC<BigNumberDisplayProps> = ({
       <Typography variant="body1" color="textSecondary">
         <NumericFormat
           value={withdrawableAmount}
-          suffix=" VOI"
+          suffix={` ${tokenSymbol}`}
           displayType={"text"}
           thousandSeparator={true}
         ></NumericFormat>
@@ -78,21 +67,16 @@ function WithdrawAll({ show, onClose }: LockupProps): ReactElement {
   }
 
   function resetState() {
-    setAmount("");
     setTxnId("");
     setTxnMsg("");
   }
 
-  const { transactionSigner, activeAccount, signTransactions } = useWallet();
+  const { activeAccount, signTransactions } = useWallet();
 
   const { showException, showSnack } = useSnackbar();
   const { showLoader, hideLoader } = useLoader();
 
-  const { loading } = useSelector((state: RootState) => state.node);
-
-  const { account, staking, contract } = useSelector(
-    (state: RootState) => state.user
-  );
+  const { account } = useSelector((state: RootState) => state.user);
 
   const { availableContracts } = account;
 
@@ -128,7 +112,6 @@ function WithdrawAll({ show, onClose }: LockupProps): ReactElement {
         const bal = acc.availableBalance();
         bals.push(bal);
       }
-      // zip available contracts with min balances
       const zipped = _.zip(apids, bals, minbals)
         .map(([apid, bal, mb]) => [apid, Math.abs(bal - mb)])
         .filter(([_, mb]) => mb > 0);
@@ -186,70 +169,23 @@ function WithdrawAll({ show, onClose }: LockupProps): ReactElement {
     return zipped.reduce((acc, [_, mb]) => acc + mb, 0);
   }, [zipped]);
 
-  console.log({ txnR, zipped });
-
   const [txnId, setTxnId] = useState<string>("");
   const [txnMsg, setTxnMsg] = useState<string>("");
 
-  const [amount, setAmount] = useState<string>("");
-
-  const accountData = account.data;
-  const stakingAccount = staking.account;
-  const contractState = contract.state;
-
-  const isDataLoading =
-    loading || account.loading || staking.loading || contract.loading;
-
   async function withdraw() {
     if (!txnR.success) return;
-
-    const algodClient = voiStakingUtils.network.getAlgodClient();
-
-    const stxns = await signTransactions(
-      txnR.txns.map((txn: string) => new Uint8Array(Buffer.from(txn, "base64")))
-    );
-
-    algodClient.sendRawTransaction(stxns as Uint8Array[]).do();
-
-    onClose();
-
-    console.log({ txnR, zipped });
-
-    // if (!activeAccount) {
-    //   showSnack("Please connect your wallet", "error");
-    //   return;
-    // }
-
-    // if (!amount || !isNumber(amount)) {
-    //   showSnack("Invalid amount", "error");
-    //   return;
-    // }
-
-    // try {
-    //   showLoader("Withdrawal in progress");
-    //   const transaction = await new CoreStaker(data).withdraw(
-    //     voiStakingUtils.network.getAlgodClient(),
-    //     AlgoAmount.Algos(Number(amount)).microAlgos,
-    //     {
-    //       addr: activeAccount.address,
-    //       signer: transactionSigner,
-    //     }
-    //   );
-    //   const txnId = transaction.txID();
-    //   await waitForConfirmation(
-    //     txnId,
-    //     20,
-    //     voiStakingUtils.network.getAlgodClient()
-    //   );
-
-    //   setTxnId(txnId);
-    //   setTxnMsg("You have withdrawn successfully.");
-    //   resetState();
-    // } catch (e) {
-    //   showException(e);
-    // } finally {
-    //   hideLoader();
-    // }
+    try {
+      const algodClient = voiStakingUtils.network.getAlgodClient();
+      const stxns = await signTransactions(
+        txnR.txns.map(
+          (txn: string) => new Uint8Array(Buffer.from(txn, "base64"))
+        )
+      );
+      algodClient.sendRawTransaction(stxns as Uint8Array[]).do();
+      onClose();
+    } catch (e) {
+      showException(e);
+    }
   }
 
   const errorMessage = "";

@@ -86,6 +86,7 @@
     ]
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.10",
     "sass": "^1.69.6"
   }
 }
