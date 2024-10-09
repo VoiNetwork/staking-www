@@ -21,12 +21,12 @@ const Wrapper=styled.div`
         /* transform: translateY(-100%); */
     }
 `
-const CopyText = ({ text }: { text: string }) => {
+const CopyText = ({ text }: { text: string|number }) => {
   const [copyStatus, setCopyStatus] = React.useState<'idle' | 'success' | 'error'>('idle');
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(text?.toString());
       setCopyStatus('success');
     } catch (err) {
       console.error('Failed to copy text: ', err);
@@ -38,6 +38,7 @@ const CopyText = ({ text }: { text: string }) => {
     }, 2000);
   };
 
+  if(!text) return <></>
   return (
     <Wrapper className="relative">
       <button

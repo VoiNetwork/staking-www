@@ -935,7 +935,7 @@ function Overview(): ReactElement {
                 <div className="props">
                   <div className="prop">
                     <div className="key">
-                      Owner Account <CopyText text={activeAccount?.address!} />
+                      Owner Account <CopyText text={activeAccount.address!} />
                     </div>
                     <div
                       className="val hover hover-underline underline truncate"
@@ -994,7 +994,7 @@ function Overview(): ReactElement {
                           <CopyText
                             text={new CoreStaker(accountData).delegateAddress(
                               contractState
-                            )}
+                            )!}
                           />
                         )}
                       </div>

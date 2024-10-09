@@ -24,6 +24,8 @@ import { isNumber } from "@repo/utils";
 import party from "party-js";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ShellCommand from "@/Components/ShellCommand/ShellCommand";
+import { Clipboard } from "lucide-react";
+import { pasteFromClipboard } from "@/utils/pasteFromClipboard";
 
 interface RegisterProps {
   show: boolean;
@@ -59,6 +61,19 @@ function Register({
 
   const [voteFirst, setVoteFirst] = useState<string>("");
   const [voteLast, setVoteLast] = useState<string>("");
+
+  const handlePaste =async () => {
+    const value =await pasteFromClipboard();
+    if(value?.value){
+      setSelectionKey(value?.value?.selectionKey);
+      setStateProofKey(value?.value?.stateProofKey);
+      setVoteKey(value?.value?.voteKey);
+      setVoteKeyDilution(value?.value?.voteKeyDilution.toString());
+      setVoteFirst(value?.value?.voteFirst.toString());
+      setVoteLast(value?.value?.voteLast.toString());
+    }
+  };
+
 
   function handleClose() {
     onClose();
@@ -256,7 +271,11 @@ function Register({
                       </Grid>
                       <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
                         <Typography variant="h6" gutterBottom>
-                          Enter participation key info:
+                          Enter participation key info:{" "}
+                          <Button onClick={handlePaste} variant="contained" className="flex gap-2">
+                            <Clipboard size={15} className="text-sm " />
+                            Paste
+                          </Button>
                         </Typography>
                       </Grid>
                       {/*
