@@ -12,7 +12,7 @@ import {
   loadAvailableBalance,
 } from "../../Redux/staking/userReducer";
 import moment from "moment";
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Button, Stack, Typography } from "@mui/material";
 import BlinkingText from "../../Components/BlinkingText/BlinkingText";
 import { STAKING_CTC_INFO, STAKING_FUNDER } from "@repo/voix";
 
@@ -20,9 +20,7 @@ function Staking(): ReactElement {
   const { loading } = useSelector((state: RootState) => state.node);
   const { activeAccount } = useWallet();
 
-  const { account, staking, contract } = useSelector(
-    (state: RootState) => state.user
-  );
+  const { account, staking } = useSelector((state: RootState) => state.user);
 
   const { availableContracts } = account;
 

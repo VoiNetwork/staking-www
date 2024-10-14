@@ -228,8 +228,6 @@ function Lockup({
     dispatch(loadAvailableBalance(activeAccount.address));
   }, [activeAccount]);
 
-  console.log({ availableBalance });
-
   const [accountInfo, setAccountInfo] = useState<any>(null);
   useEffect(() => {
     if (activeAccount) {
@@ -242,8 +240,6 @@ function Lockup({
         });
     }
   }, [activeAccount]);
-
-  console.log({ accountInfo });
 
   const { showException, showSnack } = useSnackbar();
   const { showLoader, hideLoader } = useLoader();
@@ -393,11 +389,8 @@ function Lockup({
                             algosToMicroalgos(Number(amount)) <=
                               availableBalance - txnCost ? (
                               <NumericFormat
-                                value={Math.max(
-                                  0,
-                                  microalgosToAlgos(
-                                    availableBalance - txnCost - 1e6
-                                  )
+                                value={microalgosToAlgos(
+                                  Math.max(0, availableBalance - txnCost - 1e6)
                                 )}
                                 suffix=" VOI available"
                                 displayType={"text"}
