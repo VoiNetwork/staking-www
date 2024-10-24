@@ -24,6 +24,17 @@ function App(): ReactElement {
     walletConnectProjectId = "e2fef7cf17012eaba443b7cf615f7815";
   }
 
+  const walletConnectOptions = {
+    projectId: walletConnectProjectId,
+    metadata: {
+      name: "VoiX",
+      url: "https://staking.voi.network",
+      description: "Voi Staking Platform",
+      icons: ["https://staking.voi.network/favicon.ico"],
+    },
+    themeMode: "light",
+  };
+
   const walletManager = new WalletManager({
     wallets: [
       WalletId.KIBISIS,
@@ -32,17 +43,12 @@ function App(): ReactElement {
         options: { siteName: "VoiX" },
       },
       {
+        id: WalletId.BIATEC,
+        options: walletConnectOptions,
+      },
+      {
         id: WalletId.WALLETCONNECT,
-        options: {
-          projectId: walletConnectProjectId,
-          metadata: {
-            name: "VoiX",
-            url: "https://staking.voi.network",
-            description: "Voi Staking Platform",
-            icons: ["https://staking.voi.network/favicon.ico"],
-          },
-          themeMode: "light",
-        },
+        options: walletConnectOptions,
       },
     ],
     algod: {
