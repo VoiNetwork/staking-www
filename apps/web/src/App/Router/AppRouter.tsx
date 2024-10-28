@@ -127,10 +127,12 @@ function AppRouter(): ReactElement {
                 {selectedNode && (
                   <div className="content-body">
                     <Stack spacing={3} direction="column" className="mb-4">
+                      {/*
                       <DeadlineCountdown
                         week={whichWeek}
                         deadline={whichDeadline}
                       />
+                      */}
                       <Banner></Banner>
                       {activeAccount && (
                         <Routes>
@@ -168,6 +170,7 @@ function AppRouter(): ReactElement {
                             path="/airdrop"
                             element={<Airdrop></Airdrop>}
                           ></Route>
+                          {/*
                           <Route
                             path="/staking-forecast"
                             element={<StakingForecast></StakingForecast>}
@@ -176,7 +179,7 @@ function AppRouter(): ReactElement {
                             path="/staking"
                             element={<Staking></Staking>}
                           ></Route>
-                          {/*<Route
+                          <Route
                           path="/setting"
                           element={<Setting></Setting>}
                         ></Route>*/}

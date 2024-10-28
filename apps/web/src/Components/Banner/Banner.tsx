@@ -13,23 +13,22 @@ const BannerWrapper = styled(Box)`
   }
 
   @media (max-width: 640px) {
-  /* max-width: 90vw; */
-  margin-inline: auto;
+    /* max-width: 90vw; */
+    margin-inline: auto;
 
     .buttons {
       display: flex;
       flex-wrap: wrap;
-      gap:2px;
-      
+      gap: 2px;
     }
     .button {
       font-size: small;
-      background: hsl(0, 0%, 0%,0.8);
+      background: hsl(0, 0%, 0%, 0.8);
       border-radius: 8px;
       backdrop-filter: blur(5px);
       transition: color 0.3s ease-in-out;
-      :hover{
-        background: hsl(0, 0%, 0%,0.5);
+      :hover {
+        background: hsl(0, 0%, 0%, 0.5);
       }
     }
   }
@@ -102,6 +101,7 @@ const Banner: React.FC<BannerProps> = (props) => {
         >
           Humble Swap
         </Button>
+        {/*
         <Button
           component={Link}
           className="button"
@@ -112,6 +112,7 @@ const Banner: React.FC<BannerProps> = (props) => {
         >
           Staking Guide
         </Button>
+        */}
       </Stack>
     </BannerWrapper>
   );

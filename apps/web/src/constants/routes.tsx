@@ -10,8 +10,10 @@ export const stakingRoutes: string[] = ["staking"];
 export const settingRoutes: string[] = ["setting"];
 export const dashboardRoutes: string[] = [
   "overview",
+  /*
   "stake",
   "staking",
+  */
   "deposit",
   "withdraw",
   "transfer",
@@ -36,7 +38,6 @@ export const dashboardTabs = [
     value: "stake",
     icon: <AdjustOutlined></AdjustOutlined>,
   },
-  */
   {
     label: "Staking Forecast",
     value: "staking-forecast",
@@ -47,7 +48,6 @@ export const dashboardTabs = [
     value: "staking",
     icon: <LockClockIcon></LockClockIcon>,
   },
-  /*
   {
     label: "Deposit",
     value: "deposit",
