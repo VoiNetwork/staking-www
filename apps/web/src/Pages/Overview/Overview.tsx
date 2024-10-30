@@ -31,7 +31,7 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
-import algosdk, { microalgosToAlgos } from "algosdk";
+import { microalgosToAlgos } from "algosdk";
 import { NumericFormat } from "react-number-format";
 import JsonViewer from "../../Components/JsonViewer/JsonViewer";
 import Deposit from "./Deposit/Deposit";
@@ -39,16 +39,12 @@ import Withdraw from "./Withdraw/Withdraw";
 import {
   initAccountData,
   loadAccountData,
-  loadContractState,
 } from "../../Redux/staking/userReducer";
 import ContractPicker from "../../Components/pickers/ContractPicker/ContractPicker";
 import humanizeDuration from "humanize-duration";
 import { InfoTooltip } from "../../Components/InfoToolTip/InfoToolTip";
-import { Copy } from "lucide-react";
 import CopyText from "@/Components/Copy";
 import Register from "./Register/Register";
-import axios from "axios";
-import moment from "moment";
 import { useParams } from "react-router-dom";
 import WithdrawAll from "./WithdrawAll/WithdrawAll";
 import { useConfirm } from "material-ui-confirm";
@@ -115,122 +111,6 @@ function Overview(): ReactElement {
       )
     );
   }, [availableContracts]);
-
-  const [estimatedReward, setEstimatedReward] = useState<number>(0);
-  useEffect(() => {
-    if (!activeAccount) return;
-    axios
-      .get(`https://voirewards.com/api/phase2?wallet=${activeAccount.address}`)
-      .then((res) => {
-        setEstimatedReward(res.data?.estimatedReward || 0);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, [activeAccount]);
-
-  function getWeeksFromTime(
-    startTime: Date,
-    currentUnixTime = moment().unix()
-  ): number {
-    const startUnixTime = moment(startTime).unix(); // Start time in Unix timestamp
-
-    const secondsPerWeek = 60 * 60 * 24 * 7;
-
-    const timeDifference = currentUnixTime - startUnixTime;
-    const weeksPassed = Math.floor(timeDifference / secondsPerWeek);
-
-    return weeksPassed;
-  }
-
-  const startTime = new Date("2024-09-30T00:00:00Z"); // start of week 1
-
-  const weeksPassed = getWeeksFromTime(startTime);
-
-  function computeLockupMultiplier(B2: number, R1: number) {
-    if (B2 <= 12) {
-      return 0.45 * Math.pow(B2 / R1, 2);
-    } else {
-      return Math.pow(B2 / R1, 2);
-    }
-  }
-
-  function computeTimingMultiplier(week: number) {
-    switch (week) {
-      case 1:
-        return 1;
-      case 2:
-        return 0.8;
-      case 3:
-        return 0.6;
-      case 4:
-        return 0.4;
-      default:
-        return 0;
-    }
-  }
-
-  const period_limit = 5;
-
-  const computeRate = (week: number) => (period: number) => {
-    const lockupMultiplier = computeLockupMultiplier(period, period_limit);
-    const timingMultiplier = computeTimingMultiplier(week);
-    return lockupMultiplier * timingMultiplier;
-  };
-
-  const [airdropEstimatedReward, setAirdropEstimatedReward] =
-    useState<number>(0);
-  useEffect(() => {
-    const calculateCompoundInterest = (
-      principal: number,
-      rate: number,
-      time: number,
-      compoundingsPerYear: number
-    ) => {
-      const r = rate / 100; // Convert percentage to decimal
-      return (
-        principal *
-        Math.pow(1 + r / compoundingsPerYear, compoundingsPerYear * time)
-      );
-    };
-    const rate = (period: number) => {
-      const rates: { [key: number]: number } = {
-        1: 10,
-        2: 12,
-        3: 15,
-        4: 18,
-        5: 20,
-      };
-      return rates[period] || 0;
-    };
-    let estimate = 0;
-    if (airdrop2Contracts.length > 0) {
-      const { global_period } = airdrop2Contracts[0];
-      estimate +=
-        calculateCompoundInterest(
-          estimatedReward,
-          rate(global_period),
-          global_period,
-          1
-        ) * 1e6;
-    }
-    if (airdropContracts.length > 0) {
-      const airdropTotal = airdropContracts.reduce((acc, contract) => {
-        const { global_period, global_initial } = contract;
-        return (
-          acc +
-          calculateCompoundInterest(
-            Number(global_initial),
-            rate(global_period),
-            global_period,
-            1
-          )
-        );
-      }, 0);
-      estimate += airdropTotal;
-    }
-    setAirdropEstimatedReward(Math.round(estimate));
-  }, [estimatedReward, airdropContracts, airdrop2Contracts]);
 
   const [stakedTotal, setStakedTotal] = useState<number>(0);
   useEffect(() => {
@@ -462,36 +342,6 @@ function Overview(): ReactElement {
                     suffix=""
                     displayType={"text"}
                     thousandSeparator={true}
-                  ></NumericFormat>
-                </div>
-              </div>
-            </Grid>
-            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-              <div className="tile">
-                <div className="title">
-                  <div className="label">Airdrop Estimate</div>
-                  <InfoTooltip
-                    title={
-                      <div>
-                        <Typography variant="h6">Airdrop Estimate</Typography>
-                        <Typography variant="body2">
-                          Estimated reward for the airdrop program.
-                        </Typography>
-                      </div>
-                    }
-                  />
-                </div>
-                <div className="content">
-                  <NumericFormat
-                    value={
-                      airdropEstimatedReward > 0
-                        ? microalgosToAlgos(airdropEstimatedReward)
-                        : 0
-                    }
-                    suffix=" Voi"
-                    displayType={"text"}
-                    thousandSeparator={true}
-                    decimalScale={0}
                   ></NumericFormat>
                 </div>
               </div>
