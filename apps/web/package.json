@@ -22,7 +22,7 @@
     "@repo/utils": "*",
     "@repo/voix": "*",
     "@rollup/plugin-inject": "^5.0.5",
-    "@txnlab/use-wallet-react": "^3.0.0-rc.3",
+    "@txnlab/use-wallet-react": "^3.9.0",
     "@types/humanize-duration": "^3.27.4",
     "@types/is-utf8": "^0.2.3",
     "@types/qrcode.react": "^1.0.5",
