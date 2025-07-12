@@ -64,22 +64,12 @@ const Banner: React.FC<BannerProps> = (props) => {
         <Button
           component={Link}
           className="button"
-          href="https://www.mexc.com/exchange/VOI_USDT"
+          href="https://ibuyvoi.com"
           target="_blank"
           rel="noopener"
           sx={{ color: "#fff", textDecoration: "none" }}
         >
-          MEXC
-        </Button>
-        <Button
-          component={Link}
-          className="button"
-          href="https://www.coinstore.com/spot/VOIUSDT"
-          target="_blank"
-          rel="noopener"
-          sx={{ color: "#fff", textDecoration: "none" }}
-        >
-          Coinstore
+          iBuyVoi.com
         </Button>
         <Button
           component={Link}
